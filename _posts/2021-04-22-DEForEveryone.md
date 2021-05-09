@@ -27,7 +27,7 @@ Data engineers are responsible for the first step of the process: ingesting coll
 * Remove corrupted data 
 * Develop, construct, test, and maintain architectures such as databases and large-scale processing systems to process and handle massive amounts of data. 
 
-### 1.3. Big Data
+## 1.3. Big Data
 
 Big data becomes the norm, therefore data engineers are more and more needed. 
 * Have to think about how to deal with its size. 
@@ -42,7 +42,7 @@ Big data is commonly characterized by five Vs:
 
 Data engineers need to take all of this into consideration.
 
-### 1.4. Data Engineer and Data Scientist
+## 1.4. Data Engineer and Data Scientist
 
 Data engineers enable data scientists
 
@@ -239,8 +239,6 @@ Software: Apache Spark
 
 Batches and streams
 
-Batches and streams
-
 Batches:
 * Group records at specific intervals
 * Often cheaper because you can schedule it when resources aren't being used elsewhere, typically overnight
@@ -266,7 +264,7 @@ When big data processing tools perform a processing task:
 * Subtasks are then distributed over several computers.
 
 Benefits: 
-*Extra processing power (more processing units, divide works into multiple units => faster)
+* Extra processing power (more processing units, divide works into multiple units => faster)
 * Reduced memory footprint (Instead of needing to load all of the data in one computer's memory, you can partition the data and load the subsets into memory of different computers)
 
 Risks:
@@ -326,4 +324,4 @@ Disadvantages:
 
 # 4. Reference
 
-1. [Data Engineering for Anyone - DataCamp](https://campus.datacamp.com/courses/data-engineering-for-everyone)
+1. [Data Engineering for Everyone - DataCamp](https://campus.datacamp.com/courses/data-engineering-for-everyone)
