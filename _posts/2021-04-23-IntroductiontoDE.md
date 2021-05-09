@@ -1,7 +1,7 @@
 ---
 layout: post
-author: phamdinhkhanh
-title: Bài 56 - Knowledge Distillation
+author: ledinhtrunghieu
+title: Lesson 2 - Introduction to Data Engineering
 ---
 
 # 1. Khái niệm về knowledge distillation

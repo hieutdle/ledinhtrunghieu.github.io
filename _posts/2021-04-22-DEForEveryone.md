@@ -7,6 +7,8 @@ title: Lesson 1 - Data Engineering for Everyone
 
 # 1. Data Engineering Introduction
 
+In this chapter, you’ll learn what data engineering is and why demand for them is increasing. You’ll then discover where data engineering sits in relation to the data science lifecycle, how data engineers differ from data scientists, and have an introduction to your first complete data pipeline.
+
 ## 1.1 Data Workflow
 
 There are four general steps through which data flows within an organization:
@@ -22,16 +24,17 @@ There are four general steps through which data flows within an organization:
 
 Data engineers are responsible for the first step of the process: ingesting collected data and storing it. Their job is to deliver the correct data, in the right form, to the right people, as efficiently as possible.
 
+Data engineers:
 * Ingest data from different sources
 * Optimize the databases for analysis
-* Remove corrupted data 
+* Remove corrupted data (manage data corruption)
 * Develop, construct, test, and maintain architectures such as databases and large-scale processing systems to process and handle massive amounts of data. 
 
 ## 1.3. Big Data
 
-Big data becomes the norm, therefore data engineers are more and more needed. 
-* Have to think about how to deal with its size. 
-* So large that traditional methods don't work anymore
+The demand for data engineers has increased. Big data can be defined as:
+* Data so large you have to think about how to deal with its size
+* Difficult to process using traditional data management methods.
 
 Big data is commonly characterized by five Vs: 
 * Volume (the quantity of data points) (how much)
@@ -106,24 +109,27 @@ In general, data pipelines move data from one system to another. They may follow
 
 # 2. Storing Data
 
+It’s time to talk about data storage—one of the main responsibilities for a data engineer. In this chapter, you’ll learn how data engineers manage different data structures, work in SQL—the programming language of choice for querying and storing data, and implement appropriate data storage solutions with data lakes and data warehouses.
+
 ## 2.1. Data Structures
 
 Structured data: 
 * Easy to search and organize.
-* Consistent model: Rigid structure like a spreadsheet, rows and columns (tabular format)
+* Consistent model: Data is entered following a rigid structure like a spreadsheet, rows and columns (tabular format)
 * Define types: each column takes values of a certain type, like text, data, or decimal 
-* Can be grouped to form relations
+* Can be easily grouped to form relations
 * Stored in relational databases
 * About 20% of the data is structured
-* Created and queried using SQL 
+* Created and queried using SQL (Structured Query Language)
 
 Because it's structured we can easily relate this table to other structured data. If there's another table holding the same information, we can connect to it using the number column. Tables that can be connected that way form a relational database.
 
-Semi-structured data:
+Semi-structured data: 
+* Semi-structured data resembles structured data, but allows more freedom
 * Relatively easy to search and organize
-* Consistent model, less-rigid implementation: different observations have different sizes 
-* Different types
-* Can be grouped, but needs more work NoSQL databases: JSON, XML, YAM
+* Pretty structured, but allows more flexibility
+* Consistent model, less-rigid implementation: different observations have different sizes, different types
+* Can be grouped, but needs more work NoSQL databases: usually leverages the JSON, XML, YAM file formats.
 
 Favorite Artist JSON file:
 
@@ -151,10 +157,13 @@ SQL
 * Data engineers use SQL to create and maintain databases
 * Data scientists use SQL to query (request information from) databases
 
+Database schema: Databases are made of many tables. The database schema governs how tables are related.
+
 ## 2.3. Data Warehouses, Data Lakes and Data Catalog
 
 Data Lakes
 * Stores all the collected raw data, just as it was uploaded from the different sources 
+* It's unprocessed and messy
 * Can be petabytes (1 million GBs)
 * Store any kind of data or all data structures. 
 * Cost-effective
@@ -181,16 +190,16 @@ A data catalog is a source of truth that compensates for the lack of structure i
 * Guarantees the reproducibility of the processes in case anything unexpected happens
 * Necessary to prevent the data lake becoming a data swamp
 
-Good practice for any data storage solution
-* Reliability
-* Autonomy 
-* Scalability 
-* Speed
+It's good practice to have a data catalog referencing any data that moves through your organization:
+* Reliability: We don't have to rely on tribal knowledge
+* Autonomy: Makes us autonomous
+* Scalability: Makes working with the data more scalable
+* Speed: We can go from finding data to preparing it without having to rely on a human source of information every time we have a question.
 
 Database vs Data Warehouses
 
 Database: 
-* General term
+* Very general term
 * Loosely defined as organized data stored and accessed on a computer
 
 Data warehouse is a type of database
@@ -207,7 +216,6 @@ Data processing is converting raw data into meaningful information:
 * Fit into a schema/structure: gather  data and fit it to the specific table schema using logic
 * Increase productivity: automate all the data preparation steps we can, so that when it arrives to data scientists, they can analyze it almost immediately
 
-
 How data engineers process data:
 * Data manipulation, cleaning, and tidying tasks (What should we do when the genre is missing? Do we reject the file, do we leave the genre blank, or do we provide one by default?) that can be automated or that will always need to be done
 * Store data in a sanely structured database
@@ -215,6 +223,8 @@ How data engineers process data:
 * Optimizing the performance of the database
 
 ## 3.2. Views
+
+Data Engineer also ensure that the data is stored in a sanely structured database, and create views on top of the database tables for easy access by analysts.
 
 Views are the output of a stored query on the data. For example, artist data and album data should be stored in separate tables in the database, but people will often want to work on these things together. That means data engineers need to create a view in the database combining both tables. Data engineers also optimize the performance of databases, for example by indexing the data so it's easier to retrieve.
 
@@ -228,10 +238,10 @@ Scheduling:
 
 There are different ways to glue things together:
 * Manually: Manually update the employee table
-* Automatically run at a specific time: Update the employee table at 6 AM
-* Automatically run if a specific condition is met: Update the department tables if a new employee was added (Sensor scheduling)
+* Time: Automatically run at a specific time: Update the employee table at 6 AM
+* Sensor scheduling: Automatically run if a specific condition is met: Update the department tables if a new employee was added 
 
-This sounds like the best option but it requires having sensor always listening to see if somethings been added. This requires more resources and may not be worth it in this case. Manual and automated systems can also also work together: if a user manually upgrades their subscription tier on the app, automated tasks need to propagate this information to other parts of the system, to unlock new features and update billing information.
+Sensor scheduling sounds like the best option but it requires having sensor always listening to see if somethings been added. This requires more resources and may not be worth it in this case. Manual and automated systems can also also work together: if a user manually upgrades their subscription tier on the app, automated tasks need to propagate this information to other parts of the system, to unlock new features and update billing information.
 
 Software: Apache Spark
 
@@ -265,7 +275,7 @@ When big data processing tools perform a processing task:
 
 Benefits: 
 * Extra processing power (more processing units, divide works into multiple units => faster)
-* Reduced memory footprint (Instead of needing to load all of the data in one computer's memory, you can partition the data and load the subsets into memory of different computers)
+* Reduced memory footprint (Instead of needing to load all of the data in one computer's memory, you can partition the data and load the subsets into memory of different computers. That means the memory footprint per computer is relatively small)
 
 Risks:
 * Moving data incurs a cost
