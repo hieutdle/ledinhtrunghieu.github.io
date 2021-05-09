@@ -3,11 +3,13 @@ layout: default
 title: About
 ---
 
-My name is Lê Đình Trung Hiếu.
+About me.
 
 ## 2014-2017: Chemistry - Le Quy Don Highschool for the Gifted - Vung Tau
 
 ## 2017-2021 : Computer Science - Vietnamese-German University - Vietnam
+
+## 2019-2020 : Computer Science - Frankfurt University of Applied Sciences - Germany
 
 ## 2021-present : Start Working
 
