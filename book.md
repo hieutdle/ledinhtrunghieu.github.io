@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Book
+title: Course
 ---
 
 <div>
 	<div>
-	<h2><p style="text-align: left; color: #204081; font-weight: bold">I. Các khóa học Machine Learning và Deeplearning:</p></h2>
+	<h2><p style="text-align: left; color: #204081; font-weight: bold">I. DataCamp - Data Engineering with Python</p></h2>
 	<br>
 	<nav>
 		<li><a style="text-align: left; color: #074B80"  href="http://web.stanford.edu/class/cs109/">Xác suất thống kê(Probability): CS109</a></li>
@@ -17,7 +17,7 @@ title: Book
 	</nav>
 	</div>
 	<div>
-	<h2><p style="text-align: left; color: #204081; font-weight: bold">II. Sách về Deeplearning:</p></h2>
+	<h2><p style="text-align: left; color: #204081; font-weight: bold">II. DataQuest - Data Engineering:</p></h2>
 	<br>
 	<nav>
 		<li><a style="text-align: left; color: #074B80"  href="https://dlbookvn.gitlab.io/deeplearning/">Sách Deep learning bàn dịch Tiếng Việt</a></li>
@@ -25,7 +25,7 @@ title: Book
 	</nav>
 	</div>
 	<div>
-	<h2><p style="text-align: left; color: #204081; font-weight: bold">III. AI code:</p></h2>
+	<h2><p style="text-align: left; color: #204081; font-weight: bold">III. Udacity - Data Engineer Nanodegree</p></h2>
 	<br>
 	<nav>
 		<li><a style="text-align: left; color: #074B80"  href="https://paperswithcode.com/">paper with code</a></li>
@@ -42,40 +42,6 @@ title: Book
 	</nav>
 	</div>
 	<div>
-	<h2><p style="text-align: left; color: #204081; font-weight: bold">IV. Dataset Research</p></h2>
-	<br>
-	<nav>
-		<li><a style="text-align: left; color: #074B80"  href="https://research.google/tools/datasets/">Google dataset</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://github.com/daicoolb/RecommenderSystem-DataSet">recommendation dataset</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://ai.baidu.com/broad/download">Baidu dataset</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://github.com/awesomedata/awesome-public-datasets">awesome public datasets</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://data.world/datasets/facebook">Facebook dataset</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://www.kaggle.com/datasets">Kaggle - dataset</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://www.tensorflow.org/datasets/catalog/overview#all_datasets">Tensorflow dataset</a></li>
-	</nav>
-	</div>
-	<div>
-	</div>
-	<div>
-	<h2><p style="text-align: left; color: #204081; font-weight: bold">V. Vietnam Dataset</p></h2>
-	<br>
-	<nav>
-		<li><a style="text-align: left; color: #074B80"  href="https://challenge.zalo.ai/">Zalo dataset</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://vlsp.org.vn/"> VLSP in NLP Dataset</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://www.aivivn.com/">aivivn contest</a></li>
-	</nav>
-	</div>
-	<div>
-	<h2><p style="text-align: left; color: #204081; font-weight: bold">VI. AI blog</p></h2>
-	<br>
-	<nav>
-		<li><a style="text-align: left; color: #074B80"  href="https://ai.googleblog.com/">Google blog</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://ai.facebook.com/blog">Facebook AI blog</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="http://research.baidu.com/Blog">Baidu AI blog</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://www.pyimagesearch.com/">Pyimagesearch</a></li>
-		<li><a style="text-align: left; color: #074B80"  href="https://machinelearningmastery.com/">machine learning mastery</a></li>
-	</nav>
-	</div>
 </div>
 
 
