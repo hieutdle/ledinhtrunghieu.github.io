@@ -91,7 +91,7 @@ Some products are sent directly to their final users:
 
 <img src="/assets/images/20210422_DEForEveryone/pic4.png" class="largepic"/>
 
-Companies ingest data from many different sources, which needs to be processed and stored in various ways. To handle that, we need **data** pipelines that efficiently automate the flow from one station to the next, so that data scientists can use up-to-date, accurate, relevant data.
+Companies ingest data from many different sources, which needs to be processed and stored in various ways. To handle that, we need **data pipelines** that efficiently automate the flow from one station to the next, so that data scientists can use up-to-date, accurate, relevant data.
 
 
 At Spotflix, we have sources from which we extract data. For example, the users' actions and listening history on the mobile Spotflix app, the desktop Spotflix app and the Spotflix website itself.
@@ -107,7 +107,7 @@ Database could be:
 
 Some albums data can be extracted and stored directly. For example, album cover pictures all have the same format, so we can store them directly without having to crop them. Employees could be split in different tables by department, for example sales, engineering, support,...
 
-In a nutshell, data pipelines ensure the data flows efficiently through the organization. They automate extracting, transforming, combining, validating, and loading data, to reduce human intervention and errors, and decrease the time it takes for data to flow through the organization.
+In a nutshell, **data pipelines** ensure the data flows efficiently through the organization. They automate extracting, transforming, combining, validating, and loading data, to reduce human intervention and errors, and decrease the time it takes for data to flow through the organization.
 
 
 ## 1.6. Introduction to ETL
@@ -279,11 +279,11 @@ Software: Apache Spark
 
 **Batches and streams**
 
-Batches:
+**Batches**:
 * Group records at specific intervals
 * Often cheaper because you can schedule it when resources aren't being used elsewhere, typically overnight
 
-Streams:
+**Streams**:
 * Individual data records are sent through the pipeline as soon as they are update
 * Example of batch vs stream processing would be offline vs online listening. If a user listens online, Spotflix can stream parts of the song one after the other. If the user wants to save the song to listen offline, we need to batch all parts of the song together so they can save it
 
