@@ -458,4 +458,33 @@ ingest_product_data.set_downstream(enrich_customer_data)
 
 First, we create a DAG using the `DAG` class. Afterward, we use an Operator to define each of the jobs. Several kinds of operators exist in Airflow. There are simple ones like `BashOperator` and `PythonOperator` that execute bash or Python code, respectively. Then there are ways to write your own operator, like the `SparkJobOperator` or `StartClusterOperator` in the example. Finally, we define the connections between these operators using `.set_downstream()`.
 
+**Airflow DAGs**
+
+In Airflow, a pipeline is represented as a Directed Acyclic Graph or DAG. The nodes of the graph represent tasks that are executed. The directed connections between nodes represent dependencies between the tasks.
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic23.png" class="largepic"/>
+
+
+```
+# Create the DAG object.
+# First, the DAG needs to run on every hour at minute 0. Every hour at minute N would be N * * * *. 
+
+dag = DAG(dag_id="car_factory_simulation",
+          default_args={"owner": "airflow","start_date": airflow.utils.dates.days_ago(2)},
+          schedule_interval="0 * * * *")
+
+# Task definitions
+assemble_frame = BashOperator(task_id="assemble_frame", bash_command='echo "Assembling frame"', dag=dag)
+place_tires = BashOperator(task_id="place_tires", bash_command='echo "Placing tires"', dag=dag)
+assemble_body = BashOperator(task_id="assemble_body", bash_command='echo "Assembling body"', dag=dag)
+apply_paint = BashOperator(task_id="apply_paint", bash_command='echo "Applying paint"', dag=dag)
+
+# Complete the downstream flow
+assemble_frame.set_downstream(place_tires)
+assemble_frame.set_downstream(assemble_body)
+assemble_body.set_downstream(apply_paint)
+```
+
+
+
 
