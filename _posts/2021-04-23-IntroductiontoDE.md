@@ -108,7 +108,7 @@ You can see my last post about cloud computing [here](https://ledinhtrunghieu.gi
 Now that you know the primary differences between a data engineer and a data scientist, get ready to explore the data engineer's toolbox! Learn in detail about different types of databases data engineers use, how parallel computing is a cornerstone of the data engineer's toolkit, and how to schedule data processing jobs using scheduling frameworks.
 
 
-# 2.1. Databases
+## 2.1. Databases
 
 **Database**
 * Store information
@@ -193,7 +193,7 @@ ON "Order"."customer_id"="Customer"."id"
 # Show the id column of data
 print(data["id"])
 ```
-# 2.2. Parallel computing 
+## 2.2. Parallel computing 
 
 Introduction to parallel computing [here](https://ledinhtrunghieu.github.io/2021/04/22/DEForEveryone.html#34-parallel-computing) 
 
@@ -484,6 +484,11 @@ assemble_frame.set_downstream(place_tires)
 assemble_frame.set_downstream(assemble_body)
 assemble_body.set_downstream(apply_paint)
 ```
+# 3. Extract, Transform and Load (ETL)
+
+## 3.1. Extract
+
+
 
 
 
