@@ -532,10 +532,150 @@ On the web, most communication happens to something called `requests.` You can l
 
 **Data on the Web through APIs**
 
+However, some web servers don't serve web pages that need to be readable by humans. Some serve data in a JSON data format. We call these servers **APIs** or **application programming interfaces**.
+
+The popular social media tool, Twitter, hosts an API that provides us with information on tweets in JSON format. Using the Twitter API does not tell us anything about how Twitter stores its data; it merely provides us with a **structured way of querying their data**. 
+
+Example:
+* Twitter API
+```
+{ "statuses": [{ "created_at": "Mon May 06 20:01:29 +0000 2019", "text": "this is a tweet"}] }
+```
+
+Another example request to the Hackernews API and the resulting JSON response
+
+Hackernews API
+
+```
+import requests
+
+response = requests.get("https://hacker-news.firebaseio.com/v0/item/16222426.json")
+print(response.json())
+```
+
+```
+{'by': 'neis', 'descendants': 0, 'id': 16222426, 'score': 17, 'time': 1516800333, 'title':	}
+``` 
+
+You can use the Python package, `requests` to request an API. We will use the `.get()` method and pass an URL. The resulting response object has a built-in helper method called `.json()` to parse the incoming JSON and transform it into a Python object.
+
+**Data in databases**
+The most common way of data extraction is extraction from existing application databases. Most applications, like web services, need a database to back them up and persist data. At this point, it's essential to make a distinction between **two main database types**.
+
+**Application Databases**: Databases that applications like web services use, are typically optimized for having lots of **transactions**. **A transaction** typically changes or inserts rows, or records, in the database. For example, let's say we have a customer database. Each row, or record, represents data for one specific customer. A transaction could add a customer to the database, or change their address. These kinds of transactional databases are called **OLTP**, or **online transaction processing**. They are typically **row-oriented**, in which the system adds data per rows. 
+
+**Analytical Databases**: In contrast, databases optimized for analysis are called **OLAP**, or **online analytical processing**. They are often **column-oriented**. 
+
+**Extraction from databases**
+
+To extract data from a database in Python, you'll always need a **connection string**. The **connection string** or **connection URI** is a string that holds information on how to connect to a database. It typically contains the database type, for example, PostgreSQL, the username and password, the host and port and the database name. In Python, you'd use this connection URI with a package like `sqlalchemy` to create a database engine. We can pass this engine object to several packages that support it to interact with the database. The example shows the usage with `pandas`.
+
+Connection string/URI
+```
+postgresql://[user[:password]@][host][:port]
+```
+Use in Python
+
+```
+import sqlalchemy
+connection_uri = "postgresql://repl:password@localhost:5432/pagila" db_engine = sqlalchemy.create_engine(connection_uri)
+import pandas as pd
+pd.read_sql("SELECT * FROM customer", db_engine)
+```
+
+**Fetch from an API**
+
+You've seen that you can extract data from an API by sending a request to the API and parsing the response which was in JSON format. In this example, you'll be doing the same by using the `requests` library to send a request to the Hacker News API.
+
+[Hacker News](https://news.ycombinator.com/) is a social news aggregation website, specifically for articles related to computer science or the tech world in general. Each post on the website has a JSON representation, which you'll see in the response of the request in the exercise.
+
+```
+import requests
+
+# Fetch the Hackernews post
+resp = requests.get("https://hacker-news.firebaseio.com/v0/item/16222426.json")
+
+# Print the response parsed as JSON
+print(resp.json())
+
+# Assign the score of the test to post_score
+post_score = resp.json()["score"]
+print(post_score)
+```
+
+**Read from a database**
+
+In this example, you're going to extract data that resides inside tables of a local PostgreSQL database. The data you'll be using is the Pagila example database. The database backs a fictional DVD store application, and educational resources often use it as an example database.
+
+You'll be creating and using a function that extracts a database table into a pandas DataFrame object. The tables you'll be extracting are:
+* film: the films that are rented out in the DVD store.
+* customer: the customers that rented films at the DVD store.
+In order to connect to the database, you'll have to use a PostgreSQL connection URI, which looks something like this:
+```
+postgresql://[user[:password]@][host][:port][/database]
+```
+
+```
+# Function to extract table to a pandas DataFrame
+def extract_table_to_pandas(tablename, db_engine):
+    query = "SELECT * FROM {}".format(tablename)
+    return pd.read_sql(query, db_engine)
+
+# Connect to the database using the connection URI
+connection_uri = "postgresql://repl:password@localhost:5432/pagila" 
+db_engine = sqlalchemy.create_engine(connection_uri)
+
+# Extract the film table into a pandas DataFrame
+extract_table_to_pandas("film", db_engine)
+
+# Extract the customer table into a pandas DataFrame
+extract_table_to_pandas("customer", db_engine)
+```
+## 3.2 Transform
 
 
+**Kind of transformations**
 
+<img src="/assets/images/20210501_IntroductiontoDE/pic26.png" class="largepic"/>
 
+* Selection of specific attribute. For example, we could select the 'email' column only. 
+* Translation of code values. For instance, 'New York' could be translated into 'NY'. 
+* Data validation. For example, if 'created_at' does not contain a date value, we could drop the record. 
+* Splititng columns into multiple columns
+* Joining from multiple sources
 
+**An example: split (Pandas)**
 
+<img src="/assets/images/20210501_IntroductiontoDE/pic27.png" class="largepic"/>
+
+```
+customer_df # Pandas DataFrame with customer data
+# Split email column into 2 columns on the '@' 
+symbol split_email = customer_df.email.str.split("@", expand=True) 
+# At this point, split_email will have 2 columns, a first  
+# one with everything before @, and a second one with
+# everything after @
+
+# Create 2 new columns using the resulting DataFrame. 
+customer_df = customer_df.assign(
+    username=split_email[0], 
+    domain=split_email[1],
+)
+```
+
+**Transforming in PySpark**
+
+Extract data into PySpark
+
+```
+import pyspark.sql
+
+spark = pyspark.sql.SparkSession.builder.getOrCreate()
+
+spark.read.jdbc("jdbc:postgresql://localhost:5432/pagila", 
+                "customer",
+                properties={"user":"repl","password":"password"})
+```
+
+The last transformation example will be using PySpark. We could just as well have used pandas if the load is small. However, since we used PySpark, the extract phase needs to load the table into Spark. We can do this with `spark.read.jdbc`, where `spark` is a `SparkSession` object. **JDBC** is a piece of software that helps Spark connect to several relational databases. There are some differences between this connection URI and the one you saw in the previous video. First of all, it's prepended by 'jdbc:', to tell Spark to use JDBC. Second, we pass authorization information in the `properties` attribute instead of the URL. Finally, we pass the name of the table as a second argument.
 
