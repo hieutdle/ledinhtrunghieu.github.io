@@ -486,7 +486,53 @@ assemble_body.set_downstream(apply_paint)
 ```
 # 3. Extract, Transform and Load (ETL)
 
+Having been exposed to the toolbox of data engineers, it's now time to jump into the bread and butter of a data engineer's workflow! With ETL, you will learn how to extract raw data from various sources, transform this raw data into actionable insights, and load it into relevant databases ready for consumption!
+
 ## 3.1. Extract
+
+Very roughly, **Extract** means extracting data from persistent storage, which is not suited for data processing, into memory. Persistent storage could be a file on Amazon S3, for example, or a SQL database. It's the necessary stage before we can start transforming the data. The sources to extract from vary.
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic24.png" class="largepic"/>
+
+**Extract from text files**
+
+First of all, we can extract data from plain text files. These are files that are generally readable for people. They can be unstructured, like a chapter from a book like Moby Dick. Alternatively, these can be **flat files**, where each row is a record, and each column is an attribute of the records. In the latter, we represent data in a tabular format. Typical examples of flat files are comma-, or tab-separated files: `.csv` or `.tsv`. They use commas (,) or tabs respectively to separate columns.
+
+Another widespread data format is called **JSON**, or JavaScript Object Notation. JSON files hold information in a semi-structured way. It consists of 4 atomic data types: number, string, boolean and null. There are also 2 composite data types: array and object. You could compare it to a dictionary in Python. JSON objects can be very nested, like in this example. There's a pretty good mapping from JSON objects to dictionaries in Python. There's a package in the standard library called `json`, which helps you parse JSON data. The function `json.loads` helps you with this. The reason JSON got popular is that in recent days, many web services use this data format to communicate data.
+
+```
+{ 
+    "an_object": {
+        "nested": [
+            "one",
+            "two",
+            "three",
+            {
+            "key": "four"
+            }
+        ]
+    }
+}
+```
+
+```
+import json
+
+result = json.loads('{  "key_1": "value_1",
+                        "key_2":"value_2"}')
+
+print(result["key_1"])
+```
+
+**Data on the Web**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic25.png" class="largepic"/>
+
+On the web, most communication happens to something called `requests.` You can look at a `request` as a 'request for data.' A `request` gets a `response`. For example, if you browse Google in your web browser, your browser requests the content of the Google home page. Google servers respond with the data that makes up the page.
+
+**Data on the Web through APIs**
+
+
 
 
 
