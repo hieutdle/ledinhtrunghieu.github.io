@@ -312,7 +312,7 @@ Benefits:
 Risks:
 * Moving data incurs a cost
 * Communication time (splitting a task into subtasks and merging the results of the subtasks back into one final result requires some communication between processes). In other words, if you have 2 processing units, a task that takes a few hundred milliseconds might not be worth splitting up. Additionally, due to the overhead, the speed does not increase linearly. 
-* This effect is also called parallel slowdown.
+* This effect is also called parallel slowdown.Therefore, task needs to be large and you need several processing units to be worth the splitting up.
 
 
 ## 3.5. Cloud computing
