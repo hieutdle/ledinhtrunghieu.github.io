@@ -54,6 +54,11 @@ Data Scientist:
 * Computer system that holds large amounts of data (SQL or NoSQL databases)
 * Support applications: Applications rely on databases to provide certain functionality. For example, in an online store, a database holds product data like prices or amount in stock. On the other hand, other databases hold data specifically for analyses
 
+Two examples of databases are MySQL or PostgreSQL
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic4.png" class="largepic"/>
+
+
 **Processing**
 * Clean
 * Aggregate data
@@ -72,4 +77,29 @@ outlier = df.filter([df["age] > 100)
 
 print(outliers.count())
 ```
+It looks a lot like simple pandas filter or count operations. However, behind the curtains, a cluster of computers could be performing these operations using the **PySpark** framework
+
+An example processing tool is Spark or Hive
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic5.png" class="largepic"/>
+
+**Scheduling**:
+
+Scheduling tools help to make sure **data moves** from one place to another **at the correct time**, with a **specific interval**. Data engineers make sure these jobs run in a timely fashion and that they run in the right order. Sometimes processing jobs need to run in a particular order to function correctly. For example, tables from two databases might need to be joined together after they are both cleaned. In the following diagram, the JoinProductOrder job needs to run after CleanProduct and CleanOrder ran.
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic3.png" class="largepic"/>
+
+For scheduling, we can use Apache Airflow, Oozie, or we can use the simple bash tool: cron.
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic6.png" class="largepic"/>
+
+**A Data Pipeline** 
+
+You can think of the data engineering **pipeline** through this diagram. It **extracts** all data through connections with several databases, **transforms** it using a cluster computing framework like **Spark**, and **loads** it into an analytical database. Also, everything is **scheduled** to run in a specific order through a scheduling framework like **Airflow**. A small side note here is that the sources can be external APIs or other file formats too
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic7.png" class="largepic"/>
+
+**Cloud Computing**
+
+You can see my last post about cloud computing [here](https://ledinhtrunghieu.github.io/2021/04/22/DEForEveryone.html#35-cloud-computing) 
 
