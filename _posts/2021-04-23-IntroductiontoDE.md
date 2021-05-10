@@ -237,3 +237,225 @@ result_df = athlete_events_dask.groupby('Year').Age.mean().compute()
 
 **From task to subtasks**
 
+For this example, you will be using parallel computing to apply the function take_mean_age() that calculates the average athlete's age in a given year in the Olympics events dataset. The DataFrame athlete_events has been loaded for you and contains amongst others, two columns:
+* Year: the year the Olympic event took place
+* Age: the age of the Olympian
+
+You will be using the multiprocessor.Pool API which allows you to distribute your workload over several processes. The function parallel_apply() is defined in the sample code. It takes in as input the function being applied, the grouping used, and the number of cores needed for the analysis. Note that the @print_timing decorator is used to time each operation.
+
+```
+# Function to apply a function over multiple cores
+@print_timing
+def parallel_apply(apply_func, groups, nb_cores):
+    with Pool(nb_cores) as p:
+        results = p.map(apply_func, groups)
+    return pd.concat(results)
+
+# Parallel apply using 1 core
+parallel_apply(take_mean_age, athlete_events.groupby('Year'),1)
+
+# Parallel apply using 2 cores
+parallel_apply(take_mean_age, athlete_events.groupby('Year'), 2)
+
+# Parallel apply using 4 cores
+parallel_apply(take_mean_age, athlete_events.groupby('Year'), 4)
+```
+
+**Using a DataFrame**
+
+In the previous example, you saw how to split up a task and use the low-level python multiprocessing.Pool API to do calculations on several processing units.
+
+It's essential to understand this on a lower level, but in reality, you'll never use this kind of APIs. A more convenient way to parallelize an apply over several groups is using the dask framework and its abstraction of the pandas DataFrame, for example.
+
+```
+import dask.dataframe as dd
+
+# Set the number of partitions
+athlete_events_dask = dd.from_pandas(athlete_events, npartitions = 4)
+
+# Calculate the mean Age per Year
+print(athlete_events_dask.groupby('Year').Age.mean().compute())
+```
+
+## 2.3 Parallel computing framework
+
+**Hadoop**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic12.png" class="largepic"/>
+
+**Hadoop** is a collection of open source projects, maintained by the Apache Software Foundation. Some of them are a bit outdated, but it's still relevant to talk about them. There are two Hadoop projects we want to focus on: **MapReduce** and **HDFS**.
+
+**HDFS**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic13.png" class="largepic"/>
+
+**HDFS** is a **Hadoop Distributed File System**. It's similar to the **file system** you have on your computer, the only difference being **the files reside on multiple different computers**. HDFS has been essential in the big data world, and for parallel computing by extension. Nowadays, cloud-managed storage systems like Amazon S3 often replace HDFS.
+
+**MapReduce**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic14.png" class="largepic"/>
+
+**MapReduce** was one of the first popularized  **big-data processing paradigms**. It works similar to the previous example, where the program splits tasks into subtasks, distributing the workload and data between several processing units. For MapReduce, these processing units are several computers in the cluster. MapReduce had its flaws; one of it was that it was hard to write these MapReduce jobs. Many software programs popped up to address this problem, and one of them was Hive.
+
+**Hive**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic15.png" class="largepic"/>
+
+**Hive** is a layer on top of the Hadoop ecosystem that makes data from several sources queryable in a structured way using Hive's SQL variant: Hive SQL. Facebook initially developed Hive, but the Apache Software Foundation now maintains the project. Although MapReduce was initially responsible for running the Hive jobs, it now integrates with several other data processing tools.
+
+Hive Exmaple: 
+
+```
+SELECT year, AVG(age) 
+FROM views.athlete_events 
+GROUP BY year
+```
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic16.png" class="largepic"/>
+
+This Hive query selects the average age of the Olympians per Year they participated. As you'd expect, this query looks indistinguishable from a regular SQL query. However, behind the curtains, this query is transformed into a job that can operate on a cluster of computers.
+
+**Spark**
+
+**Spark** **distributes** data processing tasks between clusters of computers. While MapReduce-based systems tend to need expensive disk writes between jobs, Spark tries to **keep as much processing as possible in memory**. In that sense, Spark was also an answer to the limitations of MapReduce. The disk writes of MapReduce were especially limiting in interactive exploratory data analysis, where each step builds on top of a previous step. Spark originates from the University of California, where it was developed at the Berkeley's AMPLab. Currently, the Apache Software Foundation maintains the project.
+
+**Resilient distributed datasets (RDD)**
+
+Spark's architecture relies on something called **resilient distributed datasets**, or **RDDs**. Without diving into technicalities, this is a data structure that maintains data which is distributed between multiple nodes. Unlike DataFrames, RDDs don't have named columns. From a conceptual perspective, you can think of RDDs as lists of tuples. We can do two types of operations on these data structures: transformations, like map or filter, and actions, like count or first. Transformations result in transformed RDDs, while actions result in a single result.
+
+**PySpark**
+
+When working with Spark, people typically use a programming language interface like PySpark. PySpark is the Python interface to spark. There are interfaces to Spark in other languages, like R or Scala, as well. PySpark hosts a DataFrame abstraction, which means that you can do operations very similar to pandas DataFrames. PySpark and Spark take care of all the complex parallel computing operations.
+
+Have a look at the following PySpark example. Similar to the Hive Query you saw before, it calculates the mean age of the Olympians, per Year of the Olympic event. Instead of using the SQL abstraction, like in the Hive Example, it uses the DataFrame abstraction.
+
+```
+# Load the dataset into athlete_events_spark first
+(athlete_events_spark
+.groupBy('Year')
+.mean('Age')
+.show())
+```
+
+simillar to
+
+```
+SELECT year, AVG(age) 
+FROM views.athlete_events 
+GROUP BY year
+```
+
+Compare Hadoop vs PySpark vs Hive
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic18.png" class="largepic"/>
+
+**PySpark Example**
+
+In this example, You'll use the PySpark package to handle a Spark DataFrame. The data is the same as in previous exercises: participants of Olympic events between 1896 and 2016.
+The Spark Dataframe, athlete_events_spark is available in your workspace.
+
+```
+# Print the type of athlete_events_spark
+print(type(athlete_events_spark))
+
+# Print the schema of athlete_events_spark
+print(athlete_events_spark.printSchema())
+
+# Group by the Year, and find the mean Age
+print(athlete_events_spark.groupBy('Year').mean('Age'))
+
+# Group by the Year, and find the mean Age
+print(athlete_events_spark.groupBy('Year').mean('Age').show())
+```
+
+**Running PySpark files**
+
+```
+cat /home/repl/spark-script.py
+```
+
+Result
+
+```
+repl:~$ cat /home/repl/spark-script.py
+from pyspark.sql import SparkSession
+
+
+if __name__ == "__main__":
+    spark = SparkSession.builder.getOrCreate()
+    athlete_events_spark = (spark
+        .read
+        .csv("/home/repl/datasets/athlete_events.csv",
+             header=True,
+             inferSchema=True,
+             escape='"'))
+
+    athlete_events_spark = (athlete_events_spark
+        .withColumn("Height",
+                    athlete_events_spark.Height.cast("integer")))
+
+    print(athlete_events_spark
+        .groupBy('Year')
+        .mean('Height')
+        .orderBy('Year')
+        .show())
+```
+
+Submit
+
+```
+spark-submit \
+  --master local[4] \
+  /home/repl/spark-script.py
+```
+Output: A DataFrame with average Olympian heights by year.
+
+## 2.4. Workflow scheduling frameworks
+
+An example of pipeline
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic19.png" class="largepic"/>
+
+You can write a Spark job that pulls data from a CSV file, filters out some corrupt records, and loads the data into a SQL database ready for analysis. However, you need to do this every day as new data is coming in to the CSV file. 
+
+One option is to run the job each day manually: Doesn't scale well: Weekends?
+
+There are simple tools that could solve this problem, like cron, the Linux tool. However, let's say you have one job for the CSV file and another job to pull in and clean the data from an API, and a third job that joins the data from the CSV and the API together. The third job depends on the first two jobs to finish. It quickly becomes apparent that we need a more holistic approach, and a simple tool like cron won't suffice. So, we ended up with dependencies between jobs.
+
+**DAGs**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic20.png" class="largepic"/>
+
+**A DAG (Directed Acyclic Graphs)** is a set of nodes that are connected by directed edges. There are no cycles in the graph, which means that no path following the directed edges sees a specific node more than once. In the example on the slide, Job A needs to happen first, then Job B, which enables Job C and D and finally Job E. As you can see, it feels natural to represent this kind of workflow in a DAG. The jobs represented by the DAG can then run in a daily schedule, for example.
+
+Tools for the jobs: Luigi, cron, Apache Airflow
+
+**Apache Airlow**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic21.png" class="largepic"/>
+
+Airbnb created **Airflow** as an internal tool for workflow management. They open-sourced Airflow in 2015, and it later joined the Apache Software Foundation in 2016. They built Airflow around the concept of DAGs. Using Python, developers can create and test these DAGs that build up complex pipelines.
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic22.png" class="largepic"/>
+
+The first job starts a Spark cluster. Once it's started, we can pull in customer and product data by running the ingest_customer_data and ingest_product_data jobs. Finally, we aggregate both tables using the enrich_customer_data job which runs after both ingest_customer_data and ingest_product_data complete.
+
+```
+#Create the DAG object
+dag = DAG(dag_id="example_dag", ..., schedule_interval="0 * * * *")
+
+# Define operations
+start_cluster = StartClusterOperator(task_id="start_cluster", dag=dag) 
+ingest_customer_data = SparkJobOperator(task_id="ingest_customer_data", dag=dag) 
+ingest_product_data = SparkJobOperator(task_id="ingest_product_data", dag=dag) 
+enrich_customer_data = PythonOperator(task_id="enrich_customer_data", ..., dag = dag)
+
+# Set up dependency flow 
+start_cluster.set_downstream(ingest_customer_data) 
+ingest_customer_data.set_downstream(enrich_customer_data) 
+ingest_product_data.set_downstream(enrich_customer_data)
+```
+
+First, we create a DAG using the `DAG`class. Afterward, we use an Operator to define each of the jobs. Several kinds of operators exist in Airflow. There are simple ones like BashOperator and PythonOperator that execute bash or Python code, respectively. Then there are ways to write your own operator, like the SparkJobOperator or StartClusterOperator in the example. Finally, we define the connections between these operators using `.set_downstream()`.
+
+
