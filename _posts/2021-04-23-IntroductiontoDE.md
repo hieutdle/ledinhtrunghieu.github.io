@@ -679,3 +679,69 @@ spark.read.jdbc("jdbc:postgresql://localhost:5432/pagila",
 
 The last transformation example will be using PySpark. We could just as well have used pandas if the load is small. However, since we used PySpark, the extract phase needs to load the table into Spark. We can do this with `spark.read.jdbc`, where `spark` is a `SparkSession` object. **JDBC** is a piece of software that helps Spark connect to several relational databases. There are some differences between this connection URI and the one you saw in the previous video. First of all, it's prepended by 'jdbc:', to tell Spark to use JDBC. Second, we pass authorization information in the `properties` attribute instead of the URL. Finally, we pass the name of the table as a second argument.
 
+**Join (PySpark)**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic28.png" class="largepic"/>
+
+```
+customer_df # PySpark DataFrame with customer data
+ratings_df # PySpark DataFrame with ratings data
+
+# Groupby ratings
+ratings_per_customer = ratings_df.groupBy("customer_id").mean("rating")
+
+# Join on customer ID 
+customer_df.join(
+    ratings_per_customer, 
+    customer_df.customer_id==ratings_per_customer.customer_id
+)
+```
+
+We have to add the mean rating for each customer as an attribute to the customer table.  First, we aggregate the ratings by grouping by customer ids using the `.groupBy()` method. To get the mean rating per customer, we chain the groupby method with the `.mean()` method. Afterward, we can join the aggregated table with the customer table. That gives us the customer table, extended with the mean rating for each customer. 
+
+Example: Splitting the rental rate
+
+Suppose you would want to have a better understanding of the rates users pay for movies, so you decided to divide the rental_rate column into dollars and cents.
+In this example, you will use the same techniques used in the previous example. The film table has been loaded into the pandas DataFrame film_df. 
+
+```
+# Get the rental rate column as a string
+rental_rate_str = film_df.rental_rate.astype(str)
+
+# Split up and expand the column
+rental_rate_expanded = rental_rate_str.str.split("." ,expand=True)
+
+# Assign the columns to film_df
+film_df = film_df.assign(
+    rental_rate_dollar=rental_rate_expanded[0],
+    rental_rate_cents=rental_rate_expanded[1],
+)
+```
+
+* Use the `.astype()` method to convert the `rental_rate` column into a column of string objects, and assign the results to `rental_rate_str`.
+* Split `rental_rate_str` on '.' and expand the results into columns. Assign the results to `rental_rate_expanded`.
+* Assign the newly created columns into `films_df` using the column names `rental_rate_dollar` and `rental_rate_cents` respectively.
+
+Joining with ratings
+
+In this example, you're going to create more synergies between the film and ratings tables.
+
+```
+# Use groupBy and mean to aggregate the column
+ratings_per_film_df = rating_df.groupby("film_id").mean("rating")
+
+# Join the tables using the film_id column
+film_df_with_ratings = film_df.join(
+    ratings_per_film_df,
+    film_df.film_id==rating_df.film_id
+)
+
+# Show the 5 first results
+print(film_df_with_ratings.show(5))
+```
+
+* Take the mean rating per film_id, and assign the result to ratings_per_film_df.
+* Complete the .join() statement to join on the film_id column.
+* Show the first 5 results of the resulting DataFrame.
+
+## 3.3 Loading
