@@ -745,3 +745,242 @@ print(film_df_with_ratings.show(5))
 * Show the first 5 results of the resulting DataFrame.
 
 ## 3.3 Loading
+
+As I mentioned before, there are two different types of databases.
+
+**Analytics or Application databases**
+
+**Analytics:**
+* Aggregate queries
+* **Online analytic processing (OLAP)**
+* Column-oriented
+
+**Applications**
+* Lots of transactions
+* **Online transaction processing (OLTP)**
+* Row-oriented
+
+**Column- and row-oriented**
+
+**Column-oriented**:  In a column-oriented database, we store data per column.  There are multiple reasons why this is optimal for analytics. Without getting too technical, you can think of analytical queries to be mostly about a small subset of columns in a table. By storing data per column, it's faster to loop over these specific columns to resolve a query. In a row-oriented system, we would lose time skipping unused columns for each row. Column-oriented databases also lend themselves better to parallelization.
+**Row-oriented**: Most application databases are row-oriented. That means we store data per record, which makes it easy to add new rows in small transactions. For example, in a row-oriented database, adding a customer record is easy and fast.
+
+**Massive Parallel Processing Databases (MPP Databases)**
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic29.png" class="largepic"/>
+
+Massively parallel processing databases is often a target at the end of an ETL process. They're column-oriented databases optimized for analytics, that run in a distributed fashion. Specifically, this means that queries are not executed on a single compute node, but rather split into subtasks and distributed among several nodes. 
+
+Famous example:
+* Amazon Redshift
+* Azure SQL Data Warehouse
+* Google BigQuery
+
+**An example: Redshift**
+
+To load data into Amazon Redshift, an excellent way to do this would be to write files to S3, AWS's file storage service, and send a copy query to Redshift. Typically, MPP databases load data best from files that use a columnar storage format. CSV files would not be a good option, for example. We often use a file format called **parquet** for this purpose.
+For example, in pandas, you can use the `.to_parquet()` method on a dataframe. In PySpark, you can use `.write.parquet()`. You can then connect to Redshift using a PostgreSQL connection URI and copy the data from S3 into Redshift.
+
+```
+# Pandas .to_parquet() method 
+df.to_parquet("./s3://path/to/bucket/customer.parquet") 
+# PySpark .write.parquet() method
+df.write.parquet("./s3://path/to/bucket/customer.parquet")
+```
+
+```
+COPY customer
+FROM 's3://path/to/bucket/customer.parquet' FORMAT as parquet
+...
+```
+
+**Load to PostgreSQL**
+
+In other cases, you might want to load the result of the transformation phase into a PostgreSQL database. For example, your data pipeline could extract from a rating table, transform it to find recommendations and load them into a PostgreSQL database, ready to be used by a recommendation service. For this, there are also several helper methods in popular data science packages. For example, you could use `.to_sql()` in Pandas. Often, you can also provide a strategy for when the table already exists. Valid strategies for `.to_sql()` in Pandas are: "fail", "replace" and "append".
+
+pandas.to_sql()
+```
+# Transformation on data
+recommendations = transform_find_recommendatins(ratings_df)
+# Load into PostgreSQL database 
+recommendations.to_sql("recommendations",
+                        db_engine,
+                        schema="store", 
+                        if_exists="replace")
+```
+
+Example
+
+Writing to a file
+
+Files are often loaded into a MPP database like Redshift in order to make it available for analysis. The typical workflow is to write the data into columnar data files. These data files are then uploaded to a storage system and from there, they can be copied into the data warehouse. In case of Amazon Redshift, the storage system would be S3, for example. The first step is to write a file to the right format. For this example you'll choose the Apache Parquet file format. There's a PySpark DataFrame called film_sdf and a pandas DataFrame called film_pdf in the workspace.
+
+```
+# Write the pandas DataFrame to parquet
+film_pdf.to_parquet("films_pdf.parquet")
+
+# Write the PySpark DataFrame to parquet
+film_sdf.write.parquet("films_sdf.parquet")
+```
+
+Load into Postgres
+
+You'll write out some data to a PostgreSQL data warehouse. That could be useful when you have a result of some transformations, and you want to use it in an application. For example, the result of a transformation could have added a column with film recommendations, and you want to use them in your online store. There's a pandas DataFrame called film_pdf in your workspace.
+As a reminder, here's the structure of a connection URI for sqlalchemy: 
+```
+postgresql://[user[:password]@][host][:port][/database]
+```
+```
+# Finish the connection URI
+connection_uri = "postgresql://repl:password@localhost:5432/dwh"
+db_engine_dwh = sqlalchemy.create_engine(connection_uri)
+
+# Transformation step, join with recommendations data
+film_pdf_joined = film_pdf.join(recommendations)
+
+# Finish the .to_sql() call to write to store.film. If the table exists, replace it completely.
+film_pdf_joined.to_sql("film", db_engine_dwh, schema="store", if_exists="replace")
+
+# Run the query to fetch the data
+pd.read_sql("SELECT film_id, recommended_film_ids FROM store.film", db_engine_dwh)
+```
+
+## 3.4 Complete the ETL pipeline
+
+We've now covered the full extent of an ETL pipeline. We've extracted data from databases, transformed the data to fit our needs, and loaded them back into a database, the data warehouse. This kind of batched ETL needs to run at a specific moment, and maybe after we completed some other tasks.
+
+**The ETL function**
+
+```
+def extract_table_to_df(tablename, db_engine):
+    return pd.read_sql("SELECT * FROM {}".format(tablename), db_engine)
+
+def split_columns_transform(df, column, pat, suffixes): 
+# Converts column into str and splits it on pat...
+
+def load_df_into_dwh(film_df, tablename, schema, db_engine):
+    return pd.to_sql(tablename, db_engine, schema=schema, if_exists="replace")
+
+db_engines = { ... } # Needs to be configured def etl():
+    # Extract
+    film_df = extract_table_to_df("film", db_engines["store"]) 
+    # Transform
+    film_df = split_columns_transform(film_df, "rental_rate", ".", ["_dollar", "_cents"]) 
+    # Load
+    load_df_into_dwh(film_df, "film", "store", db_engines["dwh"])
+```
+
+First of all, it's nice to have your ETL behavior encapsulated into a clean `etl()` function. Let's say we have a `extract_table_to_df()` function, which extracts a PostgreSQL table into a pandas DataFrame. Then we could have one or many transformation functions that takes a pandas DataFrame and transform it by putting the data in a more suitable format for analysis. This function could be called `split_columns_transform()`, for example. Last but not least, a `load_df_into_dwh()` function loads the transformed data into a PostgreSQL database. We can define the resulting `etl()` function as above. The result of `extract_table_to_df()` is used as an input for the transform function. We then use the output of the transform as input for `load_df_into_dwh`.
+
+**Airflow refresher**
+
+Now that we have a python function that describes the full ETL, we need to make sure that this function runs at a specific time. Before we go into the specifics, let's look at a small recap of Airflow [here](https://ledinhtrunghieu.github.io/2021/04/23/IntroductiontoDE.html#24-workflow-scheduling-frameworks)
+
+**Scheduling with DAGs in Airflow**
+
+So the first thing we need to do is to create the DAG itself. In this code sample, we keep it simple and create a DAG object with id `sample`. The second argument is `schedule_interval` and it defines when the DAG needs to run.
+
+```
+from airflow.models import DAG
+dag = DAG(dag_id="sample",
+            ...,
+            schedule_interval="0 0 * * *")
+```
+
+There are multiple ways of defining the interval, but the most common one is using a cron expression. That is a string which represents a set of times. It's a string containing 5 characters, separated by a space. The leftmost character describes minutes, then hours, day of the month, month, and lastly, day of the week. Going into detail would drive us too far, but there are several great resources to learn cron expressions online, for example, the website: [cron](https://crontab.guru). The DAG in the code sample run every 0th minute of the hour.
+
+```
+#	cron
+#	.-------------------------	minute			(0	-	59)
+#	| .-----------------------	hour			(0	-	23)
+#	| | .---------------------	day of	the	month	(1	-	31)
+#	| | | .-------------------	month			(1	-	12)
+#	|	|	|	|	.-----------------	day of	the	week	(0	-	6)
+#	*	*	*	*	* <command>						
+
+# Example
+0 * * * * # Every hour at the 0th minute
+```
+
+**The DAG definition file**
+
+```
+from airflow.models import DAG
+from airflow.operators.python_operator import PythonOperator
+
+dag = DAG(dag_id="etl_pipeline",
+          schedule_interval="0 0 * * *")
+
+etl_task = PythonOperator(task_id="etl_task",
+                          python_callable=etl, 
+                          dag=dag)
+
+etl_task.set_upstream(wait_for_this_task)
+```
+
+Having created the DAG, it's time to set the ETL into motion. The etl() function we defined earlier is a Python function, so it makes sense to use the PythonOperator function from the **python_operator** submodule of airflow. Looking at the documentation of the PythonOperator function, we can see that it expects a Python callable. In our case, this is the `etl()` function we defined before. It also expects two other parameters we're going to pass: `task_id` and `dag`. These are parameters which are standard for all operators. They define the identifier of this task, and the DAG it belongs to. We fill in the DAG we created earlier as a source. We can now set upstream or downstream dependencies between tasks using the `.set_upstream()` or `.set_downstream()` methods. By using `.set_upstream` in the example, `etl_task` will run after `wait_for_this_task` is completed.
+
+Save as etl_dag.py 
+Once you have this DAG definition and some tasks that relate to it, you can write it into a python file and place it in the DAG folder of Airflow. The service detects DAG and shows it in the interface.
+
+<img src="/assets/images/20210501_IntroductiontoDE/pic30.png" class="largepic"/>
+
+**Defining a DAG Example**
+
+In the previous example you applied the three steps in the ETL process:
+* Extract: Extract the film PostgreSQL table into pandas.
+* Transform: Split the rental_rate column of the film DataFrame.
+* Load: Load a the film DataFrame into a PostgreSQL data warehouse.
+The functions extract_film_to_pandas(), transform_rental_rate() and load_dataframe_to_film() are defined in your workspace. In this example, you'll add an ETL task to an existing DAG. The DAG to extend and the task to wait for are defined in your workspace are defined as dag and wait_for_table respectively.
+
+```
+# Define the ETL function
+def etl():
+    film_df = extract_film_to_pandas()
+    film_df = transform_rental_rate(film_df)
+    load_dataframe_to_film(film_df)
+
+# Define the ETL task using PythonOperator
+etl_task = PythonOperator(task_id='etl_film',
+                          python_callable=etl,
+                          dag=dag)
+
+# Set the upstream to wait_for_table and sample run etl()
+etl_task.set_upstream(wait_for_table)
+etl()
+```
+
+**Setting up Airflow**
+
+In this example, you'll learn how to add a DAG to Airflow. 
+
+You'll need to move the dag.py file containing the DAG you defined in the previous exercise to, the DAGs folder. Here are the steps to find it:
+* The airflow home directory is defined in the AIRFLOW_HOME environment variable. Type echo $AIRFLOW_HOME to find out.
+* In this directory, find the airflow.cfg file. Use head to read the file, and find the value of the dags_folder.
+
+Now you can find the folder and move the dag.py file there: mv ./dag.py <dags_folder>.
+
+```
+repl:~$ echo $AIRFLOW_HOME
+~/airflow
+repl:~$ cd ./airflow
+repl:~/airflow$ ls
+airflow.cfg  airflow.cfg.bak  airflow.db  airflow-webserver.pid  dags  logs  unittests.cfg
+repl:~/airflow$ head airflow.cfg
+[core]
+# The home folder for airflow, default is ~/airflow
+airflow_home = /home/repl/airflow
+
+# The folder where your airflow pipelines live, most likely a
+# subfolder in a code repository
+# This path must be absolute
+dags_folder = /home/repl/airflow/dags
+
+# The folder where airflow should store its log files
+repl:~/airflow$ cd ./dags
+repl:~/airflow/dags$ ls
+dag.py  dag_recommendations.py  __pycache__
+```
+# 4. Case Study: DataCamp
+
+
