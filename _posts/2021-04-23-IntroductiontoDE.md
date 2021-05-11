@@ -1024,6 +1024,8 @@ rating_data = extract_rating_data(db_engines)
 avg_rating_data = transform_avg_rating(rating_data)
 print(avg_rating_data) 
 ```
+<img src="/assets/images/20210501_IntroductiontoDE/pic33.png" class="largepic"/>
+
 **Filter out corrupt data**
 
 ```
@@ -1060,4 +1062,70 @@ def transform_recommendations(avg_course_ratings, courses_to_recommend):
 # Use the function with the predefined DataFrame objects
 recommendations = transform_recommendations(avg_course_ratings, courses_to_recommend)
 ```
+
+**Scheduling **
+
+Previous example:
+* Extract using `extract_course_data()` and `extract_rating_data()`
+* Clean up NA using `transform_fill_programming_language()`
+* Average course ratings per course: `transform_avg_rating()`
+* Get eligible user and course id pair: `transform_courses_to_recommend()`
+* Calculate the recommendations: `transform_recommendations()`
+
+Loading to Postgresql
+
+* Use the calculations in data products 
+* Update daily
+* Example use case: sending out e-mails with recommendations
+
+The loading phase
+
+```
+recommendations.to_sql( 
+    "recommendations", 
+    db_engine, 
+    if_exists="append",
+)
+```
+
+To get the data into the table, we can take the recommendations DataFrame and use the `pandas` `.to_sql` method to write it to a SQL table. It takes the table name as a first argument, a database engine, and finally, we can define a strategy for when the table exists. We could use `"append"` as a value, for example, if we'd like to add records to the database instead of replacing them
+
+```
+def etl(db_engines):
+    # Extract the data
+    courses = extract_course_data(db_engines)
+    rating = extract_rating_data(db_engines)
+    # Clean up courses data
+    courses = transofrm_fill_programming_language(courses)
+    # Get the average course ratings
+    avg_course_rating = transform_avg_rating(rating)
+    # Get eligible user and course id pairs
+    courses_to_recommend = transform_courses_to_recommend(
+        rating,
+        course,
+    )
+    # Calculate the recommendations
+    recommendatiosn = trasform_recommendantions(
+        avg_course_rating,
+        courses_to_recommend,    
+    )
+    # Load the recommendations into the database
+    load_to_dwh(recommendations,db_enginen)
+
+```
+```
+from airflow.models import DAG
+from airflow.operators.python_operator import PythonOperator
+
+dag = DAG(dag_id="recommendations", 
+          scheduled_interval="0 0 * * *")
+task_recommendations = PythonOperator( 
+    task_id="recommendations_task",
+    python_callable=etl,
+)
+```
+
+
+    
+
 
