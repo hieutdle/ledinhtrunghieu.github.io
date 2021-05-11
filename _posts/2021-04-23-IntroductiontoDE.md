@@ -1113,6 +1113,7 @@ def etl(db_engines):
     load_to_dwh(recommendations,db_enginen)
 
 ```
+**Creating the DAG**
 ```
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -1124,8 +1125,48 @@ task_recommendations = PythonOperator(
     python_callable=etl,
 )
 ```
+The target table
+```
+connection_uri = "postgresql://repl:password@localhost:5432/dwh"
+db_engine = sqlalchemy.create_engine(connection_uri)
+
+def load_to_dwh(recommendations):
+    recommendations.to_sql("recommendations", db_engine, if_exists="replace")
+```
+Defining the DAG
+```
+# Define the DAG so it runs on a daily basis
+dag = DAG(dag_id="recommendations",
+          schedule_interval="0 0 * * *")
+
+# Make sure `etl()` is called in the operator. Pass the correct kwargs.
+task_recommendations = PythonOperator(
+    task_id="recommendations_task",
+    python_callable=etl,
+    op_kwargs={"db_engines":db_engines},
+)
+```
+**Querying the recommendations**
+```
+def recommendations_for_user(user_id, threshold=4.5):
+  # Join with the courses table
+  query = """
+  SELECT title, rating FROM recommendations
+    INNER JOIN courses ON courses.course_id = recommendations.course_id
+    WHERE user_id=%(user_id)s AND rating>%(threshold)s
+    ORDER BY rating DESC
+  """
+  # Add the threshold parameter
+  predictions_df = pd.read_sql(query, db_engine, params = {"user_id": user_id, 
+                                                           "threshold": threshold})
+  return predictions_df.title.values
+
+# Try the function you created
+print(recommendations_for_user(12, 4.65))
+```
+
+# 5. Reference
 
 
-    
-
+1. [Introduction to Data Engineering - DataCamp](https://learn.datacamp.com/courses/introduction-to-data-engineering)
 
