@@ -102,3 +102,184 @@ print(tax_data_first1000.shape)
 
 Result: (1000,147)
 ```
+
+* Use `nrows` and `skiprows` together to process a file in chunks
+* `skiprows` accepts a list of row numbers, a number of rows, or a function to filter rows
+* Set header = None so pandas knows there are no columns names.
+* Note that pandas automatically makes the first row imported the header, so if you skip the row with column names, you should also specify that header equals none.
+
+```
+tax_data_next500 = pd.read_csv('us_tax_data_2016.csv',
+                                nrows=500, 
+                                skiprows=1000, 
+                                header=None)
+
+```
+
+**Assigning Column Names**
+* To assign column names when there aren't any, we use another read CSV argument: `names`.
+* Names takes a list of column names to use. The list **must** include a name for every column in the data
+* If you only want to rename some columns, it should be done after import.
+
+```
+col_names = list(tax_data_first1000)
+tax_data_next500 = pd.read_csv('us_tax_data_2016.csv',
+                               nrows=500, 
+                               skiprows=1000, 
+                               header=None,
+                               names=col_names)
+```
+
+**Example:**
+
+Import a subset of columns using `usecols`
+
+```
+# Create list of columns to use
+cols = ['zipcode','agi_stub','mars1','MARS2','NUMDEP']
+
+# Create data frame from csv using only selected columns
+data = pd.read_csv("vt_tax_data_2016.csv", usecols = cols)
+
+# View counts of dependents and tax returns by income level
+print(data.groupby("agi_stub").sum())
+```
+
+Import a file in chunks
+
+```
+# Create data frame of next 500 rows with labeled columns
+vt_data_next500 = pd.read_csv("vt_tax_data_2016.csv", 
+                       			nrows = 500,
+                       		  skiprows = 500,
+                       		  header= None,
+                       		 names=list(vt_data_first500))
+
+# View the Vermont data frames to confirm they're different
+print(vt_data_first500.head())
+print(vt_data_next500.head())
+```
+
+## 1.3. Handling errors and missing data
+
+**Common Flat File Import Issues**
+* Column data types are wrong (Incorrect data types)
+* Values are missing
+* Records that cannot be read by `pandas`
+
+**Specifying data types**
+`pandas` can automatically find out the data types by using `.dtypes`
+
+```
+print(tax_data.dtype)
+```
+<img src="/assets/images/20210424_ImportData/pic3.png" class="largepic"/>
+
+Checking data types in the tax data, we see that pandas interpreted ZIP codes as integers. They're more accurately modeled as strings. Instead of letting pandas guess, we can set the data type of any or all columns with read CSV's dtype keyword argument. Dtype takes a dictionary, where each key is a column name and each value is the data type that column should be. Note that non-standard data types, like pandas categories, must be passed in quotations. Here, we specify that the zipcode column should contain strings, leaving pandas to infer the other columns. Printing the new data frame's dtypes, we see that zipcode's dtype is "object", which is the pandas counterpart to Python strings.
+
+```
+tax_data = pd.read_csv("us_tax_data_2016.csv", 
+                        dtype={"zipcode": str})
+print(tax_data.dtypes)
+```
+
+<img src="/assets/images/20210424_ImportData/pic4.png" class="largepic"/>
+
+**Customizing Missing Data Values**
+* `pandas` automatically interprets some value as missing or NA
+
+```
+printn(tax_data.head())
+```
+<img src="/assets/images/20210424_ImportData/pic5.png" class="largepic"/>
+
+Sometimes missing values are represented in ways that pandas won't catch, such as with dummy codes. In the tax data, records were sorted so that the first few have the ZIP code 0, which is not a valid code and should be treated as missing.
+
+We can tell pandas to consider these missing data with the `na_values` keyword argument. `na_values` accepts either a single value, a list of values, or a dictionary of columns and values in that column to treat as missing.
+
+```
+tax_data = pd.read_csv("us_tax_data_2016.csv",
+                        na_values={"zipcode" : 0}) 
+print(tax_data[tax_data.zipcode.isna()])
+```
+
+<img src="/assets/images/20210424_ImportData/pic6.png" class="largepic"/>
+
+**Lines with Errors**
+
+One last issue you may face are lines that panndas just can parse. For example, a record could have more values than there are columns, like the second record in this corrupted version of the tax data. Let's try reading it. 
+
+<img src="/assets/images/20210424_ImportData/pic7.png" class="largepic"/>
+
+
+By default, trying to load this file results in a long error, and no data is imported.
+
+```
+tax_data = pd.readcsv("...")
+```
+
+<img src="/assets/images/20210424_ImportData/pic8.png" class="largepic"/>
+
+Luckily, we can change this behavior with two arguments, `error_bad_lines` and `warn_bad_lines`. Both take Boolean, or true/false values. 
+* Setting `error_bad_lines=False` makes pandas skip bad lines and load the rest of the data, instead of throwing an error. 
+* `warn_bad_lines=True` tells pandas whether to display messages when unparseable lines are skipped. 
+
+```
+tax_data = pd.read_csv("us_tax_data_2016_corrupt.csv",
+                        error_bad_lines=False, 
+                        warn_bad_lines=True)
+
+```
+<img src="/assets/images/20210424_ImportData/pic9.png" class="largepic"/>
+
+Example:
+
+Specify data types
+```
+# Create dict specifying data types for agi_stub and zipcode
+data_types = {"agi_stub":"category",
+			"zipcode":str}
+
+# Load csv using dtype to set correct data types
+data = pd.read_csv("vt_tax_data_2016.csv",dtype=data_types)
+
+# Print data types of resulting frame
+print(data.dtypes.head())
+```
+
+Set custom NA values
+
+```
+# Create dict specifying that 0s in zipcode are NA values
+null_values = {"zipcode" : 0}
+
+# Load csv using na_values keyword argument
+data = pd.read_csv("vt_tax_data_2016.csv", 
+                   na_values=null_values)
+
+# View rows with NA ZIP codes
+print(data[data.zipcode.isna()])
+```
+
+Skip bad data
+```
+try:
+  # Set warn_bad_lines to issue warnings about bad records
+  data = pd.read_csv("vt_tax_data_2016_corrupt.csv", 
+                     error_bad_lines=False, 
+                     warn_bad_lines=True)
+  
+  # View first 5 records
+  print(data.head())
+  
+except pd.io.common.CParserError:
+    print("Your data contained rows that could not be parsed.")
+```
+
+# 2. Importing Data From Excel Files
+
+Automate data imports from that staple of office life, Excel files. Import part or all of a workbook and ensure boolean and datetime data are properly loaded.
+
+
+
+
