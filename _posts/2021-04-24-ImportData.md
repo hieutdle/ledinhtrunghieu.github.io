@@ -302,5 +302,69 @@ print(survey_data.head())
 
 **Loading Select Columns and Rows** 
 * read_excel has many key word argument in common with read_csv()
-  * nrows:
-  * skiprows
+  * nrows: limit number of rows to load
+  * skiprows: specify number of rows or row numbers to skip
+  * choose columns by name, positional number, or letter (e.g. "A:P")
+
+<img src="/assets/images/20210424_ImportData/pic10.png" class="largepic"/>
+
+```
+# Read columns W-AB and AR of file, skipping metadata header 
+survey_data = pd.read_excel("fcc_survey_with_headers.xlsx",
+                            skiprows=2,
+                            usecols="W:AB, AR")
+
+# View data
+print(survey_data.head())
+```
+
+<img src="/assets/images/20210424_ImportData/pic11.png" class="largepic"/>
+                           
+**Example**
+
+Get data from a spreadsheet
+```
+# Load pandas as pd
+import pandas as pd
+# Read spreadsheet and assign it to survey_responses
+survey_responses = pd.read_excel("fcc_survey.xlsx")
+
+# View the head of the data frame
+print(survey_responses.head())
+```
+Load a portion of a spreadsheet
+```
+# Create string of lettered columns to load
+col_string = "AD,AW:BA"
+
+# Load data with skiprows and usecols set
+survey_responses = pd.read_excel("fcc_survey_headers.xlsx", 
+                        skiprows = 2, 
+                        usecols=col_string)
+
+# View the names of the columns selected
+print(survey_responses.columns)
+```
+
+## 2.2. Getting data from multiple worksheets
+
+**Select sheets to load**
+* `read_excel()` loads the first sheet in an Excel file by default
+* Use the `sheet_name` keyword argument to load other sheets
+* Specify spreadsheets by name and/or (zero-indexed) position number 
+* Pass a list of names/numbers to load more than one sheet at a time
+* If you load multiple sheets at once, any other arguments passed to read Excel apply to all sheets. For example, if you set nrows to 50, the first 50 rows of each sheet listed in sheet name will be loaded. If sheets need different parameters, load them with separate read Excel calls.
+
+```
+# Get the second sheet by position index 
+survey_data_sheet2 = pd.read_excel('fcc_survey.xlsx',
+                                    sheet_name=1)
+
+# Get the second sheet by name
+survey_data_2017 = pd.read_excel('fcc_survey.xlsx',
+                                sheet_name='2017')
+
+# Test if they have the same value, the result is True
+print(survey_data_sheet2.equals(survey_data_2017))
+```
+
