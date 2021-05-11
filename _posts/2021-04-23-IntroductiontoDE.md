@@ -18,7 +18,7 @@ In comes the data engineer:
 
 Data engineer to the rescue!
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic1.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic1.png" class="largepic"/>
 
 **Data Engineer**:
 * Extracts data from different sources
@@ -56,7 +56,7 @@ Data Scientist:
 
 Two examples of databases are MySQL or PostgreSQL
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic4.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic4.png" class="largepic"/>
 
 
 **Processing**
@@ -64,7 +64,7 @@ Two examples of databases are MySQL or PostgreSQL
 * Aggregate data
 * Join it together from different sources
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic2.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic2.png" class="largepic"/>
 
 Typically, huge amounts of data have to be processed. That is where **parallel processing** comes into play. Instead of processing the data on one computer, data engineers use **clusters of machines** to process the data. Often, these tools make an abstraction of the underlying architecture and have a simple API.
 
@@ -81,23 +81,23 @@ It looks a lot like simple pandas filter or count operations. However, behind th
 
 An example processing tool is Spark or Hive
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic5.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic5.png" class="largepic"/>
 
 **Scheduling**:
 
 Scheduling tools help to make sure **data moves** from one place to another **at the correct time**, with a **specific interval**. Data engineers make sure these jobs run in a timely fashion and that they run in the right order. Sometimes processing jobs need to run in a particular order to function correctly. For example, tables from two databases might need to be joined together after they are both cleaned. In the following diagram, the JoinProductOrder job needs to run after CleanProduct and CleanOrder ran.
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic3.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic3.png" class="largepic"/>
 
 For scheduling, we can use Apache Airflow, Oozie, or we can use the simple bash tool: cron.
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic6.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic6.png" class="largepic"/>
 
 **A Data Pipeline** 
 
 You can think of the data engineering **pipeline** through this diagram. It **extracts** all data through connections with several databases, **transforms** it using a cluster computing framework like **Spark**, and **loads** it into an analytical database. Also, everything is **scheduled** to run in a specific order through a scheduling framework like **Airflow**. A small side note here is that the sources can be external APIs or other file formats too
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic7.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic7.png" class="largepic"/>
 
 **Cloud Computing**
 
@@ -151,11 +151,11 @@ Semi-structured:
 
 **The Database schema**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic8.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic8.png" class="largepic"/>
 
 **Star schema**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic9.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic9.png" class="largepic"/>
 
 * In **data warehousing**, a schema you'll see often is the **star schema**. A lot of analytical databases like **Redshift** have optimizations for these kinds of schemas
 * The star schema consists of one or more fact **tables** referencing any number of **dimension tables**
@@ -166,7 +166,7 @@ Example:
 
 The database schema
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic10.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic10.png" class="largepic"/>
 
 ```
 data = pd.read_sql("""
@@ -199,7 +199,7 @@ Introduction to parallel computing [here](https://ledinhtrunghieu.github.io/2021
 
 Example:
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic10.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic10.png" class="largepic"/>
 
 Let's look into a more practical example. We're starting with a dataset of all Olympic events from 1896 until 2016. From this dataset, you want to get an average age of participants for each year. For this example, let's say you have four processing units at your disposal. You decide to distribute the load over all of your processing units. To do so, you need to split the task into smaller subtasks. In this example, the average age calculation for each group of years is as a subtask. You can achieve that through `groupby.` Then, you distribute all of these subtasks over the four processing units. This example illustrates roughly how the first distributed algorithms like Hadoop MapReduce work, the difference being the processing units are distributed over several machines.
 
@@ -281,25 +281,25 @@ print(athlete_events_dask.groupby('Year').Age.mean().compute())
 
 **Hadoop**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic12.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic12.png" class="largepic"/>
 
 **Hadoop** is a collection of open source projects, maintained by the Apache Software Foundation. Some of them are a bit outdated, but it's still relevant to talk about them. There are two Hadoop projects we want to focus on: **MapReduce** and **HDFS**.
 
 **HDFS**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic13.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic13.png" class="largepic"/>
 
 **HDFS** is a **Hadoop Distributed File System**. It's similar to the **file system** you have on your computer, the only difference being **the files reside on multiple different computers**. HDFS has been essential in the big data world, and for parallel computing by extension. Nowadays, cloud-managed storage systems like Amazon S3 often replace HDFS.
 
 **MapReduce**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic14.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic14.png" class="largepic"/>
 
 **MapReduce** was one of the first popularized  **big-data processing paradigms**. It works similar to the previous example, where the program splits tasks into subtasks, distributing the workload and data between several processing units. For MapReduce, these processing units are several computers in the cluster. MapReduce had its flaws; one of it was that it was hard to write these MapReduce jobs. Many software programs popped up to address this problem, and one of them was Hive.
 
 **Hive**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic15.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic15.png" class="largepic"/>
 
 **Hive** is a layer on top of the Hadoop ecosystem that makes data from several sources queryable in a structured way using Hive's SQL variant: Hive SQL. Facebook initially developed Hive, but the Apache Software Foundation now maintains the project. Although MapReduce was initially responsible for running the Hive jobs, it now integrates with several other data processing tools.
 
@@ -311,7 +311,7 @@ FROM views.athlete_events
 GROUP BY year
 ```
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic16.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic16.png" class="largepic"/>
 
 This Hive query selects the average age of the Olympians per Year they participated. As you'd expect, this query looks indistinguishable from a regular SQL query. However, behind the curtains, this query is transformed into a job that can operate on a cluster of computers.
 
@@ -347,7 +347,7 @@ GROUP BY year
 
 Compare Hadoop vs PySpark vs Hive
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic18.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic18.png" class="largepic"/>
 
 **PySpark Example**
 
@@ -414,7 +414,7 @@ Output: A DataFrame with average Olympian heights by year.
 
 An example of pipeline
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic19.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic19.png" class="largepic"/>
 
 You can write a Spark job that pulls data from a CSV file, filters out some corrupt records, and loads the data into a SQL database ready for analysis. However, you need to do this every day as new data is coming in to the CSV file. 
 
@@ -424,7 +424,7 @@ There are simple tools that could solve this problem, like cron, the Linux tool.
 
 **DAGs**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic20.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic20.png" class="largepic"/>
 
 **A DAG (Directed Acyclic Graphs)** is a set of nodes that are connected by directed edges. There are no cycles in the graph, which means that no path following the directed edges sees a specific node more than once. In the example on the slide, Job A needs to happen first, then Job B, which enables Job C and D and finally Job E. As you can see, it feels natural to represent this kind of workflow in a DAG. The jobs represented by the DAG can then run in a daily schedule, for example.
 
@@ -432,11 +432,11 @@ Tools for the jobs: Luigi, cron, Apache Airflow
 
 **Apache Airlow**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic21.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic21.png" class="largepic"/>
 
 Airbnb created **Airflow** as an internal tool for workflow management. They open-sourced Airflow in 2015, and it later joined the Apache Software Foundation in 2016. They built Airflow around the concept of DAGs. Using Python, developers can create and test these DAGs that build up complex pipelines.
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic22.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic22.png" class="largepic"/>
 
 The first job starts a Spark cluster. Once it's started, we can pull in customer and product data by running the ingest_customer_data and ingest_product_data jobs. Finally, we aggregate both tables using the enrich_customer_data job which runs after both ingest_customer_data and ingest_product_data complete.
 
@@ -462,7 +462,7 @@ First, we create a DAG using the `DAG` class. Afterward, we use an Operator to d
 
 In Airflow, a pipeline is represented as a Directed Acyclic Graph or DAG. The nodes of the graph represent tasks that are executed. The directed connections between nodes represent dependencies between the tasks.
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic23.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic23.png" class="largepic"/>
 
 
 ```
@@ -492,7 +492,7 @@ Having been exposed to the toolbox of data engineers, it's now time to jump into
 
 Very roughly, **Extract** means extracting data from persistent storage, which is not suited for data processing, into memory. Persistent storage could be a file on Amazon S3, for example, or a SQL database. It's the necessary stage before we can start transforming the data. The sources to extract from vary.
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic24.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic24.png" class="largepic"/>
 
 **Extract from text files**
 
@@ -526,7 +526,7 @@ print(result["key_1"])
 
 **Data on the Web**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic25.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic25.png" class="largepic"/>
 
 On the web, most communication happens to something called `requests.` You can look at a `request` as a 'request for data.' A `request` gets a `response`. For example, if you browse Google in your web browser, your browser requests the content of the Google home page. Google servers respond with the data that makes up the page.
 
@@ -636,7 +636,7 @@ extract_table_to_pandas("customer", db_engine)
 
 **Kind of transformations**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic26.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic26.png" class="largepic"/>
 
 * Selection of specific attribute. For example, we could select the 'email' column only. 
 * Translation of code values. For instance, 'New York' could be translated into 'NY'. 
@@ -646,7 +646,7 @@ extract_table_to_pandas("customer", db_engine)
 
 **An example: split (Pandas)**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic27.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic27.png" class="largepic"/>
 
 ```
 customer_df # Pandas DataFrame with customer data
@@ -681,7 +681,7 @@ The last transformation example will be using PySpark. We could just as well hav
 
 **Join (PySpark)**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic28.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic28.png" class="largepic"/>
 
 ```
 customer_df # PySpark DataFrame with customer data
@@ -767,7 +767,7 @@ As I mentioned before, there are two different types of databases.
 
 **Massive Parallel Processing Databases (MPP Databases)**
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic29.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic29.png" class="largepic"/>
 
 Massively parallel processing databases is often a target at the end of an ETL process. They're column-oriented databases optimized for analytics, that run in a distributed fashion. Specifically, this means that queries are not executed on a single compute node, but rather split into subtasks and distributed among several nodes. 
 
@@ -923,7 +923,7 @@ Having created the DAG, it's time to set the ETL into motion. The etl() function
 Save as etl_dag.py 
 Once you have this DAG definition and some tasks that relate to it, you can write it into a python file and place it in the DAG folder of Airflow. The service detects DAG and shows it in the interface.
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic30.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic30.png" class="largepic"/>
 
 **Defining a DAG Example**
 
@@ -984,7 +984,7 @@ dag.py  dag_recommendations.py  __pycache__
 # 4. Case Study: DataCamp
 
 
-<img src="/assets/images/20210501_IntroductiontoDE/pic31.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic31.png" class="largepic"/>
 
 **Querying the table**
 
@@ -1005,7 +1005,7 @@ user3 = pd.read_sql("SELECT * FROM rating WHERE user_id = '8770'", db_engine)
 # Use the helper function to compare the 3 users
 print_user_comparison(user1, user2, user3)
 ```
-<img src="/assets/images/20210501_IntroductiontoDE/pic32.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic32.png" class="largepic"/>
 
 **Average rating per course**
 ```
@@ -1024,7 +1024,7 @@ rating_data = extract_rating_data(db_engines)
 avg_rating_data = transform_avg_rating(rating_data)
 print(avg_rating_data) 
 ```
-<img src="/assets/images/20210501_IntroductiontoDE/pic33.png" class="largepic"/>
+<img src="/assets/images/20210423_IntroductiontoDE/pic33.png" class="largepic"/>
 
 **Filter out corrupt data**
 
