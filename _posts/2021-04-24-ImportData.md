@@ -288,3 +288,19 @@ Build pipelines to data stored in spreadsheets, plus additional data wrangling t
 * Unlike flat files, can have **formatting** (Note that pandas does not import spreadsheet formatting) and **formulas** (automatically updating results)
 * Multiple spreadsheets can exist in a workbook
 
+**Loading spreadsheets**
+Spreadsheets have their own loading function in pandas : `read_excel()`
+
+```
+import pandas as pd
+# Read the Excel file
+survey_data = pd.read_excel("fcc_survey.xlsx")
+
+# View the first 5 lines of data
+print(survey_data.head())
+```
+
+**Loading Select Columns and Rows** 
+* read_excel has many key word argument in common with read_csv()
+* * nrows:
+* * skiprows
