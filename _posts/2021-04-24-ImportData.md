@@ -302,5 +302,5 @@ print(survey_data.head())
 
 **Loading Select Columns and Rows** 
 * read_excel has many key word argument in common with read_csv()
-* * nrows:
-* * skiprows
+  * nrows:
+  * skiprows
