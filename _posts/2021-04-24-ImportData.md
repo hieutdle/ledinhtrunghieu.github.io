@@ -278,8 +278,13 @@ except pd.io.common.CParserError:
 
 # 2. Importing Data From Excel Files
 
-Automate data imports from that staple of office life, Excel files. Import part or all of a workbook and ensure boolean and datetime data are properly loaded.
+Build pipelines to data stored in spreadsheets, plus additional data wrangling techniques. Import part or all of a workbook and ensure boolean and datetime data are properly loaded.
 
+## 2.1 Introduction to spreadsheets
 
-
+**Spreadsheets**
+* Also known as Excel files
+* Data stored in tabular form, with cells arranged in rows and columns. 
+* Unlike flat files, can have **formatting** (Note that pandas does not import spreadsheet formatting) and **formulas** (automatically updating results)
+* Multiple spreadsheets can exist in a workbook
 
