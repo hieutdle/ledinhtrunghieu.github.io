@@ -709,3 +709,60 @@ survey_data["Part2EndTime"] = pd.to_datetime(survey_data["Part2EndTime"],
 print(survey_data.Part2EndTime.head())
 ```
 
+# 3. Importing Data from Databases
+
+SQL Introduction topics like WHERE clauses, aggregate functions, and basic joins.
+
+# 3.1. Introduction to databases
+
+**Relational databases**
+* Data about entities is organized into tables 
+* Each row or record is an instance of an entity 
+* Each column has information about an a ribute
+* Tables can be linked to each other via unique keys
+* Support more data, multiple simultaneous users, and data quality controls 
+* Data types are specified for each column
+* SQL (Structured Query Language) to interact with databases
+
+**Connecting to Databases**
+* Two process:
+  1. Create way to connect to database
+  2 . Query database
+* `pd.read_sql(query,engine) to load in data from a database 
+* Arguments
+  * `query`: String containing SQL query to run or table to load
+  * `engine` : Connection/database engine object
+
+```python
+# Load pandas and sqlalchemy's create_engine import pandas as pd
+from sqlalchemy import create_engine
+
+# Create database engine to manage connections
+engine = create_engine("sqlite:///data.db")
+
+# Load entire weather table by table name
+weather = pd.read_sql("weather", engine)
+
+# Load entire weather table with SQL
+weather = pd.read_sql("SELECT * FROM weather", engine)
+
+print(weather.head())
+```
+
+Example:
+```python
+# Create the database engine
+engine = create_engine("sqlite:///data.db")
+
+# Create a SQL query to load the entire weather table
+query = """
+SELECT *
+  FROM weather;
+"""
+
+# Load weather with the SQL query
+weather = pd.read_sql(query,engine)
+
+# View the first few rows of data
+print(weather.head())
+```
