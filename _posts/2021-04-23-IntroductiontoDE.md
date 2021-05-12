@@ -70,7 +70,7 @@ Typically, huge amounts of data have to be processed. That is where **parallel p
 
 Example: 
 
-```
+```python
 df = spark.read.parquet("user.parquet")
 
 outlier = df.filter([df["age] > 100)
@@ -168,7 +168,7 @@ The database schema
 
 <img src="/assets/images/20210423_IntroductiontoDE/pic10.png" class="largepic"/>
 
-```
+```python
 data = pd.read_sql("""
 SELECT first_name, last_name FROM "Customer"
 ORDER BY last_name, first_name
@@ -183,7 +183,7 @@ print(data.info())
 
 Joining on relation
 
-```
+```python
 data = pd.read_sql("""
 SELECT * FROM "Customer"
 INNER JOIN "Order"
@@ -206,7 +206,7 @@ Let's look into a more practical example. We're starting with a dataset of all O
 
 **multiprocessing.Pool**
 
-```
+```python
 from multiprocessing import Pool
 
 def take_mean_age(year_and_group): 
@@ -225,7 +225,7 @@ The resulting DataFrame is indexed by year. We can then take this function, and 
 
 Several packages offer a layer of abstraction to avoid having to write such low-level code. For example, the `dask` framework offers a DataFrame object, which performs a groupby and apply using multiprocessing out of the box. You need to define the number of partitions, for example, `4`. `dask` divides the DataFrame into 4 parts, and performs `.mean()` within each part separately. Because `dask` uses lazy evaluation, you need to add `.compute()` to the end of the chain.
 
-```
+```python
 import dask.dataframe as dd
 
 # Partition dataframe into 4
@@ -243,7 +243,7 @@ For this example, you will be using parallel computing to apply the function `ta
 
 You will be using the multiprocessor.Pool API which allows you to distribute your workload over several processes. The function `parallel_apply()` is defined in the sample code. It takes in as input the function being applied, the grouping used, and the number of cores needed for the analysis. Note that the @print_timing decorator is used to time each operation.
 
-```
+```python
 # Function to apply a function over multiple cores
 @print_timing
 def parallel_apply(apply_func, groups, nb_cores):
@@ -267,7 +267,7 @@ In the previous example, you saw how to split up a task and use the low-level py
 
 It's essential to understand this on a lower level, but in reality, you'll never use this kind of APIs. A more convenient way to parallelize an apply over several groups is using the dask framework and its abstraction of the pandas DataFrame, for example.
 
-```
+```python
 import dask.dataframe as dd
 
 # Set the number of partitions
@@ -329,7 +329,7 @@ When working with Spark, people typically use a programming language interface l
 
 Have a look at the following PySpark example. Similar to the Hive Query you saw before, it calculates the mean age of the Olympians, per Year of the Olympic event. Instead of using the SQL abstraction, like in the Hive Example, it uses the DataFrame abstraction.
 
-```
+```python
 # Load the dataset into athlete_events_spark first
 (athlete_events_spark
 .groupBy('Year')
@@ -354,7 +354,7 @@ Compare Hadoop vs PySpark vs Hive
 In this example, You'll use the PySpark package to handle a Spark DataFrame. The data is the same as in previous exercises: participants of Olympic events between 1896 and 2016.
 The Spark Dataframe, athlete_events_spark is available in your workspace.
 
-```
+```python
 # Print the type of athlete_events_spark
 print(type(athlete_events_spark))
 
@@ -440,7 +440,7 @@ Airbnb created **Airflow** as an internal tool for workflow management. They ope
 
 The first job starts a Spark cluster. Once it's started, we can pull in customer and product data by running the ingest_customer_data and ingest_product_data jobs. Finally, we aggregate both tables using the enrich_customer_data job which runs after both ingest_customer_data and ingest_product_data complete.
 
-```
+```python
 #Create the DAG object
 dag = DAG(dag_id="example_dag", ..., schedule_interval="0 * * * *")
 
@@ -465,7 +465,7 @@ In Airflow, a pipeline is represented as a Directed Acyclic Graph or DAG. The no
 <img src="/assets/images/20210423_IntroductiontoDE/pic23.png" class="largepic"/>
 
 
-```
+```python
 # Create the DAG object.
 # First, the DAG needs to run on every hour at minute 0. Every hour at minute N would be N * * * *. 
 
@@ -515,7 +515,7 @@ Another widespread data format is called **JSON**, or JavaScript Object Notation
 }
 ```
 
-```
+```python
 import json
 
 result = json.loads('{  "key_1": "value_1",
@@ -546,7 +546,7 @@ Another example request to the Hackernews API and the resulting JSON response
 
 Hackernews API
 
-```
+```python
 import requests
 
 response = requests.get("https://hacker-news.firebaseio.com/v0/item/16222426.json")
@@ -576,7 +576,7 @@ postgresql://[user[:password]@][host][:port]
 ```
 Use in Python
 
-```
+```python
 import sqlalchemy
 connection_uri = "postgresql://repl:password@localhost:5432/pagila" db_engine = sqlalchemy.create_engine(connection_uri)
 import pandas as pd
@@ -589,7 +589,7 @@ You've seen that you can extract data from an API by sending a request to the AP
 
 [Hacker News](https://news.ycombinator.com/) is a social news aggregation website, specifically for articles related to computer science or the tech world in general. Each post on the website has a JSON representation, which you'll see in the response of the request in the exercise.
 
-```
+```python
 import requests
 
 # Fetch the Hackernews post
@@ -615,7 +615,7 @@ In order to connect to the database, you'll have to use a PostgreSQL connection 
 postgresql://[user[:password]@][host][:port][/database]
 ```
 
-```
+```python
 # Function to extract table to a pandas DataFrame
 def extract_table_to_pandas(tablename, db_engine):
     query = "SELECT * FROM {}".format(tablename)
@@ -648,7 +648,7 @@ extract_table_to_pandas("customer", db_engine)
 
 <img src="/assets/images/20210423_IntroductiontoDE/pic27.png" class="largepic"/>
 
-```
+```python
 customer_df # Pandas DataFrame with customer data
 # Split email column into 2 columns on the '@' 
 symbol split_email = customer_df.email.str.split("@", expand=True) 
@@ -667,7 +667,7 @@ customer_df = customer_df.assign(
 
 Extract data into PySpark
 
-```
+```python
 import pyspark.sql
 
 spark = pyspark.sql.SparkSession.builder.getOrCreate()
@@ -683,7 +683,7 @@ The last transformation example will be using PySpark. We could just as well hav
 
 <img src="/assets/images/20210423_IntroductiontoDE/pic28.png" class="largepic"/>
 
-```
+```python
 customer_df # PySpark DataFrame with customer data
 ratings_df # PySpark DataFrame with ratings data
 
@@ -704,7 +704,7 @@ Example: Splitting the rental rate
 Suppose you would want to have a better understanding of the rates users pay for movies, so you decided to divide the rental_rate column into dollars and cents.
 In this example, you will use the same techniques used in the previous example. The film table has been loaded into the pandas DataFrame film_df. 
 
-```
+```python
 # Get the rental rate column as a string
 rental_rate_str = film_df.rental_rate.astype(str)
 
@@ -726,7 +726,7 @@ Joining with ratings
 
 In this example, you're going to create more synergies between the film and ratings tables.
 
-```
+```python
 # Use groupBy and mean to aggregate the column
 ratings_per_film_df = rating_df.groupby("film_id").mean("rating")
 
@@ -781,7 +781,7 @@ Famous example:
 To load data into Amazon Redshift, an excellent way to do this would be to write files to S3, AWS's file storage service, and send a copy query to Redshift. Typically, MPP databases load data best from files that use a columnar storage format. CSV files would not be a good option, for example. We often use a file format called **parquet** for this purpose.
 For example, in pandas, you can use the `.to_parquet()` method on a dataframe. In PySpark, you can use `.write.parquet()`. You can then connect to Redshift using a PostgreSQL connection URI and copy the data from S3 into Redshift.
 
-```
+```python
 # Pandas .to_parquet() method 
 df.to_parquet("./s3://path/to/bucket/customer.parquet") 
 # PySpark .write.parquet() method
@@ -799,7 +799,7 @@ FROM 's3://path/to/bucket/customer.parquet' FORMAT as parquet
 In other cases, you might want to load the result of the transformation phase into a PostgreSQL database. For example, your data pipeline could extract from a rating table, transform it to find recommendations and load them into a PostgreSQL database, ready to be used by a recommendation service. For this, there are also several helper methods in popular data science packages. For example, you could use `.to_sql()` in Pandas. Often, you can also provide a strategy for when the table already exists. Valid strategies for `.to_sql()` in Pandas are: "fail", "replace" and "append".
 
 pandas.to_sql()
-```
+```python
 # Transformation on data
 recommendations = transform_find_recommendatins(ratings_df)
 # Load into PostgreSQL database 
@@ -815,7 +815,7 @@ Writing to a file
 
 Files are often loaded into a MPP database like Redshift in order to make it available for analysis. The typical workflow is to write the data into columnar data files. These data files are then uploaded to a storage system and from there, they can be copied into the data warehouse. In case of Amazon Redshift, the storage system would be S3, for example. The first step is to write a file to the right format. For this example you'll choose the Apache Parquet file format. There's a PySpark DataFrame called film_sdf and a pandas DataFrame called film_pdf in the workspace.
 
-```
+```python
 # Write the pandas DataFrame to parquet
 film_pdf.to_parquet("films_pdf.parquet")
 
@@ -830,7 +830,8 @@ As a reminder, here's the structure of a connection URI for sqlalchemy:
 ```
 postgresql://[user[:password]@][host][:port][/database]
 ```
-```
+
+```python
 # Finish the connection URI
 connection_uri = "postgresql://repl:password@localhost:5432/dwh"
 db_engine_dwh = sqlalchemy.create_engine(connection_uri)
@@ -851,7 +852,7 @@ We've now covered the full extent of an ETL pipeline. We've extracted data from 
 
 **The ETL function**
 
-```
+```python
 def extract_table_to_df(tablename, db_engine):
     return pd.read_sql("SELECT * FROM {}".format(tablename), db_engine)
 
@@ -880,7 +881,7 @@ Now that we have a python function that describes the full ETL, we need to make 
 
 So the first thing we need to do is to create the DAG itself. In this code sample, we keep it simple and create a DAG object with id `sample`. The second argument is `schedule_interval` and it defines when the DAG needs to run.
 
-```
+```python
 from airflow.models import DAG
 dag = DAG(dag_id="sample",
             ...,
@@ -904,7 +905,7 @@ There are multiple ways of defining the interval, but the most common one is usi
 
 **The DAG definition file**
 
-```
+```python
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 
@@ -933,7 +934,7 @@ In the previous example you applied the three steps in the ETL process:
 * Load: Load a the film DataFrame into a PostgreSQL data warehouse.
 The functions extract_film_to_pandas(), transform_rental_rate() and load_dataframe_to_film() are defined in your workspace. In this example, you'll add an ETL task to an existing DAG. The DAG to extend and the task to wait for are defined in your workspace are defined as dag and wait_for_table respectively.
 
-```
+```python
 # Define the ETL function
 def etl():
     film_df = extract_film_to_pandas()
@@ -988,7 +989,7 @@ dag.py  dag_recommendations.py  __pycache__
 
 **Querying the table**
 
-```
+```python
 # Complete the connection URI
 connection_uri = "postgresql://repl:password@localhost:5432/datacamp_application"
 db_engine = sqlalchemy.create_engine(connection_uri)
@@ -1008,7 +1009,7 @@ print_user_comparison(user1, user2, user3)
 <img src="/assets/images/20210423_IntroductiontoDE/pic32.png" class="largepic"/>
 
 **Average rating per course**
-```
+```python
 # Complete the transformation function
 def transform_avg_rating(rating_data):
   # Group by course_id and extract average rating per course
@@ -1028,7 +1029,7 @@ print(avg_rating_data)
 
 **Filter out corrupt data**
 
-```
+```python
 course_data = extract_course_data(db_engines)
 
 # Print out the number of missing values per column
@@ -1046,7 +1047,7 @@ print(transformed.isnull().sum())
 ```
 **Using the recommender transformation**
 
-```
+```python
 # Complete the transformation function
 def transform_recommendations(avg_course_ratings, courses_to_recommend):
     # Merge both DataFrames
@@ -1090,7 +1091,7 @@ recommendations.to_sql(
 
 To get the data into the table, we can take the recommendations DataFrame and use the `pandas` `.to_sql` method to write it to a SQL table. It takes the table name as a first argument, a database engine, and finally, we can define a strategy for when the table exists. We could use `"append"` as a value, for example, if we'd like to add records to the database instead of replacing them
 
-```
+```python
 def etl(db_engines):
     # Extract the data
     courses = extract_course_data(db_engines)
@@ -1114,7 +1115,7 @@ def etl(db_engines):
 
 ```
 **Creating the DAG**
-```
+```python
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 
@@ -1126,7 +1127,7 @@ task_recommendations = PythonOperator(
 )
 ```
 The target table
-```
+```python
 connection_uri = "postgresql://repl:password@localhost:5432/dwh"
 db_engine = sqlalchemy.create_engine(connection_uri)
 
@@ -1134,7 +1135,7 @@ def load_to_dwh(recommendations):
     recommendations.to_sql("recommendations", db_engine, if_exists="replace")
 ```
 Defining the DAG
-```
+```python
 # Define the DAG so it runs on a daily basis
 dag = DAG(dag_id="recommendations",
           schedule_interval="0 0 * * *")
@@ -1147,7 +1148,7 @@ task_recommendations = PythonOperator(
 )
 ```
 **Querying the recommendations**
-```
+```python
 def recommendations_for_user(user_id, threshold=4.5):
   # Join with the courses table
   query = """

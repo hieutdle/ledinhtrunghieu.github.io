@@ -31,7 +31,7 @@ While you can create data frames by hand, you'll usually want to load existing d
 
 **Loading CSVs**
 
-```
+```python
 import pandas as pd
 
 tax_data = pd.read_csv("us_tax_data_2016.csv")
@@ -42,7 +42,7 @@ tax_data.head(4)
 
 * Specify a different delimeter with `sep`
 
-```
+```python
 import pandas as pd
 
 tax_data = pd.read_csv("us_tax_data_2016.csv", sep="\t")
@@ -50,7 +50,7 @@ tax_data = pd.read_csv("us_tax_data_2016.csv", sep="\t")
 ```
 
 Other example
-```
+```python
 # Import pandas with the alias pd
 import pandas as pd
 
@@ -68,7 +68,7 @@ plt.show()
 We'll look at ways to limit the amount of data imported, and how to make that data easier to work with by naming columns.
 
 Example
-```
+```python
 tax_data = pd.read_csv('us_tax_data_2016.csv')
 print(tax_data.shape)
 
@@ -80,7 +80,7 @@ Result: (179796,147)
 * Choose columns to load with the `usecols` keyword argument
 * Accepts a list of column numbers of names, or a function to filter column names.
 
-```
+```python
 col_names = ['STATEFIPS', 'STATE', 'zipcode', 'agi_stub', 'N1'] 
 col_nums = [0, 1, 2, 3, 4]
 # Choose columns to load by name
@@ -96,7 +96,7 @@ print(tax_data_v1.equals(tax_data_v2))
 **Limiting Rows**
 Limit the number of rows loaded with the `nrows` keyword argument
 
-```
+```python
 tax_data_first1000 = pd.read_csv('us_tax_data_2016.csv',nrows=1000)
 print(tax_data_first1000.shape)
 
@@ -108,7 +108,7 @@ Result: (1000,147)
 * Set header = None so pandas knows there are no columns names.
 * Note that pandas automatically makes the first row imported the header, so if you skip the row with column names, you should also specify that header equals none.
 
-```
+```python
 tax_data_next500 = pd.read_csv('us_tax_data_2016.csv',
                                 nrows=500, 
                                 skiprows=1000, 
@@ -121,7 +121,7 @@ tax_data_next500 = pd.read_csv('us_tax_data_2016.csv',
 * Names takes a list of column names to use. The list **must** include a name for every column in the data
 * If you only want to rename some columns, it should be done after import.
 
-```
+```python
 col_names = list(tax_data_first1000)
 tax_data_next500 = pd.read_csv('us_tax_data_2016.csv',
                                nrows=500, 
@@ -134,7 +134,7 @@ tax_data_next500 = pd.read_csv('us_tax_data_2016.csv',
 
 Import a subset of columns using `usecols`
 
-```
+```python
 # Create list of columns to use
 cols = ['zipcode','agi_stub','mars1','MARS2','NUMDEP']
 
@@ -147,7 +147,7 @@ print(data.groupby("agi_stub").sum())
 
 Import a file in chunks
 
-```
+```python
 # Create data frame of next 500 rows with labeled columns
 vt_data_next500 = pd.read_csv("vt_tax_data_2016.csv", 
                        			nrows = 500,
@@ -170,14 +170,14 @@ print(vt_data_next500.head())
 **Specifying data types**
 `pandas` can automatically find out the data types by using `.dtypes`
 
-```
+```python
 print(tax_data.dtype)
 ```
 <img src="/assets/images/20210424_ImportData/pic3.png" class="largepic"/>
 
 Checking data types in the tax data, we see that pandas interpreted ZIP codes as integers. They're more accurately modeled as strings. Instead of letting pandas guess, we can set the data type of any or all columns with read CSV's dtype keyword argument. Dtype takes a dictionary, where each key is a column name and each value is the data type that column should be. Note that non-standard data types, like pandas categories, must be passed in quotations. Here, we specify that the zipcode column should contain strings, leaving pandas to infer the other columns. Printing the new data frame's dtypes, we see that zipcode's dtype is "object", which is the pandas counterpart to Python strings.
 
-```
+```python
 tax_data = pd.read_csv("us_tax_data_2016.csv", 
                         dtype={"zipcode": str})
 print(tax_data.dtypes)
@@ -188,7 +188,7 @@ print(tax_data.dtypes)
 **Customizing Missing Data Values**
 * `pandas` automatically interprets some value as missing or NA
 
-```
+```python
 printn(tax_data.head())
 ```
 <img src="/assets/images/20210424_ImportData/pic5.png" class="largepic"/>
@@ -197,7 +197,7 @@ Sometimes missing values are represented in ways that pandas won't catch, such a
 
 We can tell pandas to consider these missing data with the `na_values` keyword argument. `na_values` accepts either a single value, a list of values, or a dictionary of columns and values in that column to treat as missing.
 
-```
+```python
 tax_data = pd.read_csv("us_tax_data_2016.csv",
                         na_values={"zipcode" : 0}) 
 print(tax_data[tax_data.zipcode.isna()])
@@ -214,7 +214,7 @@ One last issue you may face are lines that panndas just can parse. For example, 
 
 By default, trying to load this file results in a long error, and no data is imported.
 
-```
+```python
 tax_data = pd.readcsv("...")
 ```
 
@@ -224,7 +224,7 @@ Luckily, we can change this behavior with two arguments, `error_bad_lines` and `
 * Setting `error_bad_lines=False` makes pandas skip bad lines and load the rest of the data, instead of throwing an error. 
 * `warn_bad_lines=True` tells pandas whether to display messages when unparseable lines are skipped. 
 
-```
+```python
 tax_data = pd.read_csv("us_tax_data_2016_corrupt.csv",
                         error_bad_lines=False, 
                         warn_bad_lines=True)
@@ -235,7 +235,7 @@ tax_data = pd.read_csv("us_tax_data_2016_corrupt.csv",
 Example:
 
 Specify data types
-```
+```python
 # Create dict specifying data types for agi_stub and zipcode
 data_types = {"agi_stub":"category",
 			"zipcode":str}
@@ -249,7 +249,7 @@ print(data.dtypes.head())
 
 Set custom NA values
 
-```
+```python
 # Create dict specifying that 0s in zipcode are NA values
 null_values = {"zipcode" : 0}
 
@@ -262,7 +262,7 @@ print(data[data.zipcode.isna()])
 ```
 
 Skip bad data
-```
+```python
 try:
   # Set warn_bad_lines to issue warnings about bad records
   data = pd.read_csv("vt_tax_data_2016_corrupt.csv", 
@@ -291,7 +291,7 @@ Build pipelines to data stored in spreadsheets, plus additional data wrangling t
 **Loading spreadsheets**
 Spreadsheets have their own loading function in pandas : `read_excel()`
 
-```
+```python
 import pandas as pd
 # Read the Excel file
 survey_data = pd.read_excel("fcc_survey.xlsx")
@@ -308,7 +308,7 @@ print(survey_data.head())
 
 <img src="/assets/images/20210424_ImportData/pic10.png" class="largepic"/>
 
-```
+```python
 # Read columns W-AB and AR of file, skipping metadata header 
 survey_data = pd.read_excel("fcc_survey_with_headers.xlsx",
                             skiprows=2,
@@ -323,7 +323,7 @@ print(survey_data.head())
 **Example**
 
 Get data from a spreadsheet
-```
+```python
 # Load pandas as pd
 import pandas as pd
 # Read spreadsheet and assign it to survey_responses
@@ -333,7 +333,7 @@ survey_responses = pd.read_excel("fcc_survey.xlsx")
 print(survey_responses.head())
 ```
 Load a portion of a spreadsheet
-```
+```python
 # Create string of lettered columns to load
 col_string = "AD,AW:BA"
 
@@ -355,7 +355,7 @@ print(survey_responses.columns)
 * Pass a list of names/numbers to load more than one sheet at a time
 * If you load multiple sheets at once, any other arguments passed to read Excel apply to all sheets. For example, if you set nrows to 50, the first 50 rows of each sheet listed in sheet name will be loaded. If sheets need different parameters, load them with separate read Excel calls.
 
-```
+```python
 # Get the second sheet by position index 
 survey_data_sheet2 = pd.read_excel('fcc_survey.xlsx',
                                     sheet_name=1)
@@ -371,7 +371,7 @@ print(survey_data_sheet2.equals(survey_data_2017))
 **Loading All Sheets**
 * Passing `sheet_name=None` to read_excel() reads all sheets in a workbook
 
-```
+```python
 survey_responses = pd.read_excel("fcc_survey.xlsx",sheet_name=None)
 print(type(survey_responses))
 ```
@@ -379,7 +379,7 @@ print(type(survey_responses))
 
 Instead of getting a data frame, we got an ordered dictionary! Iterating through the items reveals that the keys are sheet names, and the values are data frames for each sheet.
 
-```
+```python
 for key, value in survey_responses.items(): 
 print(key, type(value))
 ```
@@ -395,7 +395,7 @@ Combine sheet when:
 
 First, we create an empty data frame, all responses. Then, we loop through the items in the survey responses dictionary. Remember, each value is a data frame corresponding to a worksheet, and each key is a sheet name. For each data frame, we add a column, Year, containing the sheet name, so we know which dataset a record came from. Finally, we append the data frames to all responses. We can check unique values in the year column to confirm that all responses has both years. In this case, we only combined two sheets, so we could have appended one to the other, but looping has the advantage of working for any number of sheets.
 
-```
+```python
 # Create empty data frame to hold all loaded sheets 
 all_responses = pd.DataFrame()
 
@@ -415,7 +415,7 @@ print(all_responses.Year.unique())
 **Reminder example**
 Select a single sheet
 
-```
+```python
 # Create df from second worksheet by referencing its position
 responses_2017 = pd.read_excel("fcc_survey.xlsx",
                                sheet_name=1)
@@ -432,7 +432,7 @@ plt.show()
 
 Select multiple sheets
 
-```
+```python
 # Load both the 2016 and 2017 sheets by name
 all_survey_data = pd.read_excel("fcc_survey.xlsx",
                                 sheet_name=['2016', '2017'])
@@ -454,7 +454,7 @@ print(all_survey_data.keys())
 * Set up a for loop to iterate through the values in the responses dictionary.
 * Append each data frame to all_responses and reassign the result to the same variable name.
 
-```
+```python
 # Create an empty data frame
 all_responses = pd.DataFrame()
 
@@ -481,7 +481,7 @@ A Boolean variable has only two possible values: True or False, which makes them
 
 **pandas and Boolean**
 
-```
+```python
 bootcamp_data = pd.read_excel("fcc_survey_booleans.xlsx") 
 print(bootcamp_data.dtypes)
 ```
@@ -490,17 +490,18 @@ pandas interpreted no columns as Boolean! Even True/False columns were loaded as
 <img src="/assets/images/20210424_ImportData/pic16.png" class="largepic"/>
 
 
-```
+```python
 # Count True values 
 print(bootcamp_data.sum())
 ```
 <img src="/assets/images/20210424_ImportData/pic17.png" class="largepic"/>
-```
-# Count NAs print(bootcamp_data.isna().sum())
+```python
+# Count NAs 
+print(bootcamp_data.isna().sum())
 ```
 <img src="/assets/images/20210424_ImportData/pic18.png" class="largepic"/>
 38 attended a bootcamp and 14 took out a loan for it. Let's also check how many values in each column are missing by summing the results of is NA. Every record has a value for bootcamp attendance, but most of the loan values are blank, even for some students who attended a bootcamp.
-```
+```python
 # Load data, casting True/False columns as Boolean 
 bool_data = pd.read_excel("fcc_survey_booleans.xlsx",
                           dtype={"AttendedBootcamp": bool, 
@@ -517,7 +518,11 @@ print(bool_data.dtypes)
 Check again
 
 <img src="/assets/images/20210424_ImportData/pic20.png" class="largepic"/>
+
 Checking counts of True values reveals issues. The loan columns have too many Trues, and the yes/no ones are all True. Checking NA values by column, we see there aren't any.
 
-`pandas` automatically loads True/False columns as floats, but that can be changed with `dtype`. Boolean values must be either True or False, so NAs were re-coded as True. While pandas recognized that 1 and 0 are False and True, respectively, it did not know what to do with Yes and No, so they were all coded as True.
+*`pandas` automatically loads True/False columns as floats, but that can be changed with `dtype`. 
+* Boolean values must be either True or False, NAs were re-coded as True
+* `pandas` recognized that 1 and 0 are False and True
+* It did not know what to do with Yes and No, so they were all coded as True.
 
