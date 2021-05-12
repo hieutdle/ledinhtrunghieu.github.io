@@ -521,8 +521,191 @@ Check again
 
 Checking counts of True values reveals issues. The loan columns have too many Trues, and the yes/no ones are all True. Checking NA values by column, we see there aren't any.
 
-*`pandas` automatically loads True/False columns as floats, but that can be changed with `dtype`. 
-* Boolean values must be either True or False, NAs were re-coded as True
-* `pandas` recognized that 1 and 0 are False and True
-* It did not know what to do with Yes and No, so they were all coded as True.
+*`pandas` automatically loads `True`/`False` columns as floats, but that can be changed with `dtype`. 
+* Boolean values must be either `True` or `False`, NAs/missing values were re-coded as True
+* `pandas` automatically recognized that 1 and 0 are `True` and `False`
+* Unrecognized values in a Boolean column are also changed to `True` (Example: Yes and No)
+
+**Setting Custom True/False Values**
+* Use `read_excel()`'s `true_values` argument to set custom `True` value
+* Use `false_values` to set custom `False` values
+* Each takes a list of values to treat as `True`/`False`, respectively
+* Custom `True`/`False` values are only applied to columns set as Boolean 
+
+```python
+# Load data with Boolean dtypes and custom T/F values 
+bool_data = pd.read_excel("fcc_survey_booleans.xlsx",
+                          dtype={"AttendedBootcamp": bool, 
+                          "AttendedBootCampYesNo": bool, 
+                          "AttendedBootcampTF":bool, 
+                          "BootcampLoan": bool, 
+                          "LoanYesNo": bool,
+                          "LoanTF": bool}, 
+                          true_values=["Yes"], 
+                          false_values=["No"])
+```
+
+But how about NA values? We don't want fake True, so we might decide to keep the loan columns as floats. 
+
+**Boolean Consideration**
+Things to consider when casting a column as Boolean include:
+* Are there missing values, or could there be in the future?
+* How the column will be used in the analysis?
+* What would happen if a value were incorrectly coded aas `True`?
+* Could the data be modeled another way (e.g., as floats or integers)?
+
+**Example:**
+
+```python
+# Load the data
+survey_data = pd.read_excel("fcc_survey_subset.xlsx")
+
+# Count NA values in each column
+print(survey_data.isnull().sum())
+
+# Set dtype to load appropriate column(s) as Boolean data
+survey_data = pd.read_excel("fcc_survey_subset.xlsx",
+                            dtype={"HasDebt":bool})
+
+# View financial burdens by Boolean group
+print(survey_data.groupby("HasDebt").sum())
+
+# Load file with Yes as a True value and No as a False value
+survey_subset = pd.read_excel("fcc_survey_yn_data.xlsx",
+                              dtype={"HasDebt": bool,
+                              "AttendedBootCampYesNo": bool},
+                              true_values=["Yes"],
+                              false_values=["No"])
+
+# View the data
+print(survey_subset.head())
+```
+
+## 2.4. Modifying imports: parsing dates
+
+**Date and time Data**
+* Dates and times have their own data type and internal representation. Python stores them as a special data type, datetime.
+* Datetime values can be translated into string representations
+* Common set of codes to describe datetime string formatting
+
+**pandas and Datetime**
+* Datetime columns are loaded as objects (strings) by default 
+* Specify that columns have datetimes with the `parse_dates` argument (not `dtype`)
+* `parse_dates` can accept:
+  * a list of column names or numbers to parse
+  * a list containing lists of columns to combine and parse (for example: day,month,year)
+  * a dictionary where keys are new column names and values are lists of columns to parse together
+
+<img src="/assets/images/20210424_ImportData/pic21.png" class="largepic"/>
+
+Part1StartTime and Part1Endtime have data in standard year-month-day-hour-minute-second format. Part2StartTime's data has been split into date and time columns. Part2EndTime is in a nonstandard format.
+
+**Parsing Dates**
+```python
+# List columns of dates to parse
+date_cols = ["Part1StartTime", "Part1EndTime"]
+
+# Load file, parsing standard datetime columns 
+survey_df = pd.read_excel("fcc_survey.xlsx",
+                          parse_dates=date_cols)
+```
+
+```python
+# Check data types of timestamp columns 
+print(survey_df[["Part1StartTime",
+                 "Part1EndTime", 
+                 "Part2StartDate", 
+                 "Part2StartTime", 
+                 "Part2EndTime"]].dtypes)
+```
+<img src="/assets/images/20210424_ImportData/pic22.png" class="largepic"/>
+
+```python
+# List columns of dates to parse
+date_cols = ["Part1StartTime",
+             "Part1EndTime",
+            [["Part2StartDate", "Part2StartTime"]]]
+
+# Load file, parsing standard and split datetime columns 
+survey_df = pd.read_excel("fcc_survey.xlsx",       
+                          parse_dates=date_cols)
+print(survey_df.head())
+```
+<img src="/assets/images/20210424_ImportData/pic22.png" class="largepic"/>
+`pandas` creates a new combined datetime column, Part2StartDate_Part2StartTime. But to control the column names, we should create a dictionary, pass that instead, and view the resulting column.
+
+```python
+# List columns of dates to parse
+date_cols = {"Part1Start": "Part1StartTime", 
+             "Part1End": "Part1EndTime", 
+             "Part2Start": ["Part2StartDate",
+                            "Part2StartTime"]}
+
+# Load file, parsing standard and split datetime columns 
+survey_df = pd.read_excel("fcc_survey.xlsx",
+                          parse_dates=date_cols)
+
+print(survey_df.Part2Start.head(3))
+```
+<img src="/assets/images/20210424_ImportData/pic24.png" class="largepic"/>
+
+**Non-Standard Dates**
+* `parse_dates` doesn't work with non-standard datetime formats. It will be counted as `str`
+* Use `pd.to_datetime()` after loading data if `parse_dates` won't work
+* `to_datetime()` arguments:
+  * Data frame and column to convert 
+  * `format`:string respresentation of datetime format
+
+**Datetime Formatting**
+* Describe datetime string formatting with codes and characters
+* Refer to strftime.org for the full list
+
+<img src="/assets/images/20210424_ImportData/pic25.png" class="largepic"/>
+
+**Parsing Non-standard Dates**
+
+<img src="/assets/images/20210424_ImportData/pic26.png" class="largepic"/>
+
+```python
+format_string = "%m%d%Y %H:%M:%S"
+survey_df["Part2EndTime"] = pd.to_datetime(survey_df["Part2EndTime"],
+                                           format=format_string)
+print(survey_df.Part2EndTime.head())
+```
+<img src="/assets/images/20210424_ImportData/pic27.png" class="largepic"/>
+
+Example:
+Parse simple date
+```python
+# Load file, with Part1StartTime parsed as datetime data
+survey_data = pd.read_excel("fcc_survey.xlsx",
+                            parse_dates=["Part1StartTime"])
+
+# Print first few values of Part1StartTime
+print(survey_data.Part1StartTime.head())
+```
+
+Get datetimes from multiple columns
+```python
+# Create dict of columns to combine into new datetime column
+datetime_cols = {"Part2Start": ["Part2StartDate",
+                                "Part2StartTime"]}
+
+
+# Load file, supplying the dict to parse_dates
+survey_data = pd.read_excel("fcc_survey_dts.xlsx",
+                             parse_dates=datetime_cols)
+
+# View summary statistics about Part2Start
+print(survey_data.Part2Start.describe())
+```
+Parse non-standard date formats
+```python
+# Parse datetimes and assign result back to Part2EndTime
+survey_data["Part2EndTime"] = pd.to_datetime(survey_data["Part2EndTime"], 
+                                             format="%m%d%Y %H:%M:%S")
+
+# Print first few values of Part2EndTime
+print(survey_data.Part2EndTime.head())
+```
 

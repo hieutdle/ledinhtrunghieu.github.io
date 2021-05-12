@@ -73,7 +73,7 @@ Example:
 ```python
 df = spark.read.parquet("user.parquet")
 
-outlier = df.filter([df["age] > 100)
+outlier = df.filter(df["age"] > 100)
 
 print(outliers.count())
 ```
