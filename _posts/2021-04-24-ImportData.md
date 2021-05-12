@@ -388,6 +388,11 @@ print(key, type(value))
 
 **Combine sheets**
 
+Combine sheet when:
+* The data is not duplicated across tabs
+* The columns are all named the same
+* You wish to read in all tabs and combine them
+
 First, we create an empty data frame, all responses. Then, we loop through the items in the survey responses dictionary. Remember, each value is a data frame corresponding to a worksheet, and each key is a sheet name. For each data frame, we add a column, Year, containing the sheet name, so we know which dataset a record came from. Finally, we append the data frames to all responses. We can check unique values in the year column to confirm that all responses has both years. In this case, we only combined two sheets, so we could have appended one to the other, but looping has the advantage of working for any number of sheets.
 
 ```
@@ -406,3 +411,113 @@ for sheet_name, frame in survey_responses.items():
 print(all_responses.Year.unique())
 ```
 <img src="/assets/images/20210424_ImportData/pic14.png" class="largepic"/>
+
+**Reminder example**
+Select a single sheet
+
+```
+# Create df from second worksheet by referencing its position
+responses_2017 = pd.read_excel("fcc_survey.xlsx",
+                               sheet_name=1)
+
+# Create df from second worksheet by referencing its name
+responses_2017 = pd.read_excel("fcc_survey.xlsx",
+                               sheet_name="2017")
+
+# Graph where people would like to get a developer job
+job_prefs = responses_2017.groupby("JobPref").JobPref.count()
+job_prefs.plot.barh()
+plt.show()                              
+```
+
+Select multiple sheets
+
+```
+# Load both the 2016 and 2017 sheets by name
+all_survey_data = pd.read_excel("fcc_survey.xlsx",
+                                sheet_name=['2016', '2017'])
+
+# Load all sheets in the Excel file
+all_survey_data = pd.read_excel("fcc_survey.xlsx",
+                                sheet_name = [0,"2017"])
+
+# Load all sheets in the Excel file
+all_survey_data = pd.read_excel("fcc_survey.xlsx",
+                                sheet_name = None)
+
+# View the sheet names in all_survey_data
+print(all_survey_data.keys())
+```
+
+
+* Create an empty data frame, all_responses.
+* Set up a for loop to iterate through the values in the responses dictionary.
+* Append each data frame to all_responses and reassign the result to the same variable name.
+
+```
+# Create an empty data frame
+all_responses = pd.DataFrame()
+
+# Set up for loop to iterate through values in responses
+for df in responses.values():
+  # Print the number of rows being added
+  print("Adding {} rows".format(df.shape[0]))
+  # Append df to all_responses, assign result
+  all_responses = all_responses.append(df)
+
+# Graph employment statuses in sample
+counts = all_responses.groupby("EmploymentStatus").EmploymentStatus.count()
+counts.plot.barh()
+plt.show()
+```
+# 2.3. Modifying imports: true/false data
+
+A Boolean variable has only two possible values: True or False, which makes them convenient for tasks like filtering. Despite this simplicity, Booleans can be tricky. True and false are represented in a few ways for demonstration purposes:
+* 1 and 0, which are common among people with coding experience,
+* Trues and Falses
+* Yes and No, which tend to appear in surveys and forms.
+
+<img src="/assets/images/20210424_ImportData/pic15.png" class="largepic"/>
+
+**pandas and Boolean**
+
+```
+bootcamp_data = pd.read_excel("fcc_survey_booleans.xlsx") 
+print(bootcamp_data.dtypes)
+```
+pandas interpreted no columns as Boolean! Even True/False columns were loaded as floats
+
+<img src="/assets/images/20210424_ImportData/pic16.png" class="largepic"/>
+
+
+```
+# Count True values 
+print(bootcamp_data.sum())
+```
+<img src="/assets/images/20210424_ImportData/pic17.png" class="largepic"/>
+```
+# Count NAs print(bootcamp_data.isna().sum())
+```
+<img src="/assets/images/20210424_ImportData/pic18.png" class="largepic"/>
+38 attended a bootcamp and 14 took out a loan for it. Let's also check how many values in each column are missing by summing the results of is NA. Every record has a value for bootcamp attendance, but most of the loan values are blank, even for some students who attended a bootcamp.
+```
+# Load data, casting True/False columns as Boolean 
+bool_data = pd.read_excel("fcc_survey_booleans.xlsx",
+                          dtype={"AttendedBootcamp": bool, 
+                                "AttendedBootCampYesNo": bool, 
+                                "AttendedBootcampTF":bool, 
+                                "BootcampLoan": bool, 
+                                "LoanYesNo": bool,
+                                "LoanTF": bool})
+print(bool_data.dtypes)
+```
+
+<img src="/assets/images/20210424_ImportData/pic19.png" class="largepic"/>
+
+Check again
+
+<img src="/assets/images/20210424_ImportData/pic20.png" class="largepic"/>
+Checking counts of True values reveals issues. The loan columns have too many Trues, and the yes/no ones are all True. Checking NA values by column, we see there aren't any.
+
+`pandas` automatically loads True/False columns as floats, but that can be changed with `dtype`. Boolean values must be either True or False, so NAs were re-coded as True. While pandas recognized that 1 and 0 are False and True, respectively, it did not know what to do with Yes and No, so they were all coded as True.
+
