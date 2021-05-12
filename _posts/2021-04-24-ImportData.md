@@ -368,3 +368,41 @@ survey_data_2017 = pd.read_excel('fcc_survey.xlsx',
 print(survey_data_sheet2.equals(survey_data_2017))
 ```
 
+**Loading All Sheets**
+* Passing `sheet_name=None` to read_excel() reads all sheets in a workbook
+
+```
+survey_responses = pd.read_excel("fcc_survey.xlsx",sheet_name=None)
+print(type(survey_responses))
+```
+<img src="/assets/images/20210424_ImportData/pic12.png" class="largepic"/>
+
+Instead of getting a data frame, we got an ordered dictionary! Iterating through the items reveals that the keys are sheet names, and the values are data frames for each sheet.
+
+```
+for key, value in survey_responses.items(): 
+print(key, type(value))
+```
+
+<img src="/assets/images/20210424_ImportData/pic13.png" class="largepic"/>
+
+**Combine sheets**
+
+First, we create an empty data frame, all responses. Then, we loop through the items in the survey responses dictionary. Remember, each value is a data frame corresponding to a worksheet, and each key is a sheet name. For each data frame, we add a column, Year, containing the sheet name, so we know which dataset a record came from. Finally, we append the data frames to all responses. We can check unique values in the year column to confirm that all responses has both years. In this case, we only combined two sheets, so we could have appended one to the other, but looping has the advantage of working for any number of sheets.
+
+```
+# Create empty data frame to hold all loaded sheets 
+all_responses = pd.DataFrame()
+
+# Iterate through data frames in dictionary
+for sheet_name, frame in survey_responses.items():
+  # Add a column so we know which year data is from 
+  frame["Year"] = sheet_name
+
+  # Add each data frame to all_responses 
+  all_responses = all_responses.append(frame)
+
+# View years in data 
+print(all_responses.Year.unique())
+```
+<img src="/assets/images/20210424_ImportData/pic14.png" class="largepic"/>
