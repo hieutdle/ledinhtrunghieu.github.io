@@ -768,3 +768,56 @@ print(weather.head())
 ```
 
 ## 3.2. Refining imports with SQL queries
+
+**SELECT and WHERE**
+
+```python
+# Load libraries import pandas as pd
+from sqlalchemy import create_engine 
+# Create database engine
+engine = create_engine("sqlite:///data.db") 
+# Write query to get records from Brooklyn 
+query = """SELECT * FROM hpd311calls
+                    WHERE borough = 'BROOKLYN';"""
+# Query the database
+brooklyn_calls = pd.read_sql(query, engine) print(brookyn_calls.borough.unique())
+```
+
+**Combining conditions: AND and OR**
+```python
+# Write query to get records about plumbing in the Bronx 
+and_query = """SELECT *
+              FROM hpd311calls
+              WHERE borough = 'BRONX'
+AND complaint_type = 'PLUMBING';""" 
+# Get calls about plumbing issues in the Bronx 
+bx_plumbing_calls = pd.read_sql(and_query, engine)
+
+# Check record count
+print(bx_plumbing_calls.shape)
+
+# Write query to get records about water leaks or plumbing 
+or_query = """SELECT *
+              FROM hpd311calls
+              WHERE complaint_type = 'WATER LEAK' 
+              OR complaint_type = 'PLUMBING';"""
+# Get calls that are about plumbing or water leaks
+leaks_or_plumbing = pd.read_sql(or_query, engine)
+
+# Check record count
+print(leaks_or_plumbing.shape)
+```
+
+## 3.3. More complex SQL queries
+
+**Getting DISTINCT Values**
+
+Get unique value, remove duplicate records
+
+```
+/* Get unique street addresses and boroughs */ 
+SELECT DISTINCT incident_address,
+borough FROM hpd311calls;
+```
+
+
