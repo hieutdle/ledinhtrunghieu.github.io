@@ -470,7 +470,7 @@ counts = all_responses.groupby("EmploymentStatus").EmploymentStatus.count()
 counts.plot.barh()
 plt.show()
 ```
-# 2.3. Modifying imports: true/false data
+## 2.3. Modifying imports: true/false data
 
 A Boolean variable has only two possible values: True or False, which makes them convenient for tasks like filtering. Despite this simplicity, Booleans can be tricky. True and false are represented in a few ways for demonstration purposes:
 * 1 and 0, which are common among people with coding experience,
@@ -713,7 +713,7 @@ print(survey_data.Part2EndTime.head())
 
 SQL Introduction topics like WHERE clauses, aggregate functions, and basic joins.
 
-# 3.1. Introduction to databases
+## 3.1. Introduction to databases
 
 **Relational databases**
 * Data about entities is organized into tables 
@@ -766,3 +766,5 @@ weather = pd.read_sql(query,engine)
 # View the first few rows of data
 print(weather.head())
 ```
+
+## 3.2. Refining imports with SQL queries
