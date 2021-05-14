@@ -927,5 +927,40 @@ import pandas as pd
 death_causes = pd.read_json("nyc_death_causes.json",
                             orient="split")
 print(death_causes.head())
-
+```
 <img src="/assets/images/20210424_ImportData/pic31.png" class="largepic"/>
+
+**Work with JSON orientations**
+
+```python
+try:
+    # Load the JSON with orient specified
+    df = pd.read_json("dhs_report_reformatted.json",
+                      orient="split")
+    # Plot total population in shelters over time
+    df["date_of_census"] = pd.to_datetime(df["date_of_census"])
+    df.plot(x="date_of_census", 
+            y="total_individuals_in_shelter")
+    plt.show()
+    
+except ValueError:
+    print("pandas could not parse the JSON.")
+```
+## 4.2. Introduction to APIs
+
+**Application Programming Interfaces**
+* An **application programming interface** is a defined way for an application to communicate with other programs, and vice versa.
+* Let programmers get data from an application without having to know about that application's database architecture
+
+Note: 
+* APIs are shared resources, and often limit how much data you can get in a specified timeframe. Using an API to get data is like using a catalog to order products. The catalog shows what's available and provides order instructions. 
+* You send a properly formed order to the right address, and get back what you asked for. Similarly, an API provides an endpoint to send requests to, and documentation describes what a request should look like, such as parameters to include.
+
+**Requests**
+* Lets users send and get data from websites
+* It's not tied to any particular API
+* `request.get()` to get data from a URL
+
+**request.get()**
+* `request.get(url_string) to get data from a URL
+
