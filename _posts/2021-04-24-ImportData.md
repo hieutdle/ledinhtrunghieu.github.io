@@ -972,6 +972,136 @@ Note:
 **response.json() and pandas
 * `response.json()` returns a dictionary
 * `read_json()` expects strings, not dictionaries
-* Load the response JSON to a Data frame with `pd.DataFrame()`
-  * `read_json()` will give error!
+* You need to load the response JSON to a Data frame with `pd.DataFrame()` because `read_json()` will give error!
 
+**Yelp Business Search API**
+<img src="/assets/images/20210424_ImportData/pic32.png" class="largepic"/>
+
+<img src="/assets/images/20210424_ImportData/pic33.png" class="largepic"/>
+
+<img src="/assets/images/20210424_ImportData/pic34.png" class="largepic"/>
+
+**Making request**
+```python
+import requests import pandas as pd
+
+api_url = "https://api.yelp.com/v3/businesses/search"
+# Set up parameter dictionary according to documentation 
+params = {"term": "bookstore",
+          "location": "San Francisco"}
+# Set up header dictionary w/ API key according to documentation 
+headers = {"Authorization": "Bearer {}".format(api_key)}
+
+# Call the API
+response = requests.get(api_url,
+                        params=params, 
+                        headers=headers)
+```
+
+**Parsing Responses**
+```python
+# Isolate the JSON data from the response object 
+data = response.json()
+print(data)
+```
+<img src="/assets/images/20210424_ImportData/pic35.png" class="largepic"/>
+```python
+# Load businesses data to a data frame 
+bookstores = pd.DataFrame(data["businesses"]) 
+print(bookstores.head(2))
+```
+<img src="/assets/images/20210424_ImportData/pic36.png" class="largepic"/>
+
+Practice:
+```python
+api_url = "https://api.yelp.com/v3/businesses/search"
+
+# Get data about NYC cafes from the Yelp API
+response = requests.get(api_url, 
+                headers=headers, 
+                params=params)
+
+# Extract JSON data from the response
+data = response.json()
+
+# Load data to a data frame
+cafes = pd.DataFrame(data["businesses"])
+
+# View the data's dtypes
+print(cafes.dtypes)
+```
+
+```python
+# Create dictionary to query API for cafes in NYC
+parameters = {"term":"cafe",
+          	  "location":"NYC"}
+
+# Query the Yelp API with headers and params set
+response = requests.get(api_url,
+                headers=headers,
+                params=parameters)
+
+# Extract JSON data from response
+data = response.json()
+
+# Load "businesses" values to a data frame and print head
+cafes = pd.DataFrame(data["businesses"])
+print(cafes.head())
+```
+
+Set request headers
+Many APIs require users provide an API key, obtained by registering for the service. Keys typically are passed in the request header, rather than as parameters.
+```python
+# Create dictionary that passes Authorization and key string
+headers = {"Authorization": "Bearer {}".format(api_key)}
+
+# Query the Yelp API with headers and params set
+response = requests.get(api_url,
+                        headers=headers,
+                        params=params)
+
+
+
+# Extract JSON data from response
+data = response.json()
+
+# Load "businesses" values to a data frame and print names
+cafes = pd.DataFrame(data["businesses"])
+print(cafes.name)
+```
+## 4.3. Working with nested JSONs
+
+**Nested JSONs**
+* JSONns contain objects with attribute-value pairs
+* A JSON is nested when the value itself is an object 
+
+<img src="/assets/images/20210424_ImportData/pic37.png" class="largepic"/>
+
+```python
+# Print columns containing nested data 
+print(bookstores[["categories", "coordinates", "location"]].head(3))
+```
+<img src="/assets/images/20210424_ImportData/pic38.png" class="largepic"/>
+
+submodule has tools for reading and writing JSON
+
+ 
+Needs its own
+ 
+statement
+ 
+
+
+ 	 
+
+ 
+Takes a dictionary/list of dictionaries (like
+Returns a a ened data frame
+Default a ened column name pa ern: Choose a di erent separator with the
+ 
+
+
+
+
+argument
+ 
