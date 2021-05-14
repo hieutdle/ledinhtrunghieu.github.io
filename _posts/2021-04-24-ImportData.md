@@ -962,5 +962,16 @@ Note:
 * `request.get()` to get data from a URL
 
 **request.get()**
-* `request.get(url_string) to get data from a URL
+* `request.get(url_string)` to get data from a URL
+* Optional keyword arguments
+  * `param` keyword : lets you pass a dictionary of parameter names and values to customize API requests
+  * `headers` keyword: takes a dictionary of names and values. If the API you're using requires a user authentication key, it would be passed in the header. 
+* Result: a response object, containing data and metadata
+  * `response.json()` will return just the JSON data
+
+**response.json() and pandas
+* `response.json()` returns a dictionary
+* `read_json()` expects strings, not dictionaries
+* Load the response JSON to a Data frame with `pd.DataFrame()`
+  * `read_json()` will give error!
 
