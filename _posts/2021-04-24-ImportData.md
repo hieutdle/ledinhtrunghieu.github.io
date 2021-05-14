@@ -886,5 +886,46 @@ Work with JSON data and web APIs, learning some techniques to combine datasets o
 ## 4.1. Introduction to JSON
 
 **Javascript Object Notation (JSON)**
+* Based on Javascriptso common format for transmitting data through the web
+* Not tabular
+  * Records don't have to all have the same set of attributes 
+  * This makes for more efficient data storage, if a value doesn't exist for a record, the attribute can be omitted (ignore) instead of storing it with a null value
+* Data organized into collections of objects
+* Objects are collections of attribute-value pairs 
+* Can be nested -- values themselves: Nested JSON: objects within objects
 
+**Reading JSON Data**
+* `read_json()`
+  * Takes a string of the path to the JSON to load. This path can be to a file saved on a computer or a URL ending in `.json`
+  * You can supply JSON data directly as a string.
+  * Specify data types with `dtype` keyword argument
+  * JSON data can be laid out in various ways, so there is an `orient` keyword argument to flag uncommon layouts.
 
+**Data Orientation**
+* JSON data isn't tabular
+* `pandas` makes assumptions about how it's arranged, or oriented, to load it into a data frame
+* `pandas` can automatically detects and handle common record and column orientations
+
+**Record Orientation**
+* Most common JSON arrangement. A record-oriented JSON consists of a list of dictionaries, each translating to a table record.
+<img src="/assets/images/20210424_ImportData/pic28.png" class="largepic"/>
+
+**Column Orientation**
+* More space-efficient than record-oriented JSON.  The entire JSON is a dictionary. Keys are column names. Values are lists of values for that column, or dictionaries of row indices and column values
+<img src="/assets/images/20210424_ImportData/pic29.png" class="largepic"/>
+
+**Specifying Orientation**
+
+However, other orientations are possible. This version is split oriented, with different lists for column names, indices, and values. 
+
+<img src="/assets/images/20210424_ImportData/pic30.png" class="largepic"/>
+
+We import pandas, then load the data with read JSON, specifying orientation by passing one of a set of documented string values to the orient keyword argument. 
+
+```python
+import pandas as pd
+death_causes = pd.read_json("nyc_death_causes.json",
+                            orient="split")
+print(death_causes.head())
+
+<img src="/assets/images/20210424_ImportData/pic31.png" class="largepic"/>
