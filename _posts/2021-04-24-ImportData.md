@@ -843,7 +843,7 @@ query = """SELECT borough, COUNT(*)
 plumbing_call_counts = pd.read_sql(query, engine)
 ```
 
-# 3.4. Loading multiple tables with joins
+## 3.4. Loading multiple tables with joins
 
 **Keys**
 Database records have unique identifiers, or keys
@@ -883,7 +883,7 @@ print(df.head())
 # 4. Importing JSON Data and Working with APIs
 Work with JSON data and web APIs, learning some techniques to combine datasets once they have been loaded into data frames.
 
-# 4.1. Introduction to JSON
+## 4.1. Introduction to JSON
 
 **Javascript Object Notation (JSON)**
 
