@@ -820,4 +820,71 @@ SELECT DISTINCT incident_address,
 borough FROM hpd311calls;
 ```
 
+**Aggregate Functions**
+* `SUM`
+* `AVG`
+* `MAX`
+* `MIN`
+* `COUNT`
+
+**GROUP BY**
+
+```python
+# Create database engine
+engine = create_engine("sqlite:///data.db")
+
+# Write query to get plumbing call counts by borough 
+query = """SELECT borough, COUNT(*)
+            FROM hpd311calls
+            WHERE complaint_type = 'PLUMBING' 
+            GROUP BY borough;"""
+
+# Query databse and create data frame
+plumbing_call_counts = pd.read_sql(query, engine)
+```
+
+# 3.4. Loading multiple tables with joins
+
+**Keys**
+Database records have unique identifiers, or keys
+
+**Joining Tables**
+```
+SELECT *
+FROM hpd311calls
+JOIN weather
+ON hpd311calls.created_date = weather.date 
+WHERE hpd311calls.complaint_type = 'HEAT/HOT WATER';
+```
+
+**Joining and Aggregating**
+
+```python
+# Modify query to join tmax and tmin from weather by date
+query = """
+    SELECT hpd311calls.created_date, 
+	        COUNT(*), 
+          weather.tmax,
+          weather.tmin
+    FROM hpd311calls 
+    JOIN weather
+    ON hpd311calls.created_date = weather.date
+ WHERE hpd311calls.complaint_type = 'HEAT/HOT WATER' 
+ GROUP BY hpd311calls.created_date;
+ """
+
+# Query database and save results as df
+df = pd.read_sql(query, engine)
+
+# View first 5 records
+print(df.head())
+```
+
+# 4. Importing JSON Data and Working with APIs
+Work with JSON data and web APIs, learning some techniques to combine datasets once they have been loaded into data frames.
+
+# 4.1. Introduction to JSON
+
+**Javascript Object Notation (JSON)**
+
 
