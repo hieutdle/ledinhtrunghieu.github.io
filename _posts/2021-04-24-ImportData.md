@@ -1083,25 +1083,70 @@ print(bookstores[["categories", "coordinates", "location"]].head(3))
 ```
 <img src="/assets/images/20210424_ImportData/pic38.png" class="largepic"/>
 
-submodule has tools for reading and writing JSON
+**pandas.io.json**
+* `pandas.io.json` submodule has tools for reading and writing JSON
+  * Needs its own `import` statement 
+* `json_normalize()`
+  * Takes a dictionary/list of dictionaries (like `pd.DataFrame()` does)
+  * Return a flattened data frame
+  * Default flattened name pattern: `attribute.nestedattribeute`
+  * Choose a different separator with `sep` argument
 
- 
-Needs its own
- 
-statement
- 
+**Loading Nested JSON Data**
+```python
+import pandas as pd import requests
+from pandas.io.json import json_normalize
+
+# Set up headers, parameters, and API endpoint 
+api_url = "https://api.yelp.com/v3/businesses/search"
+headers = {"Authorization": "Bearer {}".format(api_key)} params = {"term": "bookstore",
+"location": "San Francisco"}
+
+# Make the API call and extract the JSON data response = requests.get(api_url,
+headers=headers, params=params)
+data = response.json()
+```
+
+```python
+# Flatten data and load to data frame, with _ separators 
+bookstores = json_normalize(data["businesses"], sep="_") 
+print(list(bookstores))
+```
+<img src="/assets/images/20210424_ImportData/pic39.png" class="largepic"/>
+
+```python
+print(bookstores.categories.head())
+```
+<img src="/assets/images/20210424_ImportData/pic40.png" class="largepic"/>
+
+**Deeply Nested Data**
+* `json_normalize()` 
+  * `record_path`: string/list of string attributes to nested data
+  * `meta`: list of other attributes to load to data frame
+  * `meta_prefix`: string to prefix to meta columns names
+
+```python
+# Flatten categories data, bring in business details 
+df = json_normalize(data["businesses"],
+                    sep="_",
+                    record_path="categories", 
+                    meta=["name",
+                          "alias",
+                          "rating",
+                          ["coordinates", "latitude"], 
+                          ["coordinates", "longitude"]],
+                          meta_prefix="biz_")
+print(df.head(4))
+```
+<img src="/assets/images/20210424_ImportData/pic4.png" class="largepic"/>
 
 
- 	 
+## 4.4. Combining multiple datasets
 
- 
-Takes a dictionary/list of dictionaries (like
-Returns a a ened data frame
-Default a ened column name pa ern: Choose a di erent separator with the
- 
+**Appending**
+* Use case: adding rows from one data frame to another
+* `append()`
+  * Data frame method
+  * Syntax:`df1.append(df2)`
+  * Set `ignores_index`to True to renumber rows rather than 2 rows 0, 2 rows 1,...
 
-
-
-
-argument
- 
