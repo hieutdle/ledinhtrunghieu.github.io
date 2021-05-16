@@ -1145,6 +1145,126 @@ print(df.head(4))
 
 **Appending**
 * Use case: adding rows from one data frame to another
-nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn  * Data frame method
+* Data frame method
   * Syntax:`df1.append(df2)`
   * Set `ignores_index`to True to renumber rows rather than 2 rows 0, 2 rows 1,...
+
+```python
+# Get first 20 bookstore results 
+params = {"term": "bookstore",
+          "location": "San Francisco"} 
+
+first_results = requests.get(api_url,
+                              headers=headers,
+                            params=params).json()
+
+first_20_bookstores = json_normalize(first_results["businesses"],sep="_")
+
+print(first_20_bookstores.shape)
+```
+```
+(20,24)
+```
+
+```python
+# Get the next 20 bookstores 
+params["offset"] = 20
+next_results = requests.get(api_url,
+                            headers=headers,
+                             params=params).json()
+next_20_bookstores = json_normalize(next_results["business],
+                                    sep = "_")
+print(next_20_bookstores.shape)
+```
+```
+(20,24)
+```
+```python
+# Put bookstore datasets together, renumber rows
+bookstores = first_20_bookstores.append(next_20_bookstores,
+                                        ignore_index=True)
+print(bookstores.name)
+```
+<img src="/assets/images/20210424_ImportData/pic42.png" class="largepic"/>
+
+**Merging**
+* Use case: combining datasets to add related columns
+* Datasets have key column(s) with common values
+* `merge()`: `pandas` version of a SQL join
+  * Both a`pandas` function and a data frame method
+* `df.merge()` arguments
+  * Second data frame to merge
+  * Columns to merge on
+    * `on` if names are the same in both data frame
+    * `left_on` and `right_on` if key names differ
+    * Key columns should be in the same data type
+
+```python
+call_counts.head()
+```
+<img src="/assets/images/20210424_ImportData/pic43.png" class="largepic"/>
+
+```python
+weather.head()
+```
+<img src="/assets/images/20210424_ImportData/pic44.png" class="largepic"/>
+
+```python
+# Merge weather into call counts on date columns 
+merged = call_counts.merge(weather,
+                          left_on="created_date", 
+                          right_on="date")
+print(merged.head())
+```
+<img src="/assets/images/20210424_ImportData/pic45.png" class="largepic"/>
+
+* Default	behavior: return only values that are in both datasets. There aren't call counts for December, so none of the December weather data appears here
+* One record for each value match between data frames. The call and weather data have what is called a one-to-one relationship 
+  * Each call count record can be linked to only one weather record by date, and vice versa
+  * Multiple matches = multiple records. If you merge data where a record in one data frame can be linked to multiple records in the other, the result will have one row for each possible link.
+
+**Example**
+
+```python
+# Add an offset parameter to get cafes 51-100
+params = {"term": "cafe", 
+          "location": "NYC",
+          "sort_by": "rating", 
+          "limit": 50,
+            "offset" : 50}
+
+result = requests.get(api_url, headers=headers, params=params)
+next_50_cafes = json_normalize(result.json()["businesses"])
+
+# Append the results, setting ignore_index to renumber rows
+cafes = top_50_cafes.append(next_50_cafes,
+                            ignore_index = True)
+
+# Print shape of cafes
+print(cafes.shape)
+```
+```
+100,24
+```
+
+```python
+#Print columns nanme
+print(cafes.columns.values.tolist())
+print(crosswalk.head())
+```
+
+```python
+# Merge crosswalk into cafes on their zip code fields
+cafes_with_pumas = cafes.merge(crosswalk,
+                               left_on="location_zip_code",
+                               right_on="zipcode")
+
+
+
+# Merge pop_data into cafes_with_pumas on puma field
+cafes_with_pop = cafes_with_pumas.merge(pop_data,
+                                on = "puma")
+
+# View the data
+print(cafes_with_pop.head())
+```
