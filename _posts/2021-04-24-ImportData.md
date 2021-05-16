@@ -1145,8 +1145,6 @@ print(df.head(4))
 
 **Appending**
 * Use case: adding rows from one data frame to another
-* `append()`
-  * Data frame method
+nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn  * Data frame method
   * Syntax:`df1.append(df2)`
   * Set `ignores_index`to True to renumber rows rather than 2 rows 0, 2 rows 1,...
-
