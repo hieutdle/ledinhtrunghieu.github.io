@@ -348,7 +348,7 @@ print(*guest_welcomes, sep='\n')
 # 2. Timing and profiling code
 Learn how to gather and compare runtimes between different coding approaches. Practice using the line_profiler and memory_profiler packages to profile your code base and spot bottlenecks. Then, you'll put your learnings to practice by replacing these bottlenecks with efficient Python code.
 
-# 2.1. Examining runtime
+## 2.1. Examining runtime
 
 **Calculate time***
 * Calculate runtime with IPython magic command `%timeit`
@@ -418,4 +418,165 @@ literal_list = []
 literal_dict = {} 
 literal_tuple = ()
 ```
+
+```python
+f_time = %timeit -o formal_dict = dict()
+```
+```
+145 ns ± 1.5 ns per loop (mean ± std. dev. of 7 runs, 10000000 loops each)
+```
+```python
+l_time = %timeit -o literal_dict = {}
+```
+```
+93.3 ns ± 1.88 ns per loop (mean ± std. dev. of 7 runs, 10000000 loops each)
+```
+```python
+diff = (f_time.average - l_time.average) * (10**9) 
+print('l_time better than f_time by {} ns'.format(diff))
+```
+```
+l_time better than f_time by 51.90819192857814 ns
+```
+
+**Practice**:
+```python
+# Create a list of integers (0-50) using list comprehension
+nums_list_comp = [num for num in range(51)]
+print(nums_list_comp)
+
+# Create a list of integers (0-50) by unpacking range
+nums_unpack = [*range(50)]
+print(nums_unpack)
+```
+
+```python
+# Create a list using the formal name
+formal_list = list()
+print(formal_list)
+
+# Create a list using the literal syntax
+literal_list = []
+print(literal_list)
+```
+
+```python
+In [2]:
+%%timeit hero_wts_lbs = []
+for wt in wts:
+    hero_wts_lbs.append(wt * 2.20462)
+746 us +- 9.66 us per loop (mean +- std. dev. of 7 runs, 1000 loops each)
+In [3]:
+%%timeit wts_np = np.array(wts)
+hero_wts_lbs_np = wts_np * 2.20462
+948 ns +- 51.5 ns per loop (mean +- std. dev. of 7 runs, 1000000 loops each)
+```
+
+## 2.2. Code profiling for runtime
+
+**Code profiling**
+* Detailed stats on frequency and duration of functions call
+* Line-by-line analyses
+* Package used: `line_profiler`
+```python
+pip install linen_profiler
+```
+
+**Code profiling: runtime**
+```python
+heroes = ['Batman', 'Superman', 'Wonder Woman']
+hts = np.array([188.0, 191.0, 183.0])
+wts = np.array([ 95.0, 101.0,74.0])
+```
+
+```python
+def convert_units(heroes, heights, weights):
+    new_hts = [ht * 0.39370 for ht in heights]
+    new_wts = [wt * 2.20462 for wt in weights]
+
+    hero_data = {}
+
+    for i,hero in enumerate(heroes):
+        hero_data[hero] = (new_hts[i], new_wts[i])
+
+    return hero_data
+```
+```python
+convert_units(heroes, hts, wts)
+```
+```
+{'Batman': (74.0156, 209.4389),
+'Superman': (75.1967, 222.6666),
+'Wonder Woman': (72.0471, 163.1419)}
+```
+```
+%timeit convert_units(heroes,hts,wts)
+```
+```
+3 µs ± 32 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+```
+<img src="/assets/images/20210425_EfficientPython/pic5.png" class="largepic"/>
+
+A lot of manual work and not very efficientn
+
+**Code profiling: line_profiler**
+* Using `line_profiler` package
+```
+%load_exit line_profiler
+```
+Magic command for line-by-line times
+```
+%lprun -f convert_units convert_units(heroes,hts,wts)
+```
+
+<img src="/assets/images/20210425_EfficientPython/pic6.png" class="largepic"/>
+
+## 2.3. Code profiling for memory usage
+
+**Quick and dirty approach**
+```python
+import sys
+import numpy as np
+
+nums_list = [*range(1000)] 
+sys.getsizeof(nums_list)
+
+nums_np = np.array(range(1000))
+sys.getsizeof(nums_np)
+```
+
+```
+9112
+8069
+```
+
+**Code profiling: memory**
+* Detailed stats on memory consumption 
+* Line-by-line analyses
+* Package used: `memory_profiler`
+```python
+pip install memory_profiler
+```
+* Using `memory_profiler` package
+
+```
+%load_ext memory_profiler
+
+%mprun -f convert_units convert_units(heroes, hts, wts)
+```
+* Functnion must be imported when using `memory_filter`
+    * hero_func.py
+
+```python
+from hero_funcs import convert_units
+%load_ext memory_profiler
+%mprun -f convert_units convert_units(heroes, hts, wts)
+```
+<img src="/assets/images/20210425_EfficientPython/pic7.png" class="largepic"/>
+
+
+* Small memory allocations could result in 0.0 MiB output.
+* Inspects memory by querying the operating system
+* Results may differ between platforms and runs
+    * Can still observe how each line of code compares to others based on memory consumption
 
