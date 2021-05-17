@@ -587,3 +587,215 @@ from hero_funcs import convert_units
 * Results may differ between platforms and runs
     * Can still observe how each line of code compares to others based on memory consumption
 
+**Compare**
+
+```python
+def get_publisher_heroes(heroes, publishers, desired_publisher):
+
+    desired_heroes = []
+
+    for i,pub in enumerate(publishers):
+        if pub == desired_publisher:
+            desired_heroes.append(heroes[i])
+
+    return desired_heroes
+
+def get_publisher_heroes_np(heroes, publishers, desired_publisher):
+
+    heroes_np = np.array(heroes)
+    pubs_np = np.array(publishers)
+
+    desired_heroes = heroes_np[pubs_np == desired_publisher]
+
+    return desired_heroes
+```
+
+* `get_publisher_heroes_np()` is faster.
+* Both functions have the same memory consumption.
+* Should use get_publisher_heroes_np().
+
+# 3. Gaining efficiencies
+
+Learn a few useful built-in modules for writing efficient code and practice using set theory. You'll then learn about looping patterns in Python and how to make them more efficient.
+
+## 3.1. Efficiently combining, counting, and iterating
+
+**Combining object**
+
+```python
+names = ['Bulbasaur', 'Charmander', 'Squirtle'] 
+hps = [45, 39, 44]
+combined = []
+for i,pokemon in enumerate(names):
+    combined.append((pokemon, hps[i]))
+print(combined)
+```
+```
+[('Bulbasaur', 45), ('Charmander', 39), ('Squirtle', 44)]
+```
+
+**Combining object with zip**
+Python's built-in function zip provides a more elegant solution. The name "zip" describes how this function combines objects like a zipper on a jacket (making two separate things become one). zip returns a zip object that must be unpacked into a list and printed to see the contents. Each item is a tuple of elements from the original lists.
+
+```python
+combined_zip = zip(names, hps) 
+print(type(combined_zip))
+
+combined_zip_list = [*combined_zip]
+print(combined_zip_list)
+```
+```
+<class 'zip'>
+[('Bulbasaur', 45), ('Charmander', 39), ('Squirtle', 44)]
+```
+
+**The Collection module**
+* Part of Python's Standard Library (built-in module)
+* Specialized container datatypes
+    *Alternatives to general purpose dict, list, set, and tuple
+* Notable:
+    * `namedtuple`: tuple subclasses with named fields
+    * `deque`: list-like container with fast appends and pops
+    * **`Counter`: dict for counting hashable objects**
+    * `OrderedDict` : dict that retains order of entries
+    * `defaultdict`: dict that calls a factory function to supply missing values
+**Counting with loop**
+```python
+# Each Pokémon's type (720 total)
+poke_types = ['Grass', 'Dark', 'Fire', 'Fire', ...]
+type_counts = {}
+for poke_type in poke_types:
+    if poke_type not in type_counts: 
+        type_counts[poke_type] = 1
+    else:
+    type_counts[poke_type] += 1 
+print(type_counts)
+```
+<img src="/assets/images/20210425_EfficientPython/pic8.png" class="largepic"/>
+
+**collection.Counter()**
+```python
+# Each Pokémon's type (720 total)
+poke_types = ['Grass', 'Dark', 'Fire', 'Fire', ...] 
+from collections import Counter
+type_counts = Counter(poke_types) 
+print(type_counts)
+```
+
+<img src="/assets/images/20210425_EfficientPython/pic9.png" class="largepic"/>
+
+**Counter** returns a Counter dictionary of key-value pairs. When printed, it's ordered by highest to lowest counts. If comparing runtime times, we'd see that using Counter takes half the time as the standard dictionary approach
+
+**The itertools module**
+* Part of Python's Standard Library (built-in module)
+* Functional tools for creating and using iterators
+* Notable:
+    * Infinite iterators: `count`,`cycle`,`repeat`
+    * Finnite iterators: `accumlate`,`chain`,`zip_longest`,etc.
+    * **Combination generators**: `product`, `permutationsn`,`combinantions`
+
+**Combinations with loop**
+```python
+poke_types = ['Bug', 'Fire', 'Ghost', 'Grass', 'Water']
+combos = []
+
+for x in  poke_types: 
+    for y in poke_types:
+        if x == y: #  skip pairs having the same type twice
+            continue
+        if ((x,y) not in combos) & ((y,x) not in combos): # Either order of the pair doesn't already exist within the combos list before appending it
+            combos.append((x,y))
+print(combos)
+```
+<img src="/assets/images/20210425_EfficientPython/pic10.png" class="largepic"/>
+
+**itertools.combinations()**
+```python
+poke_types = ['Bug','Fire','Ghost','Grass','Water'] 
+from itertools import combinations
+combos_obj = combinations(poke_types, 2) 
+print(type(combos_obj))
+```
+<img src="/assets/images/20210425_EfficientPython/pic11.png" class="largepic"/>
+
+```python
+combos = [*combos_obj] 
+print(combos)
+```
+<img src="/assets/images/20210425_EfficientPython/pic12.png" class="largepic"/>
+
+**Practice**
+```python
+# Combine names and primary_types
+names_type1 = [*zip(names, primary_types)]
+
+print(*names_type1[:5], sep='\n')
+
+# Combine all three lists together
+names_types = [*zip(names,primary_types,secondary_types)]
+
+print(*names_types[:5], sep='\n')
+
+# Combine five items from names and three items from primary_types
+differing_lengths = [*zip(names[:5],(primary_types[:3]))]
+
+print(*differing_lengths, sep='\n')
+```
+
+```
+('Abomasnow', 'Grass')
+('Abra', 'Psychic')
+('Absol', 'Dark')
+```
+
+```python
+# Collect the count of primary types
+type_count = Counter(primary_types)
+print(type_count, '\n')
+
+# Collect the count of generations
+gen_count = Counter(generations)
+print(gen_count, '\n')
+
+# Use list comprehension to get each Pokémon's starting letter
+starting_letters = [name[0] for name in names]
+
+# Collect the count of Pokémon for each starting_letter
+starting_letters_count = Counter(starting_letters)
+print(starting_letters_count)
+```
+
+```
+Counter({'Water': 66, 'Normal': 64, 'Bug': 51, 'Grass': 47, 'Psychic': 31, 'Rock': 29, 'Fire': 27, 'Electric': 25, 'Ground': 23, 'Fighting': 23, 'Poison': 22, 'Steel': 18, 'Ice': 16, 'Fairy': 16, 'Dragon': 16, 'Ghost': 13, 'Dark': 13}) 
+
+Counter({5: 122, 3: 103, 1: 99, 4: 78, 2: 51, 6: 47}) 
+
+Counter({'S': 83, 'C': 46, 'D': 33, 'M': 32, 'L': 29, 'G': 29, 'B': 28, 'P': 23, 'A': 22, 'K': 20, 'E': 19, 'W': 19, 'T': 19, 'F': 18, 'H': 15, 'R': 14, 'N': 13, 'V': 10, 'Z': 8, 'J': 7, 'I': 4, 'O': 3, 'Y': 3, 'U': 2, 'X': 1})
+```
+
+```python
+# Import combinations from itertools
+
+from itertools import combinations
+
+# Create a combination object with pairs of Pokémon
+combos_obj = combinations(pokemon,2)
+print(type(combos_obj), '\n')
+
+# Convert combos_obj to a list by unpacking
+combos_2 = [*combos_obj]
+print(combos_2, '\n')
+
+# Collect all possible combinations of 4 Pokémon directly into a list
+combos_4 = [*combinations(pokemon,4)]
+print(combos_4)
+```
+
+```
+int(combos_4)
+<class 'itertools.combinations'> 
+
+[('Geodude', 'Cubone'), ('Geodude', 'Lickitung'), ('Geodude', 'Persian'), ('Geodude', 'Diglett'), ('Cubone', 'Lickitung'), ('Cubone', 'Persian'), ('Cubone', 'Diglett'), ('Lickitung', 'Persian'), ('Lickitung', 'Diglett'), ('Persian', 'Diglett')] 
+
+[('Geodude', 'Cubone', 'Lickitung', 'Persian'), ('Geodude', 'Cubone', 'Lickitung', 'Diglett'), ('Geodude', 'Cubone', 'Persian', 'Diglett'), ('Geodude', 'Lickitung', 'Persian', 'Diglett'), ('Cubone', 'Lickitung', 'Persian', 'Diglett')]
+```
