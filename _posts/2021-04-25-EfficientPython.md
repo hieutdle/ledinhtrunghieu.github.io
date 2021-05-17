@@ -279,6 +279,7 @@ More clear with 2-D indexing
 nums = [-2, -1, 0, 1, 2]
 nums_np = np.array(nums)
 ```
+
 * Boolean indexing 
 ```python
 num_np > 0
@@ -293,6 +294,7 @@ nums_np[nums_np > 0]
 array([1, 2])
 ```
 * No boolean indexing for lists
+
 ```python
 # For loop (inefficient option) pos = []
 for num in nums: 
