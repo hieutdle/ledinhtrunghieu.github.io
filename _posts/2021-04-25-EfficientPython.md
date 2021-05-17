@@ -213,8 +213,8 @@ print(names_uppercase)
 ## 1.3. The power of NumPy arrays
 
 **NumPy** or **Numerical Python**
-
 * Alternative to Python lists
+
 ```python
 nums_list = list(range(5))
 ```
@@ -249,6 +249,7 @@ dtype('float64')
 
 **NumPy array broadcasting**
 * Python lists don't support broading castingn
+
 ```python
 nums = [-2,-1,0,1,2]
 numns ** 2
@@ -281,6 +282,7 @@ nums_np = np.array(nums)
 ```
 
 * Boolean indexing 
+
 ```python
 num_np > 0
 ```
@@ -480,6 +482,7 @@ hero_wts_lbs_np = wts_np * 2.20462
 * Detailed stats on frequency and duration of functions call
 * Line-by-line analyses
 * Package used: `line_profiler`
+
 ```python
 pip install linen_profiler
 ```
@@ -523,6 +526,7 @@ A lot of manual work and not very efficientn
 
 **Code profiling: line_profiler**
 * Using `line_profiler` package
+
 ```
 %load_exit line_profiler
 ```
@@ -556,6 +560,7 @@ sys.getsizeof(nums_np)
 * Detailed stats on memory consumption 
 * Line-by-line analyses
 * Package used: `memory_profiler`
+
 ```python
 pip install memory_profiler
 ```
