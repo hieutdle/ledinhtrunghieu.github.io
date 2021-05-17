@@ -212,3 +212,210 @@ print(names_uppercase)
 
 ## 1.3. The power of NumPy arrays
 
+**NumPy** or **Numerical Python**
+
+* Alternative to Python lists
+```python
+nums_list = list(range(5))
+```
+```
+[0, 1, 2, 3, 4]
+```
+```python
+import numpy as np
+nums_np = np.array(range(5))
+```
+```
+array([0, 1, 2, 3, 4])
+```
+
+```python
+# NumPy array homogeneity (must contain element of the same type)
+nums_np_ints = np.array([1, 2, 3])
+
+nums_np_ints.dtype
+
+# NumPy will convert all elements to float to remain homogeneity nature
+nums_np_floats = np.array([1, 2.5, 3]) 
+
+nums_np_floats.dtype
+```
+```
+array([1, 2, 3])
+dtype('int64')
+array([1. , 2.5, 3. ]) 
+dtype('float64')
+```
+
+**NumPy array broadcasting**
+* Python lists don't support broading castingn
+```python
+nums = [-2,-1,0,1,2]
+numns ** 2
+```
+```
+TypeError: unsupported operand type(s) for ** or pow(): 'list' and 'int'
+```
+* NumPy array can do this
+
+```python
+nums_np = np.array([-2, -1, 0, 1, 2])
+nums_np ** 2
+```
+```
+array([4, 1, 0, 1, 4])
+```
+
+**Indexing**
+<img src="/assets/images/20210425_EfficientPython/pic1.png" class="largepic"/>
+
+More clear with 2-D indexing
+
+<img src="/assets/images/20210425_EfficientPython/pic2.png" class="largepic"/>
+
+**NumPy arrary boolean indexing**
+
+```python
+nums = [-2, -1, 0, 1, 2]
+nums_np = np.array(nums)
+```
+* Boolean indexing 
+```python
+num_np > 0
+```
+```
+array([False, False, False,True,True])
+```
+```python
+nums_np[nums_np > 0]
+```
+```
+array([1, 2])
+```
+* No boolean indexing for lists
+```python
+# For loop (inefficient option) pos = []
+for num in nums: 
+    if num > 0:
+    pos.append(num) 
+print(pos)
+
+# List comprehension (better option but not best)
+pos = [num for num in nums if num > 0]
+print(pos)
+```
+
+```
+[1, 2]
+[1, 2]
+```
+**Practice**
+```python
+# Print second row of nums
+print(nums[1,:])
+
+# Print all elements of nums that are greater than six
+print(nums[nums > 6])
+
+# Double every element of nums
+nums_dbl = nums * 2
+print(nums_dbl)
+
+# Replace the third column of nums
+nums[:,2] = nums[:,2] + 1
+print(nums)
+```
+
+**Sum Practice**
+```python
+# Create a list of arrival times
+arrival_times = [*range(10,60,10)]
+
+# Convert arrival_times to an array and update the times
+arrival_times_np = np.array(arrival_times)
+new_times = arrival_times_np - 3
+
+# Use list comprehension and enumerate to pair guests to new times
+guest_arrivals = [(names[i],time) for i,time in enumerate(new_times)]
+
+# Map the welcome_guest function to each (guest,time) pair
+welcome_map = map(welcome_guest, guest_arrivals)
+
+guest_welcomes = [*welcome_map]
+print(*guest_welcomes, sep='\n')
+```
+
+# 2. Timing and profiling code
+Learn how to gather and compare runtimes between different coding approaches. Practice using the line_profiler and memory_profiler packages to profile your code base and spot bottlenecks. Then, you'll put your learnings to practice by replacing these bottlenecks with efficient Python code.
+
+# 2.1. Examining runtime
+
+**Calculate time***
+* Calculate runtime with IPython magic command `%timeit`
+* **Magic commands**: enhancements on top of normal Python syntax 
+    * Prefixed by the "%" character
+    * Link to docs [here](https://ipython.readthedocs.io/en/stable/interactive/magics.html)
+    * See all available magic commands with `%lsmagic`
+
+
+**Using `%timeit`**
+Code to be timed
+
+```python
+import numpy as np
+rand_nums = np.random.rand(1000)
+```
+
+Timing with `%timeit`
+```python
+%timeit rand_nums = np.random.rand(1000)
+```
+<img src="/assets/images/20210425_EfficientPython/pic3.png" class="largepic"/>
+
+**Specifying number of runs/loop
+Setting the number of runs(`-r`) and/or loop (`-n`)
+
+```python
+# Set number of runs to 2 (-r2)
+# Set number of loops to 10 (-n10)
+
+%timeit -r2 -n10 rand_nums = np.random.rand(1000)
+```
+
+<img src="/assets/images/20210425_EfficientPython/pic4.png" class="largepic"/>
+
+Line magic: %timeit
+
+Cell magic: %%timeit
+
+```python
+%%timeit 
+nums = []
+for x in range(10):
+nums.append(x)
+```
+
+**Saving output**
+```python
+times = %timeit -o rand_nums = np.random.rand(1000)
+times.timings # print all runsn
+times.best
+times.worst
+```
+
+**Comparing times**
+
+Python data structures can be created using formal name
+```python
+formal_list = list()
+formal_dict = dict() 
+formal_tuple = tuple()
+```
+
+Python data structures can be created using literal syntax
+```python
+literal_list = [] 
+literal_dict = {} 
+literal_tuple = ()
+```
+
