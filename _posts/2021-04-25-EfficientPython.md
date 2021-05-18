@@ -821,3 +821,111 @@ for pokemon_a in  list_a:
             in_common.append(pokemon_a)
 print(in_common)
 ``` 
+
+**Smart way (also faster in runtime)**
+
+```python
+set_a.intersection(set_b)
+```
+**Check difference**
+
+```python
+set_a.difference(set_b)
+
+# Set method: symmetric difference
+set_a.symmetric_difference(set_b)
+```
+**Set method: union**
+
+```python
+set_a.union(set_b)
+```
+
+**Membership testing with sets**
+```python
+# The same 720 total Pokémon in each data structure
+names_list	=	['Abomasnow','Abra','Absol',...]
+names_tuple	=	('Abomasnow','Abra','Absol',...)
+names_set	=	{'Abomasnow','Abra','Absol',...}
+```
+
+```python
+
+%timeit 'Zubat' in	names_list
+
+7.63 µs ± 211 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+
+%timeit 'Zubat' in	names_tuple
+
+7.6 µs ± 394 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+
+%timeit 'Zubat' in	names_set
+
+37.5 ns ± 1.37 ns per loop (mean ± std. dev. of 7 runs, 10000000 loops each)
+```
+
+**Unique with sets**
+
+```python
+# 720 Pokémon primary types corresponding to each Pokémon
+primary_types = ['Grass',	'Psychic',	'Dark',	'Bug', ...]
+
+unique_types = []
+for prim_type in primary_types:
+    if	prim_type not in unique_types: 
+        unique_types.append(prim_type)
+
+print(unique_types)
+```
+
+**Smart way unique**
+
+```python
+# 720 Pokémon primary types corresponding to each Pokémon 
+primary_types = ['Grass', 'Psychic', 'Dark', 'Bug', ...]
+unique_types_set = set(primary_types)
+print(unique_types_set)
+```
+
+```python
+{'Grass', 'Psychic', 'Dark', 'Bug', 'Steel', 'Rock', 'Normal',
+'Water', 'Dragon', 'Electric', 'Poison', 'Fire', 'Fairy', 'Ice', 'Ground', 'Ghost', 'Fighting', 'Flying'}
+```
+
+**Practice**
+```python
+# Convert both lists to sets
+ash_set = set(ash_pokedex)
+misty_set = set(misty_pokedex)
+
+# Find the Pokémon that exist in both sets
+both = ash_set.intersection(misty_set)
+print(both)
+
+# Find the Pokémon that Ash has and Misty does not have
+ash_only = ash_set.difference(misty_set)
+print(ash_only)
+
+# Find the Pokémon that are in only one set (not both)
+unique_to_set = ash_set.symmetric_difference(misty_set)
+print(unique_to_set)
+```
+
+```python
+# Convert Brock's Pokédex to a set
+brock_pokedex_set = set(brock_pokedex)
+print(brock_pokedex_set)
+
+# Check if Psyduck is in Ash's list and Brock's set
+print('Psyduck' in ash_pokedex)
+print('Psyduck' in brock_pokedex_set)
+
+# Check if Machop is in Ash's list and Brock's set
+print("Machop" in ash_pokedex)
+print("Psyduck" in brock_pokedex_set)
+```
+
+## 3.3. Eliminating loops
+
+
+
