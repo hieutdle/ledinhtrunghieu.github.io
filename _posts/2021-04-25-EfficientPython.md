@@ -787,15 +787,37 @@ combos_2 = [*combos_obj]
 print(combos_2, '\n')
 
 # Collect all possible combinations of 4 Pokémon directly into a list
-combos_4 = [*combinations(pokemon,4)]
+combos_4 = [*combinations(pokemon,4)]n
 print(combos_4)
 ```
 
 ```
-int(combos_4)
 <class 'itertools.combinations'> 
 
 [('Geodude', 'Cubone'), ('Geodude', 'Lickitung'), ('Geodude', 'Persian'), ('Geodude', 'Diglett'), ('Cubone', 'Lickitung'), ('Cubone', 'Persian'), ('Cubone', 'Diglett'), ('Lickitung', 'Persian'), ('Lickitung', 'Diglett'), ('Persian', 'Diglett')] 
 
 [('Geodude', 'Cubone', 'Lickitung', 'Persian'), ('Geodude', 'Cubone', 'Lickitung', 'Diglett'), ('Geodude', 'Cubone', 'Persian', 'Diglett'), ('Geodude', 'Lickitung', 'Persian', 'Diglett'), ('Cubone', 'Lickitung', 'Persian', 'Diglett')]
 ```
+
+## 3.2. Set theory
+
+* Branch of Mathematics applied to collections of objects
+* Python has built-in `set` datatype with accompanying methods:
+    * `intersection()`: all elements that are in both sets
+    * `difference()`: all elements in one set but not the other
+    * `symmetric_difference`: all elements in exactly one set
+    * `union()`: all elements that are in either set
+* Fast membership testing
+    * Check if a value exists in a sequence or not
+    * Using the	operator `in`
+
+**Check similar object with loop (stupid way)**:
+
+```python
+in_common = []
+for pokemon_a in  list_a: 
+    for pokemon_b in list_b:
+        if pokemon_a == pokemon_b:
+            in_common.append(pokemon_a)
+print(in_common)
+``` 
