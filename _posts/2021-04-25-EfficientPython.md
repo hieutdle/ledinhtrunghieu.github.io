@@ -927,5 +927,235 @@ print("Psyduck" in brock_pokedex_set)
 
 ## 3.3. Eliminating loops
 
+**Looping in Python**
+* Looping patterns:
+    * `for` loop: iterate over sequence piece-by-piece 
+    * `while` loop: repeat loop as long as condition is met
+    * "nested" loops: use one loop inside another loop 
+    * Costly!
+
+**Benefits of eliminating loops**
+* Fewer lines of code
+* Better code readability
+    * "Flat is better than nested" 
+* Efficiency gains
+
+**Eliminating loops with builts-ins**
+
+```python
+# List of HP, Attack, Defense, Speed poke_stats = [
+poke_stats = [	
+    [90,92,75,60],
+	[25,20,15,90],
+    [65,130,60,75],
+...
+]
+# For loop approach
+totals = []
+for row in poke_stats: totals.append(sum(row))
+# List comprehension
+totals_comp = [sum(row) for row in poke_stats] 
+# Built-in map() function
+totals_map = [*map(sum, poke_stats)]
+```
+
+```python
+poke_types = ['Bug','Fire','Ghost','Grass','Water']
+# Nested for loop approach 
+combos = []
+for x in poke_types:  
+    for y in poke_types:
+        if	x == y:
+            continue
+        if	((x,y) not in combos) & ((y,x) not in combos): 
+            combos.append((x,y))
+
+# Built-in module approach
+from itertools import combinations 
+combos2 = [*combinations(poke_types, 2)]
+```
+
+**Eliminate loops with NumPy**
+
+# Array of HP, Attack, Defense, Speed import numpy as np
+
+```python
+poke_stats = np.array([
+	[90,92,75,60],
+	[25,20,15,90],
+	[65,130,60,75],
+    ...
+])
+
+avgs = []
+for row in poke_stats: 
+    avg = np.mean(row) 
+    avgs.append(avg)
+print(avgs)
+
+# Better approach
+avgs_np = poke_stats.mean(axis=1) 
+print(avgs_np)
+```
+
+```python
+
+gen1_gen2_name_lengths_loop = []
+
+for name,gen in zip(poke_names, poke_gens):
+    if gen < 3:
+        name_length = len(name)
+        poke_tuple = (name, name_length)
+        gen1_gen2_name_lengths_loop.append(poke_tuple)
+
+# Collect Pokémon that belong to generation 1 or generation 2
+gen1_gen2_pokemon = [name for name,gen in zip(poke_names, poke_gens) if gen < 3]
+
+# Create a map object that stores the name lengths
+name_lengths_map = map(len, gen1_gen2_pokemon)
+
+# Combine gen1_gen2_pokemon and name_lengths_map into a list
+gen1_gen2_name_lengths = [*zip(gen1_gen2_pokemon, name_lengths_map)]
+
+print(gen1_gen2_name_lengths_loop[:5])
+print(gen1_gen2_name_lengths[:5])
 
 
+[('Abra', 4), ('Aerodactyl', 10), ('Aipom', 5), ('Alakazam', 8), ('Ampharos', 8)]
+[('Abra', 4), ('Aerodactyl', 10), ('Aipom', 5), ('Alakazam', 8), ('Ampharos', 8)]
+```
+
+```python
+
+# Create a total stats array
+total_stats_np = stats.sum(axis=1)
+
+# Create an average stats array
+avg_stats_np = stats.mean(axis=1)
+
+# Combine names, total_stats_np, and avg_stats_np into a list
+poke_list_np = [*zip(names,total_stats_np,avg_stats_np)]
+
+print(poke_list_np == poke_list, '\n')
+print(poke_list_np[:3])
+print(poke_list[:3], '\n')
+top_3 = sorted(poke_list_np, key=lambda x: x[1], reverse=True)[:3]
+print('3 strongest Pokémon:\n{}'.format(top_3))
+```
+
+## 3.4. Writing better loops
+
+* Understand what is being done with each loop iteration
+* Move one-time calculations outside (above) the loop : If a calculation is performed for each iteration of a loop, but its value doesn't change with each iteration, it's best to move this calculation outside (or above) the loop
+* Use holistic conversions outside (below) the loop: If a loop is converting data types with each iteration, it's possible that this conversion can be done outside (or below) the loop using a map function
+* Anything that is done once should be outside the loop
+
+**Moving calculations above a loop**
+```python
+import numpy as	np
+names = ['Absol','Aron','Jynx','Natu','Onix'] 
+attacks = np.array([130,70,50,50,45])
+for pokemon,attack in zip(names, attacks): 
+    total_attack_avg = attacks.mean()
+    if	attack > total_attack_avg:
+    print(
+        "{}'s attack: {} > average: {}!"
+        .format(pokemon, attack, total_attack_avg)
+)
+
+Absol's attack: 130 > average: 69.0!
+Aron's attack: 70 > average: 69.0!
+```
+
+Move `total_attack_avg = attacks.mean()` above `for` loop
+
+**Using holistic conversions**
+
+Before:
+
+```python
+names = ['Pikachu', 'Squirtle', 'Articuno', ...] 
+legend_status = [False, False, True, ...] 
+generations = [1, 1, 1, ...]
+poke_data = []
+for poke_tuple in zip(names, legend_status, generations): 
+    poke_list = list(poke_tuple) 
+    poke_data.append(poke_list)
+print(poke_data)
+```
+
+After:
+
+```python
+names = ['Pikachu', 'Squirtle', 'Articuno', ...] 
+legend_status = [False, False, True, ...] 
+generations = [1, 1, 1, ...]
+poke_data_tuples = []
+for poke_tuple in zip(names, legend_status, generations): 
+    poke_data_tuples.append(poke_tuple)
+poke_data = [*map(list, poke_data_tuples)] 
+print(poke_data)
+
+```
+
+**Practice**:
+
+```python
+# Import Counter
+from collections import Counter
+# Collect the count of each generation
+gen_counts = Counter(generations)
+
+# Improve for loop by moving one calculation above the loop
+total_count = len(generations)
+
+for gen,count in gen_counts.items():
+    gen_percent = round(count / total_count * 100, 2)
+    print('generation {}: count = {:3} percentage = {}'
+          .format(gen, count, gen_percent))
+```
+```python
+# Collect all possible pairs using combinations()
+possible_pairs = [*combinations(pokemon_types, 2)]
+
+# Create an empty list called enumerated_tuples
+enumerated_tuples= []
+
+# Append each enumerated_pair_tuple to the empty list above
+for i,pair in enumerate(possible_pairs, 1):
+    enumerated_pair_tuple = (i,) + pair
+    enumerated_tuples.append(enumerated_pair_tuple)
+
+# Convert all tuples in enumerated_tuples to a list
+enumerated_pairs = [*map(list, enumerated_tuples)]
+print(enumerated_pairs)
+```
+```python
+# Calculate the total HP avg and total HP standard deviation
+hp_avg = hps.mean()
+hp_std = hps.std()
+
+# Use NumPy to eliminate the previous for loop
+z_scores = (hps - hp_avg)/hp_std
+
+# Combine names, hps, and z_scores
+poke_zscores2 = [*zip(names, hps, z_scores)]
+print(*poke_zscores2[:3], sep='\n')
+```
+
+```python
+# Calculate the total HP avg and total HP standard deviation
+hp_avg = hps.mean()
+hp_std = hps.std()
+
+# Use NumPy to eliminate the previous for loop
+z_scores = (hps - hp_avg)/hp_std
+
+# Combine names, hps, and z_scores
+poke_zscores2 = [*zip(names, hps, z_scores)]
+print(*poke_zscores2[:3], sep='\n')
+
+# Use list comprehension with the same logic as the highest_hp_pokemon code block
+highest_hp_pokemon2 = [(name, hp, zscore) for name,hp,zscore in poke_zscores2 if zscore > 2]
+print(*highest_hp_pokemon2, sep='\n')
+```
