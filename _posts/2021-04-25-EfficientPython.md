@@ -977,9 +977,8 @@ combos2 = [*combinations(poke_types, 2)]
 
 **Eliminate loops with NumPy**
 
-# Array of HP, Attack, Defense, Speed import numpy as np
-
 ```python
+# Array of HP, Attack, Defense, Speed import numpy as np
 poke_stats = np.array([
 	[90,92,75,60],
 	[25,20,15,90],
@@ -1163,4 +1162,149 @@ print(*highest_hp_pokemon2, sep='\n')
 # 4. Intro to pandas DataFrame iteration
 
 A brief introduction on how to efficiently work with pandas DataFrames. Learn the various options you have for iterating over a DataFrame, learn how to efficiently apply functions to data stored in a DataFrame.
+
+## 4.1 Intro to pandas DataFrame iteration
+**Pandas**:
+* Library used for data analysis
+* Main data structure is the DataFrame
+* Tabular data with labeled rows and columns 
+* Built on top of the NumPy array structure
+
+**Baseball stats**
+```python
+import pandas as pd
+baseball_df = pd.read_csv('baseball_stats.csv')
+print(baseball_df.head())
+```
+
+<img src="/assets/images/20210425_EfficientPython/pic13.png" class="largepic"/>
+
+**Calculating win percentage**
+
+```python
+import numpy as np
+def calc_win_perc(wins, games_played):
+    win_perc = wins / games_played
+    return np.round(win_perc,2)
+
+# Adding in percentage to DataFrame
+
+win_perc_list = []
+for i in range(len(baseball_df)): 
+    row = baseball_df.iloc[i] 
+    wins = row['W']
+    games_played = row['G']
+    win_perc = calc_win_perc(wins, games_played) 
+    win_perc_list.append(win_perc)
+
+baseball_df['WP'] = win_perc_list
+print(baseball_df.head())
+```
+
+<img src="/assets/images/20210425_EfficientPython/pic14.png" class="largepic"/>
+
+`iloc()`: With iloc() function, we can retrieve a particular value belonging to a row and column using the index values assigned to it.
+
+**Faster method: Iterating with .iterrow()**
+
+```python
+win_perc_list = []
+for i,row in baseball_df.iterrows(): 
+    wins = row['W']
+    games_played = row['G']
+
+    win_perc = calc_win_perc(wins, games_played)
+
+    win_perc_list.append(win_perc)
+
+baseball_df['WP'] = win_perc_list
+```
+
+**Practice**
+
+```python
+# Iterate over pit_df and print each index variable and then each row
+for i,row in pit_df.iterrows():
+    print(i)
+    print(row)
+    print(type(row))
+```
+
+```
+<class 'pandas.core.series.Series'>
+```
+
+```python
+# Print the row and type of each row
+for row_tuple in pit_df.iterrows():
+    print(row_tuple)
+    print(type(row_tuple))
+```
+
+```
+<class 'tuple'>
+```
+
+Since `.iterrows()` returns each DataFrame row as a tuple of (index, pandas Series) pairs, you can either split this tuple and use the index and row-values separately (as you did with for i,row in `pit_df.iterrows())`, or you can keep the result of .iterrows() in the tuple form (as you did with for row_tuple in pit_df.iterrows()).
+
+If using i,row, you can access things from the row using square brackets (i.e., row['Team']). If using row_tuple, you would have to specify which element of the tuple you'd like to access before grabbing the team name (i.e., row_tuple[1]['Team']).
+
+With either approach, using `.iterrows()` will still be substantially faster than using `.iloc`.
+
+```python
+# Create an empty list to store run differentials
+run_diffs = []
+
+# Write a for loop and collect runs allowed and runs scored for each row
+for i,row in giants_df.iterrows():
+    runs_scored = row['RS']
+    runs_allowed = row['RA']
+    
+    # Use the provided function to calculate run_diff for each row
+    run_diff = calc_run_diff(runs_scored, runs_allowed)
+    
+    # Append each run differential to the output list
+    run_diffs.append(run_diff)
+
+giants_df['RD'] = run_diffs
+print(giants_df)
+```
+
+## 4.2. Another iterator method: .itertuples()
+
+**Iterating with .iterrows()**
+```python
+for row_tuple in team_wins_df.iterrows(): 
+    print(row_tuple) 
+    # We have to access the row's values with square bracket indexing.
+    print(type(row_tuple[1]))
+```
+<img src="/assets/images/20210425_EfficientPython/pic15.png" class="largepic"/>
+
+**Iterating with .itertuples() (faster)**
+
+```python
+for row_namedtuple in team_wins_df.itertuples(): 
+    print(row_namedtuple)
+```
+<img src="/assets/images/20210425_EfficientPython/pic18.png" class="largepic"/>
+
+
+```python
+print(row_namedtuple.Index)
+```
+<img src="/assets/images/20210425_EfficientPython/pic16.png" class="largepic"/>
+
+
+```python
+print(row_namedtuple.Team)
+```
+
+<img src="/assets/images/20210425_EfficientPython/pic17.png" class="largepic"/>
+
+```python
+for row_tuple in team_wins_df.iterrows(): 
+    print(row_tuple[1]['Team'])
+```
+<img src="/assets/images/20210425_EfficientPython/pic19.png" class="largepic"/>
 
