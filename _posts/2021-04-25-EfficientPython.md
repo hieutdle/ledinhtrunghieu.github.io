@@ -1159,3 +1159,8 @@ print(*poke_zscores2[:3], sep='\n')
 highest_hp_pokemon2 = [(name, hp, zscore) for name,hp,zscore in poke_zscores2 if zscore > 2]
 print(*highest_hp_pokemon2, sep='\n')
 ```
+
+# 4. Intro to pandas DataFrame iteration
+
+A brief introduction on how to efficiently work with pandas DataFrames. Learn the various options you have for iterating over a DataFrame, learn how to efficiently apply functions to data stored in a DataFrame.
+
