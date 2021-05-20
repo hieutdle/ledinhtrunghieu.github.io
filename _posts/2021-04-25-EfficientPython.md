@@ -1308,3 +1308,118 @@ for row_tuple in team_wins_df.iterrows():
 ```
 <img src="/assets/images/20210425_EfficientPython/pic19.png" class="largepic"/>
 
+```python
+for row_namedtuple in team_wins_df.itertuples(): 
+    print(row_namedtuple['Team'])
+```
+
+<img src="/assets/images/20210425_EfficientPython/pic20.png" class="largepic"/>
+
+```python
+for row_namedtuple in team_wins_df.itertuples(): 
+    print(row_namedtuple.Team)
+```
+<img src="/assets/images/20210425_EfficientPython/pic21.png" class="largepic"/>
+
+When using `.iterrows()`, we can use square brackets to reference a column within our team_wins_df DataFrame. 
+When using `.itertuples()`, we have to use a dot when referring to a column within our DataFrame
+
+**Practice**
+
+```python
+# Loop over the DataFrame and print each row's Index, Year and Wins (W)
+for row in rangers_df.itertuples():
+  i = row.Index
+  year = row.Year
+  wins = row.W
+  
+  # Check if rangers made Playoffs (1 means yes; 0 means no)
+  if row.Playoffs == 1:
+    print(i,year, wins)
+
+run_diffs = []
+
+# Loop over the DataFrame and calculate each row's run differential
+for row in yankees_df.itertuples():
+    
+    runs_scored = row.RS
+    runs_allowed = row.RA
+
+    run_diff = calc_run_diff(runs_scored, runs_allowed)
+    
+    run_diffs.append(run_diff)
+
+# Append new column
+yankees_df['RD'] = run_diffs
+# Sort to take highest run differential
+final_df = yankees_df.sort_values(by=['RD'], ascending=False)
+print(final_df )
+```
+
+## 4.3. pandas alternative to looping
+
+**pandas.apply() method**
+Previous example:
+
+```python
+run_diffs_iterrows = []
+for i,row in baseball_df.iterrows():
+    run_diff = calc_run_diff(row['RS'], row['RA']) 
+    run_diffs_iterrows.append(run_diff)
+
+baseball_df['RD'] = run_diffs_iterrows
+```
+
+* Takes a function and applies it to a DataFrame
+    * Must specify an axis to apply ( `0` for columns; `1` for rows)
+* Can be used with anonymous functions (lambda functions)
+* Example:
+
+```python
+baseball_df.apply(
+    lambda row: calc_run_diff(row['RS'], row['RA']), 
+    axis=1
+)
+```
+
+**Run differentials with `.apply()`**
+```python
+run_diffs_apply = baseball_df.apply(
+    lambda row: calc_run_diff(row['RS'], row['RA']), 
+    axis=1)
+baseball_df['RD'] = run_diffs_apply 
+print(baseball_df)
+```
+
+Faster than iterrows.
+
+**Practice**
+```python
+# Gather sum of all columns
+stat_totals = rays_df.apply(sum, axis=0)
+
+
+# Gather total runs scored in all games per year
+total_runs_scored = rays_df[['RS', 'RA']].apply(sum, axis=1)
+
+# Convert numeric playoffs to text by applying text_playoffs()
+textual_playoffs = rays_df.apply(lambda row: text_playoffs(row['Playoffs']), axis=1)
+
+# Display the first five rows of the DataFrame
+print(dbacks_df.head())
+
+# Create a win percentage Series 
+win_percs = dbacks_df.apply(lambda row: calc_win_perc(row['W'], row['G']), axis=1)
+print(win_percs, '\n')
+
+# Append a new column to dbacks_df
+dbacks_df['WP'] = win_percs
+print(dbacks_df, '\n')
+
+# Display dbacks_df where WP is greater than 0.50
+print(dbacks_df[dbacks_df['WP'] >= 0.50])
+
+```
+
+## 4.4. Optimal pandas iterating
+
