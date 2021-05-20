@@ -1423,3 +1423,62 @@ print(dbacks_df[dbacks_df['WP'] >= 0.50])
 
 ## 4.4. Optimal pandas iterating
 
+**pandas internals**
+* Eliminating loops applies to using pandas as well 
+* pandas is built on NumPy
+    * Take advantage of NumPy array effciencies
+
+<img src="/assets/images/20210425_EfficientPython/pic22.png" class="largepic"/>
+
+```python
+print(baseball_df)
+```
+<img src="/assets/images/20210425_EfficientPython/pic23.png" class="largepic"/>
+
+
+```
+wins_np = baseball_df['W'].values 
+print(type(wins_np))
+```
+<img src="/assets/images/20210425_EfficientPython/pic24.png" class="largepic"/>
+
+
+```
+print(wins_np)
+```
+<img src="/assets/images/20210425_EfficientPython/pic25.png" class="largepic"/>
+
+**Power of vectorization**
+*Broadcasting (vectorizing) is extremely efficient!
+
+```python
+baseball_df['RS'].values - baseball_df['RA'].values
+```
+Since `pandas` is built on top of `NumPy`, we can grab any of these DataFrame column's values as a `NumPy` array using the `.values()` method. 
+Instead of looping over a DataFrame, and treating each row independently, like we've done with `.iterrows()`, `.itertuples()`, and `.apply()`, we can perform calculations on the underlying NumPy arrays of our baseball_df DataFrame. Here, we gather the RS and RA columns in our DataFrame as NumPy arrays, and use broadcasting to calculate run differentials all at once!
+
+**Run differentials with arrays**
+```python
+run_diffs_np = baseball_df['RS'].values - baseball_df['RA'].values 
+baseball_df['RD'] = run_diffs_np
+```
+
+**Last Practice**
+```python
+win_perc_preds_loop = []
+
+# Use a loop and .itertuples() to collect each row's predicted win percentage
+for row in baseball_df.itertuples():
+    runs_scored = row.RS
+    runs_allowed = row.RA
+    win_perc_pred = predict_win_perc(runs_scored, runs_allowed)
+    win_perc_preds_loop.append(win_perc_pred)
+
+# Apply predict_win_perc to each row of the DataFrame
+win_perc_preds_apply = baseball_df.apply(lambda row: predict_win_perc(row['RS'], row['RA']), axis=1)
+
+# Calculate the win percentage predictions using NumPy arrays
+win_perc_preds_np = predict_win_perc(baseball_df['RS'].values, baseball_df['RA'].values)
+baseball_df['WP_preds'] = win_perc_preds_np
+print(baseball_df.head())
+```
