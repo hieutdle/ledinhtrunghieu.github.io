@@ -1268,3 +1268,8 @@ cafes_with_pop = cafes_with_pumas.merge(pop_data,
 # View the data
 print(cafes_with_pop.head())
 ```
+
+# 5. Reference
+
+1. [Streamlined Data Ingestion with pandas - DataCamp](https://learn.datacamp.com/courses/streamlined-data-ingestion-with-pandas)
+

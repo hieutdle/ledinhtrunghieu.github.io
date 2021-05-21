@@ -1482,3 +1482,9 @@ win_perc_preds_np = predict_win_perc(baseball_df['RS'].values, baseball_df['RA']
 baseball_df['WP_preds'] = win_perc_preds_np
 print(baseball_df.head())
 ```
+
+# 5. Reference
+
+
+1. [Writing Efficient Python Code - DataCamp](https://learn.datacamp.com/courses/writing-efficient-python-code)
+
