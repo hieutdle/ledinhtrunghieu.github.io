@@ -6,6 +6,8 @@ title: Lesson 5 - Writing Functions in Python
     
 # 1. Best Practices
 
+Learn about Docstrings, why they matter, how to know when you need to turn a chunk of code into a function and the details of how Python passes arguments to functions.
+
 ## 1.1. Docstrings
 
 **A Complex function**
@@ -118,14 +120,14 @@ def the_answer():
 return 42
 print(the_answer.__doc__)
 ```
-<img src="/assets/images/20210426_FunctionsInPytho/pic1.png" class="largepic"/>
+<img src="/assets/images/20210426_FunctionsInPython/pic1.png" class="largepic"/>
 
 
 ```python
 import inspect 
 print(inspect.getdoc(the_answer))
 ```
-<img src="/assets/images/20210426_FunctionsInPytho/pic2.png" class="largepic"/>
+<img src="/assets/images/20210426_FunctionsInPython/pic2.png" class="largepic"/>
 
 
 ## 1.2. DRY and "Do One Thing"
@@ -224,22 +226,341 @@ def plot_data(X):
 
 ## 1.3. Pass by assignment
 
-<img src="/assets/images/20210426_FunctionsInPytho/pic2.png" class="largepic"/>
+<img src="/assets/images/20210426_FunctionsInPython/pic2.png" class="largepic"/>
 
 In Python, integers are immutable, meaning they can't be changed.
 
-<img src="/assets/images/20210426_FunctionsInPytho/pic4.png" class="largepic"/>
+<img src="/assets/images/20210426_FunctionsInPython/pic4.png" class="largepic"/>
 
 There are only a few immutable data types in Python because almost everything is represented as an object. The only way to tell if something is mutable is to see if there is a function or method that will change the object without assigning it to a new variable.
 
 # 2. Context Managers
 
-# 2.1. Using context managers
+Context managers are a convenient way to provide connections in Python and guarantee that those connections get cleaned up when you are done using them. 
+
+## 2.1. Using context managers
 
 **What is a context manager**
 A context manager:
 * Sets up a context 
 * Runs your code 
 * Removes the context
+
+**A real-world example**
+```python
+with open('my_file.txt') as my_file: 
+    text = my_file.read()
+    length = len(text)
+
+print('The file is {} characters long'.format(length))
+```
+
+`open` does three things:
+* Sets up a context by opening a file
+* Lets you run any code you want on that file 
+* Removes the context by closing the file
+
+**Using a context manager**
+```python
+with <context-manager>(<args>) as <variable-name>: 
+    # Run your code here
+    # This code is running "inside the context"
+
+# This code runs after the context is removed
+```
+
+**Practice**
+
+```python
+image = get_image_from_instagram()
+
+# Time how long process_with_numpy(image) takes to run
+with timer():
+  print('Numpy version')
+  process_with_numpy(image)
+
+# Time how long process_with_pytorch(image) takes to run
+with timer():
+  print('Pytorch version')
+  process_with_pytorch(image)
+```
+
+## 2.2. Writing context managers
+
+**Two ways to define a context manager**
+* Class-based 
+* Function-based
+
+```python
+@contextlib.contextmanager 
+def my_context():
+    # Add any set up code you need yield
+    yield
+    # Add any teardown code you need
+```
+
+1.	Define a function.
+2.	(optional) Add any set up code your context needs.
+3.	Use the "yield" keyword.
+4.	(optional) Add any teardown code your context needs.
+5.	Add the `@contextlib.contextmanager` decorator.
+
+
+**The "yield" keyword**
+
+```python
+@contextlib.contextmanager 
+def my_context():
+    print('hello') 
+    yield 42 
+    print('goodbye')
+```
+
+```python
+with my_context() as foo: 
+    print('foo is {}'.format(foo))
+```
+
+<img src="/assets/images/20210426_FunctionsInPython/pic5.png" class="largepic"/>
+
+The "yield" keyword may also be new to you. When you write this word, it means that you are going to return a value, but you expect to finish the rest of the function at some point in the future. The value that your context manager yields can be assigned to a variable in the "with" statement by adding "as <variable name>". Here, we've assigned the value 42 that my_context() yields to the variable "foo". By running this code, you can see that after the context block is done executing, the rest of the my_context() function gets run, printing "goodbye". Some of you may recognize the "yield" keyword as a thing that gets used when creating generators. In fact, a context manager function is technically a generator that yields a single value.
+
+
+**Setup and teardown**
+
+```python
+@contextlib.contextmanager 
+def database(url):
+    # set up database connection
+    db = postgres.connect(url)
+
+    yield db
+
+    # tear down database connection
+    db.disconnect()
+```
+
+```python
+url = 'http://datacamp.com/data' 
+with database(url) as my_db:
+    course_list = my_db.execute( 
+        'SELECT * FROM courses'
+)
+
+```
+
+**Yielding a value or None**
+```python
+@contextlib.contextmanager 
+    def in_dir(path):
+    # save current working directory
+    old_dir = os.getcwd()
+
+    # switch to new working directory
+    os.chdir(path)
+
+    yield
+
+    # change back to previous # working directory
+    os.chdir(old_dir)
+```
+
+```pyhon
+with in_dir('/data/project_1/'): 
+    project_files = os.listdir()
+```
+
+**Practice**
+```python
+@contextlib.contextmanager
+def open_read_only(filename):
+  """Open a file in read-only mode.
+
+  Args:
+    filename (str): The location of the file to read
+
+  Yields:
+    file object
+  """
+  read_only_file = open(filename, mode='r')
+  # Yield read_only_file so it can be assigned to my_file
+  yield read_only_file
+  # Close read_only_file
+  read_only_file.close()
+
+with open_read_only('my_file.txt') as my_file:
+  print(my_file.read())
+```
+
+## 1.3. Advanced topics
+
+**Nested context**
+
+```python
+def copy(src, dst):
+    """Copy the contents of one file to another.
+
+    Args:
+        src (str): File name of the file to be copied. 
+        dst (str): Where to write the new file.
+    """
+    # Open the source file and read in the contents 
+    with open(src) as f_src:
+        contents = f_src.read()
+
+    # Open the destination file and write out the contents 
+    with open(dst, 'w') as f_dst:
+        f_dst.write(contents)
+```
+
+```python
+def copy(src, dst):
+    """Copy the contents of one file to another.
+
+    Args:
+        src (str): File name of the file to be copied. 
+        dst (str): Where to write the new file.
+    """
+    # Open both files
+    with open(src) as f_src:
+        with open(dst, 'w') as f_dst:
+        # Read and write each line, one at a time 
+        for line in f_src:
+            f_dst.write(line)
+```
+
+**Handling errors**
+```python
+def get_printer(ip):
+    p = connect_to_printer(ip)
+
+    # This MUST be called or no one else will 
+    # be able to connect to the printer 
+    p.disconnect()
+    print('disconnected from printer')
+
+doc = {'text': 'This is my text.'}
+
+with get_printer('10.0.34.111') as printer:
+    printer.print_page(doc['txt'])
+```
+
+<img src="/assets/images/20210426_FunctionsInPython/pic6.png" class="largepic"/>
+
+
+This will raise a KeyError because "txt" is not in the "doc" dictionary. And that means "p.disconnect()" doesn't get called.
+
+```python
+try:
+    # code that might raise an error 
+except:
+    # do something about the error 
+finally:
+    # this code runs no matter what
+```
+
+```python
+def get_printer(ip):
+    p = connect_to_printer(ip)
+
+    try:
+        yield 
+    finally:
+        p.disconnect()  
+        print('disconnected from printer')
+
+doc = {'text': 'This is my text.'}
+
+with get_printer('10.0.34.111') as printer: 
+    printer.print_page(doc['txt'])
+```
+
+<img src="/assets/images/20210426_FunctionsInPython/pic7.png" class="largepic"/>
+
+When the sloppy programmer runs their code, they still get the KeyError, but "finally" ensures that "p.disconnect()" is called before the error is raised.
+
+
+**Context Manager Pattern**
+
+<img src="/assets/images/20210426_FunctionsInPython/pic8.png" class="largepic"/>
+
+**Practice**
+
+```python
+# Use the "stock('NVDA')" context manager
+# and assign the result to the variable "nvda"
+with stock('NVDA') as nvda:
+  # Open 'NVDA.txt' for writing as f_out
+  with open('NVDA.txt', 'w') as f_out:
+    for _ in range(10):
+      value = nvda.price()
+      print('Logging ${:.2f} for NVDA'.format(value))
+      f_out.write('{:.2f}\n'.format(value))
+```
+
+```python
+def in_dir(directory):
+  """Change current working directory to `directory`,
+  allow the user to run some code, and change back.
+
+  Args:
+    directory (str): The path to a directory to work in.
+  """
+  current_dir = os.getcwd()
+  os.chdir(directory)
+
+  # Add code that lets you handle errors
+  try:
+    yield
+  # Ensure the directory is reset,
+  # whether there was an error or not
+  finally:
+    os.chdir(current_dir)
+```
+
+# 3. Decorators
+
+**Functions are just another type of object**
+
+Python objects:
+
+```python
+def x(): 
+    pass
+x = [1, 2, 3]
+x = {'foo': 42}
+x = pandas.DataFrame()
+x	= 3
+x	= 71.2
+```
+
+**Functions as variable**
+```python
+def my_function(): 
+    print('Hello')
+x = my_function 
+type(x)
+```
+
+```
+<type 'function'>
+```
+
+```python
+x()
+```
+
+```
+Hello
+```
+
+```python
+PrintyMcPrintface = print 
+PrintyMcPrintface('Python is awesome!')
+```
+
+```
+Python is awesome!
+```
 
 
