@@ -520,6 +520,10 @@ def in_dir(directory):
 
 # 3. Decorators
 
+## 3.1. Functions are objects
+
+Decorators are an extremely powerful concept in Python. They allow you to modify the behavior of a function without changing the code of the function itself
+
 **Functions are just another type of object**
 
 Python objects:
