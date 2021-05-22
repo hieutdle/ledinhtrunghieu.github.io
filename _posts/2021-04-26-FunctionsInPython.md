@@ -567,4 +567,137 @@ PrintyMcPrintface('Python is awesome!')
 Python is awesome!
 ```
 
+**Lists and dictionaries of functions**
+
+```python
+list_of_functions = [my_function, open, print] 
+list_of_functions[2]('I am printing with an element of a list!')
+```
+
+<img src="/assets/images/20210426_FunctionsInPython/pic9.png" class="largepic"/>
+
+```python
+dict_of_functions = { 
+    'func1': my_function, 
+    'func2': open, 
+    'func3': print
+}
+dict_of_functions['func3']('I am printing with a value of a dict!')
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic10.png" class="largepic"/>
+
+**Defining a function inside another function**
+```python
+def foo(x,  y): 
+    def in_range(v):
+        return v > 4 and v < 10
+
+    if in_range(x) and in_range(y):
+        print(x * y)
+```
+
+**Functions as return values**
+```python
+def get_function(): 
+    def print_me(s):
+        print(s)
+
+    return print_me
+
+new_func = get_function() 
+new_func('This is a sentence.')
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic11.png" class="largepic"/>
+
+**Practice**
+
+```python
+# Call has_docstring() on the log_product() function
+ok = has_docstring(log_product)
+
+if not ok:
+  print("log_product() doesn't have a docstring!")
+else:
+  print("log_product() looks ok")
+
+
+def create_math_function(func_name):
+  if func_name == 'add':
+    def add(a, b):
+      return a + b
+    return add
+  elif func_name == 'subtract':
+    # Define the subtract() function
+    def subtract(a,b):
+      return a - b
+    return subtract
+  else:
+    print("I don't know that one")
+    
+add = create_math_function('add')
+print('5 + 2 = {}'.format(add(5, 2)))
+
+subtract = create_math_function('subtract')
+print('5 - 2 = {}'.format(subtract(5, 2)))
+```
+
+## 3.2. Scope
+
+* Local Scope: First, the interpreter looks in the local scope. When you are inside a function, the local scope is made up of the arguments and any variables defined inside the function.
+* If the interpreter can't find the variable in the local scope, it expands its search to the global scope. These are the things defined outside the function.
+* Finally, if it can't find the thing it is looking for in the global scope, the interpreter checks the builtin scope. These are things that are always available in Python. For instance, the print() function is in the builtin scope, which is why we are able to use it in our foo() function.
+* In the case of nested functions, where one function is defined inside another function, Python will check the scope of the parent function before checking the global scope. This is called the nonlocal scope to show that it is not the local scope of the child function and not the global scope.
+
+
+**The global keyword**
+Note that Python only gives you read access to variables defined outside of your current scope. If what we had really wanted was to change the value of x in the global scope, then we have to declare that we mean the global x by using the global keyword. 
+
+
+```python
+x = 7
+
+def foo(): 
+    global x 
+    x = 42
+    print(x)
+foo()
+
+42
+
+def foo():
+    x = 10
+
+    def bar(): x = 200
+        print(x)
+
+    bar()
+    print(x)
+
+foo()
+
+200
+10
+
+
+def foo():
+    def bar(): 
+        nonlocal x 
+        x = 200
+        print(x)
+
+    bar()
+    print(x)
+
+foo()
+
+200
+200
+
+```
+
+## 3.3. Closures
+
+A **closure** in Python is a tuple of variables that are no longer in scope, but that a function needs in order to run.
+
+**Attaching nonlocal variables to nested functions**
 
