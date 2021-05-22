@@ -701,3 +701,202 @@ A **closure** in Python is a tuple of variables that are no longer in scope, but
 
 **Attaching nonlocal variables to nested functions**
 
+```python
+def foo(): 
+    a = 5
+    def bar(): 
+        print(a)
+    return bar
+
+func = foo()
+
+func()
+
+Result: 5
+
+type(func.__closure__)
+
+<class 'tuple'>
+
+len(func.__closure__)
+
+1
+
+func.__closure__[0].cell_contents
+
+5
+
+del(x)
+func()
+
+5
+
+```
+
+* When `foo()` returned the new `bar()` function, Python helpfully attached any nonlocal variable that `bar()` was going to need to the function object. Those **variables** get stored in a tuple in the "__closure__" attribute of the function. The closure for "func" has one variable, and you can view the value of that variable by accessing the "cell_contents" of the item.
+* Closure and deletion: Because foo()'s "value" argument gets added to the closure attached to the new "my_func" function. So even though x doesn't exist anymore, the value persists in its closure.
+
+**Definitions - nested function**
+
+Nested function: A function defined inside another function.
+
+```python
+# outer function 
+def parent():
+    # nested function 
+    def child():
+        pass 
+    return child
+```
+
+**Definitions - nonlocal variables**
+
+Nonlocal variables: Variables defined in the parent function that are used by the child function.
+
+```python
+def parent(arg_1, arg_2):
+    # From child()'s point of view,
+    # `value` and `my_dict` are nonlocal variables, 
+    # as are `arg_1` and `arg_2`.
+    value = 22
+    my_dict = {'chocolate': 'yummy'}
+
+
+    def child(): 
+        print(2 * value)
+        print(my_dict['chocolate']) 
+        print(arg_1 + arg_2)
+
+
+    return child
+```
+
+**Closure: Nonlocal variables a attached to a returned function.**
+
+```python
+def parent(arg_1, arg_2): 
+    value = 22
+    my_dict = {'chocolate': 'yummy'}
+
+
+    def child(): 
+        print(2 * value)
+        print(my_dict['chocolate']) 
+        print(arg_1 + arg_2)
+    
+    return  child 
+
+new_function = parent(3, 4)
+
+print([cell.cell_contents for cell in new_function.__closure__])
+```
+
+**Why does all of this matter?**
+
+Decorators use:
+* Functions as objects
+* Nested functions
+* Nonlocal scope
+* Closures*
+
+**Practice**
+
+```python
+def return_a_func(arg1, arg2):
+  def new_func():
+    print('arg1 was {}'.format(arg1))
+    print('arg2 was {}'.format(arg2))
+  return new_func
+    
+my_func = return_a_func(2, 17)
+
+print(my_func.__closure__ is not None)
+print(len(my_func.__closure__) == 2)
+
+# Get the values of the variables in the closure
+closure_values = [
+  my_func.__closure__[i].cell_contents for i in range(2)
+]
+print(closure_values == [2, 17])
+```
+
+## 4.4. Decorators
+
+
+<img src="/assets/images/20210426_FunctionsInPython/pic12.png" class="largepic"/>
+
+A **decorator** is a **wrapper** that you can place around a function that **changes that function's behavior**. You can modify the **inputs**, modify the **outputs**, or even change the **behavior of the function** itself.
+
+**What does a decorator look like?**
+
+```python
+@double_args
+def multiply(a, b): 
+    return a * b
+multiply(1, 5)
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic13.png" class="largepic"/>
+
+**The double_args decorator**
+
+```python
+def multiply(a, b): 
+    return a * b
+def double_args(func): 
+    def wrapper(a, b):
+        # Call the passed in function, but double each argument
+        return func(a * 2, b * 2) 
+    return wrapper
+new_multiply = double_args(multiply) 
+new_multiply(1,	5)
+
+20
+
+multiply. __closure__[0].cell_contents
+
+<function multiply at 0x7f0060c9e620>
+
+```
+ Remember that we can do this because Python stores the original multiply function in the new function's closure.
+
+ **Decorator syntax**
+
+```python
+def double_args(func): 
+    def wrapper(a, b):
+        return func(a * 2, b * 2)
+    return wrapper
+
+@double_args
+def multiply(a, b): 
+    return a * b
+
+multiply(1,	5)
+
+20
+```
+**Practice**
+
+```python
+def print_before_and_after(func):
+  def wrapper(*args):
+    print('Before {}'.format(func.__name__))
+    # Call the function being decorated with *args
+    func(*args)
+    print('After {}'.format(func.__name__))
+  # Return the nested function
+  return wrapper
+
+@print_before_and_after
+def multiply(a, b):
+  print(a * b)
+
+multiply(5, 10)
+```
+
+# 4. More on Decorators
+
+Learn advanced decorator concepts like how to preserve the metadata of your decorated functions and how to write decorators that take arguments.
+
+# 4.1. Real-world examples
+
