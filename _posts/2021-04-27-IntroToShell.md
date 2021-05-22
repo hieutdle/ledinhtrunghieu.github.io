@@ -288,3 +288,304 @@ The shell has other wildcards as well, though they are less commonly used:
 
 **Sort lines of text**
 
+`sort` puts data in order. By default it does this in ascending alphabetical order, but the flags `-n` and `-r` can be used to sort numerically and reverse the order of its output, while `-b` tells it to ignore leading blanks and `-f` tells it to fold case (i.e., be case-insensitive). Pipelines often use `grep` to get rid of unwanted records and then sort to put the remaining records in order.
+
+```
+cut -d , -f 2 seasonal/winter.csv | grep -v Tooth | sort -r
+ ```
+
+ **Remove duplicate lines**
+
+ Using `uniq`
+
+ Write a pipeline to:
+* get the second column from seasonal/winter.csv,
+* remove the word "Tooth" from the output so that only tooth names are displayed,
+* sort the output so that all occurrences of a particular tooth name are adjacent; and
+* display each tooth name once along with a count of how often it occurs.
+
+```
+cut -d , -f 2 seasonal/winter.csv | grep -v Tooth | sort | uniq -c
+```
+
+**Save the output of a pipe**
+
+The shell lets us redirect the output of a sequence of piped commands:
+
+```
+cut -d , -f 2 seasonal/*.csv | grep -v Tooth > teeth-only.txt
+```
+
+However, `>` must appear at the end of the pipeline: if we try to use it in the middle, like this:
+
+```
+cut -d , -f 2 seasonal/*.csv > teeth-only.txt | grep -v Tooth
+```
+
+then all of the output from `cut` is written to `teeth-only.txt`, so there is nothing left for `grep` and it waits forever for some input.
+
+**stop a running program**
+
+`Ctrl` + `C`
+
+**Wrapping up**
+* Use `wc` with appropriate parameters to list the number of lines in all of the seasonal data files. (Use a wildcard for the filenames instead of typing them all in by hand.)
+* Add another command to the previous one using a pipe to remove the line containing the word "total".
+* Add two more stages to the pipeline that use `sort -n` and `head -n 1` to find the file containing the fewest lines.
+```
+wc -l seasonal/* | grep -v total | sort -n | head -n 1
+```
+
+# 4. Batch processing
+
+**How does the shell store information?**
+
+The shell stores information in variables. Some of these, called **environment variables**, are available all the time.
+
+**Print a variable's value**
+
+A simpler way to find a variable's value is to use a command called `echo`, which prints its arguments. 
+
+```
+echo hello DataCamp!
+```
+
+prints
+```
+hello DataCamp!
+```
+
+`echo USER`: it will print the variable's name, `USER`.
+
+To get the variable's value, you must put a dollar sign `$` in front of it. Typing
+
+echo `$USER` prints `repl`
+
+**How else does the shell store information**
+
+The other kind of variable is called a **shell variable**, which is like a local variable in a programming language.
+
+To create a shell variable, you simply assign a value to a name:
+```
+training=seasonal/summer.csv
+```
+```
+echo $training
+seasonal/summer.csv
+```
+
+**Repeat a command many times**
+
+Shell variables are also used in **loops**, which repeat commands many times. If we run this command:
+
+```
+for filetype in gif jpg png; do echo $filetype; done
+```
+
+it produces:
+```
+gif
+jpg
+png
+```
+
+Notice these things about the loop:
+* The structure is `for` …variable… `in` …list… `; do` …body… `; done`
+* The list of things the loop is to process (in our case, the words `gif`, `jpg`, and `png`).
+* The variable that keeps track of which thing the loop is currently processing (in our case, `filetype`).
+* The body of the loop that does the processing (in our case, echo `$filetype`).
+
+**Repeat a command once for each file**
+
+```
+for filename in seasonal/*.csv; do echo $filename; done
+for filename in people/*; do echo $filename; done
+```
+
+**Record the names of a set of files**
+
+```
+files=seasonal/*.csv
+for f in $files; do echo $f; done
+```
+
+**Run many commands in a single loop**
+
+```
+for file in seasonal/*.csv; do head -n 2 $file | tail -n 1; done
+```
+
+**Why shouldn't I use spaces in filenames?**
+
+```
+mv July 2017.csv 2017 July data.csv
+```
+It's easy and sensible to give files multi-word names like July 2017.csv when you are using a graphical file explorer. However, this causes problems when you are working in the shell. Because it looks to the shell as though you are trying to move four files called `July`, `2017.csv`, `2017`, and `July` (again) into a directory called `data.csv`. Instead, you have to quote the files' names so that the shell treats each one as a single parameter:
+
+```
+mv 'July 2017.csv' '2017 July data.csv'
+
+```
+
+**How can I do many things in a single loop?**
+
+The loops you have seen so far all have a single command or pipeline in their body, but a loop can contain any number of commands. To tell the shell where one ends and the next begins, you must separate them with semi-colons:
+
+```
+for f in seasonal/*.csv; do echo $f; head -n 2 $f | tail -n 1; done
+```
+
+```
+seasonal/autumn.csv
+2017-01-05,canine
+seasonal/spring.csv
+2017-01-25,wisdom
+seasonal/summer.csv
+2017-01-11,canine
+seasonal/winter.csv
+2017-01-03,bicuspid
+```
+
+Suppose you forget the semi-colon between the echo and head commands in the previous loop, so that you ask the shell to run:
+
+```
+for f in seasonal/*.csv; do echo $f head -n 2 $f | tail -n 1; done
+```
+
+```
+seasonal/autumn.csv head -n 2 seasonal/autumn.csv
+seasonal/spring.csv head -n 2 seasonal/spring.csv
+seasonal/summer.csv head -n 2 seasonal/summer.csv
+seasonal/winter.csv head -n 2 seasonal/winter.csv
+``` 
+
+Other test
+
+```
+for f in seasonal/*.csv; do echo $f | head -n 2 $f | tail -n 1; done
+```
+
+```
+2017-01-05,canine
+2017-01-25,wisdom
+2017-01-11,canine
+2017-01-03,bicuspid
+```
+
+# 5. Creating new tools
+
+**How can I edit a file?**
+
+Unix has a bewildering variety of text editors. For this course, we will use a simple one called **Nano**. If you type `nano filename`, it will open filename for editing (or create it if it doesn't already exist). You can move around with the arrow keys, delete characters using backspace, and do other operations with control-key combinations:
+* `Ctrl` + `K`: delete a line.
+* `Ctrl` + `U`: un-delete a line.
+* `Ctrl` + `O`: save the file ('O' stands for 'output'). You will also need to press Enter to confirm the filename!
+* `Ctrl` + `X`: exit the editor.
+
+**How can I record what I just did**
+```
+head steps.txt
+    2  cp seasonal/spring.csv seasonal/summer.csv ~
+    3  grep -h -v Tooth spring.csv summer.csv > temp.csv
+    4  history | tail -n 3 > steps.csv
+```
+
+**Save commands to re-run later?**
+You have been using the shell interactively so far. But since the commands you type in are just text, you can store them in files for the shell to run over and over again. 
+
+Use `nano dates.sh` to create a file called dates.sh that contains this command:
+
+```
+cut -d , -f 1 seasonal/*.csv
+```
+to extract the first column from all of the CSV files in seasonal
+
+```
+bash dates.sh
+```
+
+**How can I re-use pipes?**
+
+A file full of shell commands is called a **shell script**, or sometimes just a "script" for short. Scripts don't have to have names ending in .sh, but this lesson will use that convention to help you keep track of which files are scripts.
+
+Scripts can also contain pipes. For example, if all-dates.sh contains this line:
+```
+cut -d , -f 1 seasonal/*.csv | grep -v Date | sort | uniq
+```
+then:
+```
+bash all-dates.sh > dates.out
+```
+will extract the unique dates from the seasonal data files and save them in dates.out.
+
+**Pass filenames to scripts**
+
+A script that processes specific files is useful as a record of what you did, but one that allows you to process any files you want is more useful. To support this, you can use the special expression `$@` (dollar sign immediately followed by at-sign) to mean "all of the command-line parameters given to the script".
+
+For example, if `unique-lines.sh` contains sort `$@ | uniq`, when you run:
+
+```
+bash unique-lines.sh seasonal/summer.csv
+```
+the shell replaces `$@` with `seasonal/summer.csv` and processes one file. If you run this:
+```
+bash unique-lines.sh seasonal/summer.csv seasonal/autumn.csv
+```
+
+it processes two data files, and so on.
+
+
+```
+nano count-records.sh
+
+bash count-records.sh seasonal/*.csv > num-records.out
+```
+**How can I process a single argument?**
+
+As well as `$@`, the shell lets you use `$1`, `$2`, and so on to refer to specific command-line parameters. You can use this to write commands that feel simpler or more natural than the shell's. For example, you can create a script called `column.sh` that selects a single column from a CSV file when the user provides the filename as the first parameter and the column as the second:
+```
+cut -d , -f $2 $1
+```
+
+and then run it using:
+
+```
+bash column.sh seasonal/autumn.csv 1
+```
+
+Notice how the script uses the two parameters in reverse order.
+
+**How can one shell script do many things?**
+
+Our shells scripts so far have had a single command or pipe, but a script can contain many lines of commands. For example, you can create one that tells you how many records are in the shortest and longest of your data files, i.e., the range of your datasets' lengths.
+
+**How can I write loops in a shell script?**
+
+
+```
+# Print the first and last data records of each file.
+for filename in $@
+do
+    head -n 2 $filename | tail -n 1
+    tail -n 1 $filename
+done
+
+```
+Run date-range.sh on all four of the seasonal data files using `seasonal/*.csv` to match their names, and pipe its output to `sort` to see that your scripts can be used just like Unix's built-in commands.
+
+
+```
+$ nano date-range.sh
+$ bash date-range.sh seasonal/*.csv
+$ bash date-range.sh seasonal/*.csv | sort
+```
+
+**What happens when I don't provide filenames?**
+
+tail: cannot open 'somefile.txt' for reading: No such file or directory
+You should use Ctrl + C to stop a running program.
+
+# 6. Reference
+
+1. [Introduction to Shell - DataCamp](https://learn.datacamp.com/courses/introduction-to-shell)
+
