@@ -898,5 +898,46 @@ multiply(5, 10)
 
 Learn advanced decorator concepts like how to preserve the metadata of your decorated functions and how to write decorators that take arguments.
 
-# 4.1. Real-world examples
+## 4.1. Real-world examples
+
+**Time a function**
+
+```python
+import time
+def timer(func):
+    """A decorator that prints how long a function took to run.
+
+    Args:
+        func (callable): The function being decorated.
+
+    Returns:
+        callable: The decorated function. 
+    """
+
+    # Define the wrapper function to return.
+    def wrapper(*args, **kwargs):
+    # When wrapper() is called, get the current time. 
+    t_start = time.time()
+    # Call the decorated function and store the result. 
+    result = func(*args, **kwargs)
+    # Get the total time it took to run, and print it. 
+    t_total = time.time() - t_start
+    print('{} took {}s'.format(func.__name__,t_total)) 
+    return result
+return wrapper
+
+```
+
+**Using timer()**
+```python
+@timer
+def sleep_n_seconds(n): 
+    time.sleep(n)
+
+sleep_n_seconds(5)
+sleep_n_seconds took 5.0050950050354s
+
+sleep_n_seconds(10)
+sleep_n_seconds took 10.010067701339722s
+```
 
