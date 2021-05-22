@@ -941,3 +941,238 @@ sleep_n_seconds(10)
 sleep_n_seconds took 10.010067701339722s
 ```
 
+**Memoize**
+
+**Memoizing** is the process of storing the results of a function so that the next time the function is called with the same arguments; you can just look up the answer. 
+
+```python
+def memoize(func):
+    """Store the results of the decorated function for fast lookup
+    """
+    # Store results in a dict that maps arguments to results
+    cache = {}
+    # Define the wrapper function to return.
+    def wrapper(*args, **kwargs):
+        # If these arguments haven't been seen before,
+        if (args, kwargs) not in cache:
+            # Call func() and store the result.
+            cache[(args, kwargs)] = func(*args, **kwargs)
+        return cache[(args, kwargs)]
+    return wrapper
+```
+
+```python
+@memoize
+def slow_function(a, b): 
+    print('Sleeping...') 
+    time.sleep(5)
+    return a + b
+
+slow_function(3, 4)
+
+Sleeping... 
+7
+
+slow_function(3, 4)
+7
+```
+
+**When to use decorators**
+Add common behavior to multiple functions
+
+```python
+
+@timer  
+def foo():
+    # do some computation
+
+@timer  
+def bar():
+    # do some other computation
+
+
+@timer  
+def baz():
+    # do something else
+```
+
+## 4.2. Decorators and metadata
+
+```python
+@timer
+def sleep_n_seconds(n=10):
+    """Pause processing for n seconds.
+Args:
+    n (int): The number of seconds to pause for. 
+    """
+    time.sleep(n)
+print(sleep_n_seconds.__doc__)
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic14.png" class="largepic"/>
+
+```python
+print(sleep_n_seconds.__name__)
+```
+```
+wrapper
+```
+When we try to print the docstring, we get nothing back. Even stranger, when we try to look up the function's name, Python tells us that sleep_n_seconds()'s name is "wrapper".
+
+**The timer decorator**
+
+```python
+def timer(func):
+    """A decorator that prints how long a function took to run."""
+
+    def wrapper(*args, **kwargs): 
+        t_start = time.time()
+
+        result = func(*args, **kwargs)
+        t_total = time.time() - t_start
+        print('{} took {}s'.format(func.__name__, t_total))
+        
+        return result
+    return wrapper
+```
+
+When you ask for sleep_n_seconds()'s docstring or name, you are actually referencing the nested function that was returned by the decorator. In this case, the nested function was called wrapper() and it didn't have a docstring.
+
+```python
+from functools import wraps 
+def timer(func):
+    """A decorator that prints how long a function took to run."""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs): 
+        t_start = time.time()
+
+        result = func(*args, **kwargs)
+        t_total = time.time() - t_start
+        print('{} took {}s'.format(func.__name__, t_total))
+        
+        return result
+    return wrapper
+```
+Python provides us with an easy way to fix this. The wraps() function from the functools module is a decorator that you use when defining a decorator. If you use it to decorate the wrapper function that your decorator returns, it will modify wrapper()'s metadata to look like the function you are decorating.
+
+If we use this updated version of the timer() decorator to decorate sleep_n_seconds() and then try to print sleep_n_seconds()'s docstring, we get the result we expect.
+
+
+**Decorate print_sum() with the add_hello() decorator to replicate the issue that your friend saw - that the docstring disappears.**
+```python
+def add_hello(func):
+  def wrapper(*args, **kwargs):
+    print('Hello')
+    return func(*args, **kwargs)
+  return wrapper
+
+# Decorate print_sum() with the add_hello() decorator
+@add_hello
+def print_sum(a, b):
+  """Adds two numbers and prints the sum"""
+  print(a + b)
+  
+print_sum(10, 20)
+print(print_sum.__doc__)
+```
+
+```python
+@check_everything
+def duplicate(my_list):
+  """Return a new list that repeats the input twice"""
+  return my_list + my_list
+
+t_start = time.time()
+duplicated_list = duplicate(list(range(50)))
+t_end = time.time()
+decorated_time = t_end - t_start
+
+t_start = time.time()
+# Call the original function instead of the decorated one
+duplicated_list = duplicate.__wrapped__(list(range(50)))
+t_end = time.time()
+undecorated_time = t_end - t_start
+
+print('Decorated time: {:.5f}s'.format(decorated_time))
+print('Undecorated time: {:.5f}s'.format(undecorated_time))
+```
+
+## 4.3. Decorators that take arguments
+
+**run_n_times()**
+```python
+def run_n_times(func):
+    def wrapper(*args, **kwargs):
+    # How do we pass "n" into this function? 
+    for i in range(???):
+        func(*args, **kwargs) 
+    return wrapper
+
+@run_n_times(3)
+def print_sum(a, b): 
+    print(a + b)
+@run_n_times(5) 
+def print_hello():
+    print('Hello!')
+
+```
+
+**A decorator factory**
+```python
+def run_n_times(n):
+    """Define and return a decorator""" 
+    def decorator(func):
+        def wrapper(*args, **kwargs): 
+            for i in range(n):
+                func(*args, **kwargs) 
+            return wrapper
+        return decorator 
+
+run_three_times = run_n_times(3) 
+@run_three_times
+def print_sum(a, b): 
+    print(a + b)
+@run_n_times(3)
+def print_sum(a, b): 
+    print(a + b)
+```
+
+```python
+@run_n_times(3)
+def print_sum(a, b): 
+    print(a + b)
+print_sum(3, 5)
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic15.png" class="largepic"/>
+
+```python
+@run_n_times(5) 
+def print_hello():
+    print('Hello!') 
+print_hello()
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic16.png" class="largepic"/>
+
+```python
+# Modify the print() function to always run 20 times
+print = run_n_times(20)(print)
+
+print('What is happening?!?!')
+```
+
+```python
+# Make hello() return bolded text
+@html('<b>', '</b>')
+def hello(name):
+  return 'Hello {}!'.format(name)
+
+print(hello('Alice'))
+
+# Wrap the result of hello_goodbye() in <div> and </div>
+@html('<b>', '</b>')
+def hello_goodbye(name):
+  return '\n{}\n{}\n'.format(hello(name), goodbye(name))
+  
+print(hello_goodbye('Alice'))
+```
+
