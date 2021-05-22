@@ -1284,3 +1284,8 @@ except AssertionError:
   print('foo() did not return a dict!')
 
 ```
+
+# 5. Reference
+
+1. [Writing Functions in Python - DataCamp](https://learn.datacamp.com/courses/writing-functions-in-python)
+
