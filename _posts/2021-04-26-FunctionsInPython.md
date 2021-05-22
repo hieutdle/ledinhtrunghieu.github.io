@@ -1176,3 +1176,87 @@ def hello_goodbye(name):
 print(hello_goodbye('Alice'))
 ```
 
+## 4.4. Timeout(): a real world example
+
+**Time out**
+
+```python
+@timeout
+def function1():
+# This function sometimes # runs for a loooong time
+...
+@timeout
+def function2():
+# This function sometimes # hangs and doesn't return
+...
+```
+
+**Time out background info**
+```python
+import signal
+def raise_timeout(*args, **kwargs): 
+    raise TimeoutError()
+# When an "alarm" signal goes off, call raise_timeout() 
+signal.signal(signalnum=signal.SIGALRM, handler=raise_timeout) 
+# Set off an alarm in 5 seconds
+signal.alarm(5)
+# Cancel the alarm 
+signal.alarm(0)
+```
+
+```python
+def timeout_in_5s(func): 
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+         # Set an alarm for 5 seconds 
+         signal.alarm(5)
+    try:
+        # Call the decorated func 
+        return func(*args, **kwargs)
+    finally:
+        # Cancel alarm 
+        signal.alarm(0)
+    return wrapper
+```
+```python
+@timeout_in_5s 
+def foo():
+    time.sleep(10) 
+    print('foo!')
+
+foo()
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic17.png" class="largepic"/>
+
+```python
+def timeout(n_seconds):
+    def decorator(func): @wraps(func)
+        def wrapper(*args, **kwargs): 
+            # Set an alarm for n seconds
+            signal.alarm(n_seconds) 
+            try:
+                # Call the decorated func 
+                return func(*args, **kwargs)
+            finally:
+                # Cancel alarm 
+                signal.alarm(0)
+return wrapper return decorator
+```
+
+```python
+@timeout(5) 
+def foo():
+    time.sleep(10) 
+    print('foo!')
+@timeout(20) 
+def bar():
+    time.sleep(10) 
+    print('bar!')
+foo()
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic17.png" class="largepic"/>
+
+```python
+bar()
+```
+<img src="/assets/images/20210426_FunctionsInPython/pic18.png" class="largepic"/>
