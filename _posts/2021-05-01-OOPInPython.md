@@ -1189,3 +1189,7 @@ class LoggedDF(pd.DataFrame):
 # Instantiate a LoggedDF called ldf
 ldf = LoggedDF({"col1": [1,2], "col2":[3,4]}) 
 ```
+# 5. Reference
+
+1. [Object-Oriented Programming in Python- DataCamp](https://learn.datacamp.com/courses/object-oriented-programming-in-python)
+
