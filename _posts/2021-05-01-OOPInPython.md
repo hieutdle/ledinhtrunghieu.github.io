@@ -642,3 +642,389 @@ Learn how to make sure that objects that store the same data are considered equa
 
 ## 3.1. Operator overloading: comparison
 
+**How to compare two classes**
+
+**Overloading __eq__()**
+
+```python
+class Customer:
+    def __init__(self, id, name): 
+        self.id, self.name = id, name
+    # Will be called when == is used 
+    def __eq__(self, other):
+        # Diagnostic printout
+        print("__eq__() is called")
+
+    # Returns True if all attributes match 
+    return (self.id == other.id) and \
+           (self.name == other.name)
+```
+
+* `__eq__()` is called when 2 objects of a class are compared using
+* accepts 2 arguments, `self` and `other` objects to compare
+* return a boolean
+
+
+**Comparison of objects**
+
+```python
+# Two equal objects 
+
+customer1 = Customer(123,"MaryamAzar")
+customer2 = Customer(123,"MaryamAzar")
+
+customer1 == customer2
+```
+
+**Other comparison operators**
+
+<img src="/assets/images/20210501_OOPInPython/pic4.png" class="largepic"/>
+* `__hash__()` to use objects as dictionary keys and in sets
+
+**Practice**
+
+```python
+class BankAccount:
+    def __init__(self, number, balance=0):
+        self.number, self.balance = number, balance
+      
+    def withdraw(self, amount):
+        self.balance -= amount 
+
+    # MODIFY to add a check for the type()
+    def __eq__(self, other):
+        return (type(self) == type(other))
+
+acct = BankAccount(873555333)
+pn = Phone(873555333)
+print(acct == pn)
+```
+**Comparison and inheritance**
+
+```python
+class Parent:
+    def __eq__(self, other):
+        print("Parent's __eq__() called")
+        return True
+
+class Child(Parent):
+    def __eq__(self, other):
+        print("Child's __eq__() called")
+        return True
+
+p = Parent()
+c = Child()
+
+p == c 
+
+```
+Child's __eq__() method will be called. Python always calls the child's __eq__() method when comparing a child object to a parent object.
+
+## 3.2. Operator overloading: string representation
+
+**Printing an object** 
+
+```python
+class Customer:
+    def __init__(self, name, balance): 
+        self.name, self.balance = name, balance
+
+cust = Customer("Maryam Azar", 3000)
+print(cust)
+```
+<img src="/assets/images/20210501_OOPInPython/pic5.png" class="largepic"/>
+
+Two method to print: `__str__()` and `__repr__()`:
+
+<img src="/assets/images/20210501_OOPInPython/pic6.png" class="largepic"/>
+
+
+The difference is that `str` is supposed to give an informal representation, suitable for an end user, and `repr` is mainly used by developers. The best practice is to use `repr` to print a string that can be used to reproduce the object -- for example, with numpy array, this shows the exact method call that was used to create the object. If you only choose to implement one of them, chose `repr`, because it is also used as a fall-back for print when `str` is not defined.
+
+**Implementation: str**
+
+```python
+class Customer:
+    def __init__(self, name, balance): 
+        self.name, self.balance = name, balance
+
+    def __str__(self): 
+        cust_str = """ 
+        Customer:
+            name: {name} 
+            balance: {balance}
+        """.format(name = self.name, \
+                   balance = self.balance) 
+        return cust_str
+
+cust = Customer("Maryam Azar", 3000)
+# Will implicitly call 	__str__()
+print(cust)
+```
+
+**The triple quotes are used in Python to define multi-line strings, and the format method is used on strings to substitute values inside curly brackets with variables. If we create a customer object now and call print on that object, we will see a user-friendly output**
+
+<img src="/assets/images/20210501_OOPInPython/pic7.png" class="largepic"/>
+
+**Implementation: repr**
+
+
+```python
+class Customer:
+    def __init__(self, name, balance): 
+        self.name, self.balance = name, balance
+
+    def __repr__(self): 
+        # Notice the '...' around name
+        return "Customer('{name}', {balance})".format(name = self.name, balance = self.balance) 
+
+cust = Customer("Maryam Azar", 3000)
+cust # <--- # Will implicitly call 	__repr__()
+
+```
+Notice the single quotes around the name in the return statement. Without the quotes, the name of the customer would be substituted into the string as-is, but the point of repr is to give the exact call needed to reproduce the the object, where the name should be in quotes. Notice also that we can use single quotes inside double quotes and vice versa.
+
+<img src="/assets/images/20210501_OOPInPython/pic8.png" class="largepic"/>
+
+**Practice**
+```python
+my_num = 5
+my_str = "Hello"
+
+f = ...
+print(f)
+
+f = "my_num is {}, and my_str is \"{}\".".format(my_num, my_str)
+
+my_num is 5, and my_str is "Hello".
+```
+
+**Practice**
+
+```python
+class Employee:
+    def __init__(self, name, salary=30000):
+        self.name, self.salary = name, salary
+            
+    # Add the __str__() method
+    def __str__(self): 
+        cust_str = """ 
+            Employee name:: {name} 
+            Employee salary: {salary}
+        """.format(name = self.name, \
+                   salary = self.salary) 
+        return cust_str
+
+emp1 = Employee("Amar Howard", 30000)
+print(emp1)
+emp2 = Employee("Carolyn Ramirez", 35000)
+print(emp2)
+```
+```python
+class Employee:
+    def __init__(self, name, salary=30000):
+        self.name, self.salary = name, salary
+      
+
+    def __str__(self):
+        s = "Employee name: {name}\nEmployee salary: {salary}".format(name=self.name, salary=self.salary)      
+        return s
+      
+    # Add the __repr__method  
+    def __repr__(self): 
+        
+        return "Employee('{name}', {salary})".format(name = self.name, salary = self.salary) 
+
+emp1 = Employee("Amar Howard", 30000)
+print(repr(emp1))
+emp2 = Employee("Carolyn Ramirez", 35000)
+print(repr(emp2))
+```
+
+## 3.3 Exceptions
+
+**Exception handling**
+* Prevent the program from terminating when an exception is raised
+* `try`-`except`-`finally`
+
+```python
+try:
+    # Try running some code 
+except ExceptionNameHere:
+    # Run this code if ExceptionNameHere happens
+except AnotherExceptionHere: #<-- multiple except blocks
+    # Run this code if AnotherExceptionHere happens
+...
+finally: #<-- optional
+    # Run this code no matter what
+```
+
+**Raising Exception**
+* raise ExceptionNameHere('Error message here')
+```python
+def make_list_of_ones(length): 
+    if length <= 0:
+    raise ValueError("Invalid length!") # <--- Will stop the program and raise an error
+return [1]*length
+
+make_list_of_ones(-1)
+```
+<img src="/assets/images/20210501_OOPInPython/pic9.png" class="largepic"/>
+
+**Exception are classes**
+* standard exceptions are inherited from `BaseException` or `Exception`
+
+```
+BaseException
++-- Exception	
+    +-- ArithmeticError	#	<---
+    |	    +-- FloatingPointError		
+    |	    +-- OverflowError		
+    |	    +-- ZeroDivisionError	#	<---
+    +-- TypeError
+    +-- ValueError
+    |	+-- UnicodeError
+    |	    +-- UnicodeDecodeError
+    |	    +-- UnicodeEncodeError
+    |	    +-- UnicodeTranslateError
+    +-- RuntimeError
+    ...
++-- SystemExit
+...
+```
+
+**Custom exceptions**
+* Inherit from `Exception` or one of its subclasses
+* Usually an empty class
+
+```python
+class BalanceError(Exception): pass
+
+class Customer:
+    def __init__(self, name, balance): 
+        if balance < 0 :
+            raise BalanceError("Balance has to be non-negative!") 
+        else:
+            self.name, self.balance = name, balance
+
+cust = Customer("Larry Torres",	-100)
+```
+<img src="/assets/images/20210501_OOPInPython/pic10.png" class="largepic"/>
+
+* Exception interrupted the constructor → object not created
+```
+cust
+```
+<img src="/assets/images/20210501_OOPInPython/pic11.png" class="largepic"/>
+
+**Catching custom exceptions**
+```python
+try:
+    cust = Customer("Larry Torres", -100) 
+except BalanceError:
+    cust = Customer("Larry Torres", 0)
+```
+
+**Practice**
+```python
+class SalaryError(ValueError): pass
+class BonusError(SalaryError): pass
+
+class Employee:
+  MIN_SALARY = 30000
+  MAX_BONUS = 5000
+
+  def __init__(self, name, salary = 30000):
+    self.name = name    
+    if salary < Employee.MIN_SALARY:
+      raise SalaryError("Salary is too low!")      
+    self.salary = salary
+    
+  # Rewrite using exceptions  
+  def give_bonus(self, amount):
+    if amount > Employee.MAX_BONUS:
+       raise BonusError("The bonus amount is too high!")  
+        
+    elif self.salary + amount <  Employee.MIN_SALARY:
+       raise SalaryError("The salary after bonus is too low!")
+      
+    else:  
+      self.salary += amount
+```
+
+It's better to include an `except` block for a child exception before the block for a parent exception, otherwise the child exceptions will be always be caught in the parent block, and the `except` block for the child will never be executed.
+
+# 4. Best Practices of Class Design
+
+## 4.1. Designing for inheritance and polymorphism
+
+**Polymorphism: Using a unified interface to operate on objects of different classes**
+
+<img src="/assets/images/20210501_OOPInPython/pic12.png" class="largepic"/>
+
+**All that matter is the interface**
+
+```python
+# Withdraw amount from each of accounts in list_of_accounts 
+def batch_withdraw(list_of_accounts, amount):
+    for acct in list_of_accounts: 
+        acct.withdraw(amount)
+
+b, c, s = BankAccount(1000), CheckingAccount(2000), SavingsAccount(3000) 
+batch_withdraw([b,c,s]) # <-- Will use BankAccount.withdraw(),
+                            #	then CheckingAccount.withdraw(),
+                            #	then SavingsAccount.withdraw()
+
+```
+
+* `batch_withdraw()` doesn't need to check the object to know which `withdraw()` to call. This function doesn't know -- or care -- whether the objects passed to it are checking accounts, savings accounts or a mix -- all that matters is that they have a withdraw method that accepts one argument. That is enough to make the function work.
+* When the withdraw method is actually called, Python will dynamically pull the correct method: modified withdraw for whenever a checking account is being processed,and base withdraw for whenever a savings or generic bank account is processed. 
+* As a person writing this batch processing function,you don't need to worry about what exactly is being passed to it, only what kind of interface it has. To really make use of this idea, you have to design your classes with inheritance and polymorphism - the uniformity of interface - in mind
+
+**Liskov substitution principle**
+* **Base class should be interchangeable with any of its subclasses without altering any properties of the program**
+* Wherever `Bank Account`works, `CheckingAccount` should work as well. For example, the batch withdraw function worked regardless of what kind of account was used.
+* Syntactically
+    * the method in a subclass should have a signature with parameters 
+    * returned values compatible with the method in the parent class.
+* Semantically
+    * the state of the object and the program must remains consistent
+        * the subclass method shouldn't rely on stronger input conditions
+        * subclass method should not provide weaker output conditions
+        * should not throw additional exceptions.
+
+
+**Violating LSP**
+* Syntactic incompatibility: `BankAccount.withdraw()` requires  1 parameter, but `CheckingAccount.withdraw()` requires 2
+* Subclass strengthening input conditions:  `BankAccount.withdraw()`accepts any amount, but `CheckingAccount.withdraw()` assumes that the amount is limited
+* Subclass weakening output conditions: `BankAccount.withdraw()` can only leave a positive balance or cause an error, `CheckingAccount.withdraw()` can leave balance negative
+* Changing additional attributes in subclass's method
+* Throwing additional exceptions in subclass's method
+
+## 4.2. Managing data access: private attributes
+
+**All class data is public**
+*All class data in Python is technically public. Any attribute or method of any class can be accessed by anyone. If you are coming from a background in another programming language like Java, this might seem unusual or an oversight, but it is by design. The fundamental principle behind much of Python design "we are all adults here". It is a philosophy that goes beyond just code, and describes how the Python community interacts with each other: you should have trust in your fellow developers.*
+
+**Restricting access**
+* Naming conventions
+* Use `@property` to customize access
+* Overriding `__getattr__()` and `__setattr__()`
+
+**Naming convention: internal attributes**
+`obj._att_name`,`obj._method_name()` : The first and most important convention is using a single leading underscore to indicate an attribute or method that isn't a part of the public class interface, and can change without notice. 
+* Starts with a single _ → "internal" 
+* Not a part of the public API
+* As a class user: "don't touch this"
+* As a class developer: use for implementation details, helper functions..
+`df._is_mixed_type`:  that indicates whether the DataFrame contains data of mixed types, `datetime._ymd2ord()`: converts a date into a number containing how many days have passed since January 1st of year 1.
+
+Nothing is technically preventing you from using these attributes, but a single leading underscore is the developer's way of saying that you shouldn't. The class developer trusts that you are an adult and will be able to use the class responsibly.
+
+**Naming convention: pseudoprivate attributes**
+`obj.__attr_name`,`obj.__method_name()`
+* Attributes and methods whose names start with a double underscore are the closest thing Python has to "private" fields and methods of other programming languages. 
+* It means that this data is not inherited - at least, not in a way you're used to, because Python implements name mangling: any name starting with a double underscore will be automatically prepended by the name of the class when interpreted by Python, and that new name will be the actual internal name of the attribute or method: `obj.__attr_name` is is interpreted as `obj.MyClass_attr_name`
+* The main use of these pseudo-private attributes is to prevent name clashes in child classes: you can't control what attributes or methods someone will introduce when inheriting from your class, and it's possible that someone will unknowingly introduce a name that already exists in you class, thus overriding the parent method or attribute! You can use double leading underscores to protect important attributes and methods that should not be overridden. 
+* Finally, be careful: leading AND trailing double underscores are only used for build-in Python methods (`__init__()`,`__repr__()`), so your name should only start -- but not end! -- with double underscores.
+
