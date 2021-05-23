@@ -1028,3 +1028,164 @@ Nothing is technically preventing you from using these attributes, but a single 
 * The main use of these pseudo-private attributes is to prevent name clashes in child classes: you can't control what attributes or methods someone will introduce when inheriting from your class, and it's possible that someone will unknowingly introduce a name that already exists in you class, thus overriding the parent method or attribute! You can use double leading underscores to protect important attributes and methods that should not be overridden. 
 * Finally, be careful: leading AND trailing double underscores are only used for build-in Python methods (`__init__()`,`__repr__()`), so your name should only start -- but not end! -- with double underscores.
 
+<img src="/assets/images/20210501_OOPInPython/pic13.png" class="largepic"/>
+
+```python
+# MODIFY to add class attributes for max number of days and months
+class BetterDate:
+    _MAX_DAYS = 30
+    _MAX_MONTHS = 12
+    
+    def __init__(self, year, month, day):
+      self.year, self.month, self.day = year, month, day
+      
+    @classmethod
+    def from_str(cls, datestr):
+        year, month, day = map(int, datestr.split("-"))
+        return cls(year, month, day)
+    
+    # Add _is_valid() checking day and month values
+    def _is_valid(self):
+        return (self.day <= BetterDate._MAX_DAYS) and \
+               (self.month <= BetterDate._MAX_MONTHS)
+         
+bd1 = BetterDate(2020, 4, 30)
+print(bd1._is_valid())
+
+bd2 = BetterDate(2020, 6, 45)
+print(bd2._is_valid())
+
+True
+False
+```
+
+## 4.3. Properties
+
+**Properties: a special kind of attribute that allow customized access**
+
+```python
+class Employee:
+    def set_name(self, name): 
+        self.name = name
+    def set_salary(self, salary): 
+        self.salary = salary
+    def give_raise(self, amount): 
+        self.salary = self.salary + amount
+    def __init__(self, name, salary): 
+        self.name, self.salary = name, salary
+
+emp = Employee("Miriam Azari", 35000)
+# Use dot syntax and = to alter atributes 
+emp.salary = emp.salary + 5000
+```
+
+This means that with a simple equality we can assign anything to salary: a million, a negative number, or even the word "Hello". Salary is an important attribute, and that should not be allowed.
+
+**How can we control attributes access?**
+* Check the value for validity
+* or make attributes read-only
+* modifyng `set_salary()` wouldn't help because we can still do `emp.salary = -100`
+
+**Restricted and read-only attributes example**
+<img src="/assets/images/20210501_OOPInPython/pic14.png" class="largepic"/>
+
+**@property**
+
+```python
+class Employer:
+    def __init__(self, name, new_salary):  # Use "protected" attribute with leading	__ to store data ( _salary)
+        self._salary = new_salary
+
+    @property
+    def salary(self):  # Use @property on a method whose name is exactly the name of the restricted attribute (salary with out underscore); return the internal attribute
+        return self._salary
+
+    @salary.setter
+    def salary(self, new_salary):  # Use decorator: @attr.setter on a method attr(). It will be called when a value is assigned to the property attribute
+        if new_salary < 0:
+            raise ValueError("Invalid salary")
+        self._salary = new_salary #  the value to assign passed as argument
+
+emp = Employee("Miriam Azari", 35000) 
+# accessing the "property" 
+emp.salary
+
+35000
+
+emp.salary = 60000 # <-- @salary.setter
+
+emp.salary = -1000
+
+ValueError: Invalid salary
+```
+There are two methods called salary -- the name of the property -- that have different decorators. The method with property decorator returns the data, and the method with salary dot setter decorator implements validation and sets the attribute.
+
+We can use this property just as if it was a regular attribute (remember the only real attribute we have is the internal underscore-salary). Use the dot syntax and equality sign to assign a value to the salary property. 
+
+**Why use @property?**
+* User-facing: behave like attributes : the user of your class will not have to do anything special. They won't even be able to distinguish between properties and regular attributes. 
+* Developer-facing: give control of access
+
+**Other possibilities**
+* If you do not define a `setter` method, the property will be read-only, like Dataframe shape. 
+* Add `@attr.getter`: Use for the method that is called when the property's value is retrieved
+* Add `@attr.deletr`: Use for the method that is called when the property is deleted using `del`
+
+**Practice**
+```python
+class Customer:
+    def __init__(self, name, new_bal):
+        self.name = name
+        if new_bal < 0:
+           raise ValueError("Invalid balance!")
+        self._balance = new_bal  
+
+    # Add a decorated balance() method returning _balance        
+    @property
+    def balance(self):
+        return self._balance
+
+    # Add a setter balance() method
+    @balance.setter
+    def balance(self, new_bal):
+        # Validate the parameter value
+        if new_bal < 0:
+           raise ValueError("Invalid balance!")
+        self._balance = new_bal
+        print("Setter method called")
+
+# Create a Customer        
+cust = Customer("Belinda Lutz",2000)
+
+# Assign 3000 to the balance property
+cust.balance = 3000
+
+# Print the balance property
+print(cust.balance)
+```
+
+**Read-only properties**
+
+```python
+import pandas as pd
+from datetime import datetime
+
+# MODIFY the class to use _created_at instead of created_at
+class LoggedDF(pd.DataFrame):
+    def __init__(self, *args, **kwargs):
+        pd.DataFrame.__init__(self, *args, **kwargs)
+        self._created_at = datetime.today()
+    
+    def to_csv(self, *args, **kwargs):
+        temp = self.copy()
+        temp["created_at"] = self._created_at
+        pd.DataFrame.to_csv(temp, *args, **kwargs)   
+    
+    # Add a read-only property: _created_at
+    @property  
+    def created_at(self):
+        return self._created_at
+
+# Instantiate a LoggedDF called ldf
+ldf = LoggedDF({"col1": [1,2], "col2":[3,4]}) 
+```
