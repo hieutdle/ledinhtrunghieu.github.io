@@ -286,7 +286,7 @@ End to end tests check the whole software at once.. They start from one end, whi
 
 Write more advanced unit tests. Starting from testing complicated data types like NumPy arrays to testing exception handling. Learn how to find the balance between writing too many tests and too few tests. Get introduced to a radically new programming methodology called **Test Driven Development (TDD)** and put it to practice. 
 
-# 2.1. Mastering assert statements
+## 2.1. Mastering assert statements
 
 **The optional message argume**
 

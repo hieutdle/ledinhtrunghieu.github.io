@@ -841,7 +841,7 @@ emp2 = Employee("Carolyn Ramirez", 35000)
 print(repr(emp2))
 ```
 
-## 3.3 Exceptions
+## 3.3. Exceptions
 
 **Exception handling**
 * Prevent the program from terminating when an exception is raised
