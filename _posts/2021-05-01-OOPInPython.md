@@ -582,3 +582,63 @@ bank_acct.withdraw(200, fee=15)
 
 TypeError: withdraw() got an unexpected keyword argument 'fee'
 ```
+**Practice**
+
+```python
+class Employee:
+    def __init__(self, name, salary=30000):
+        self.name = name
+        self.salary = salary
+
+    def give_raise(self, amount):
+        self.salary += amount
+
+        
+class Manager(Employee):
+    def display(self):
+        print("Manager ", self.name)
+
+    def __init__(self, name, salary=50000, project=None):
+        Employee.__init__(self, name, salary)
+        self.project = project
+
+    # Add a give_raise method
+    def give_raise(self,amount,bonus =1.05):
+        Employee.give_raise(self, amount*bonus)
+
+    
+mngr = Manager("Ashta Dunbar", 78500)
+mngr.give_raise(1000)
+print(mngr.salary)
+mngr.give_raise(2000, bonus=1.03)
+print(mngr.salary)
+```
+
+```python
+# Import pandas as pd
+import pandas as pd
+
+# Define LoggedDF inherited from pd.DataFrame and add the constructor
+class LoggedDF(pd.DataFrame):
+  
+  def __init__(self, *args, **kwargs):
+    pd.DataFrame.__init__(self, *args, **kwargs)
+    self.created_at = datetime.today()
+    
+  def to_csv(self, *args, **kwargs):
+    # Copy self to a temporary DataFrame
+    temp = self.copy()
+    
+    # Create a new column filled with self.created_at
+    temp["created_at"] = self.created_at
+    
+    # Call pd.DataFrame.to_csv on temp, passing in *args and **kwargs
+    pd.DataFrame.to_csv(temp, *args, **kwargs)
+```
+
+# 3. Integrating with Standard Python
+
+Learn how to make sure that objects that store the same data are considered equal, how to define and customize string representations of objects, and even how to create new error types. 
+
+## 3.1. Operator overloading: comparison
+
