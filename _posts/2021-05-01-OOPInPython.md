@@ -256,3 +256,329 @@ class Point:
 
 ## 2.1. Instance and class data
 
+**Core principle of OOP**
+
+**Inheritance**
+* Extending functionality of existing code
+**Polymorphism**
+* Creating a unified interface
+**Encapsulation**
+* Bundling of data and methods
+
+**Class-level data**
+```python
+class Employee:
+    # Define a class attribute
+    MIN_SALARY = 30000 #<--- no self.
+    def __init__(self, name, salary): 
+        self.name = name
+        # Use class name to access class attribute 
+        if	salary >= Employee.MIN_SALARY:
+            self.salary = salary 
+        else:
+        self.salary = Employee.MIN_SALARY
+```
+
+* `MIN_SALARY` is shared among all instances 
+* Don't use `self` to to define class attribute
+* Use `ClassName.ATTR_NAME` to access the class attribute value
+
+**Class-method**
+* Methods are already "shared": same code for every instance 
+* Class methods can't use instance-level data
+
+```python
+class MyClass:
+    @classmethod	# <---use decorator to declare a class method 
+    def my_awesome_method(cls, args...): # <---cls argument refers to the class
+    # Do stuff here
+    # Can't use any instance attributes :(
+
+MyClass.my_awesome_method(args...)
+```
+
+
+**Why we need class-method?**
+
+ The main use case is alternative constructors. A class can only have one init method, but there might be multiple ways to initialize an object. For example, we might want to create an Employee object from data stored in a file. We can't use a method, because it would require an instance, and there isn't one yet
+
+* Use class methods to create objects
+* Use `return` to return an object 
+* `cls(...)` will call `__init__(...)`
+
+```python
+
+class Employee:
+    # Define a class attribute
+    MIN_SALARY = 30000 #<--- no self.
+    def __init__(self, name, salary): 
+        self.name = name
+        # Use class name to access class attribute 
+        if	salary >= Employee.MIN_SALARY:
+            self.salary = salary 
+        else:
+        self.salary = Employee.MIN_SALARY
+
+
+@classmethod
+def from_file(cls,  filename): 
+    with open(filename, "r") as f:
+        name = f.readline() 
+    return cls(name)
+
+
+# Create an employee without calling Employee() 
+emp = Employee.from_file("employee_data.txt") 
+type(emp)
+
+__main__.Employee
+```
+
+**Practice**
+```python
+class Player:
+    MAX_POSITION = 10
+    
+    def __init__(self):
+        self.position = 0
+
+    # Add a move() method with steps parameter     
+    def move(self, steps):
+        if self.position + steps < Player.MAX_POSITION:
+           self.position = self.position + steps 
+        else:
+           self.position = Player.MAX_POSITION
+    
+    # This method provides a rudimentary visualization in the console    
+    def draw(self):
+        drawing = "-" * self.position + "|" +"-"*(Player.MAX_POSITION - self.position)
+        print(drawing)
+
+p = Player(); p.draw()
+p.move(4); p.draw()
+p.move(5); p.draw()
+p.move(3); p.draw()
+```
+
+
+**Classmethod is an alternative constructure, way to create an object**
+
+```python
+# import datetime from datetime
+from datetime import datetime
+
+class BetterDate:
+    def __init__(self, year, month, day):
+      self.year, self.month, self.day = year, month, day
+      
+    @classmethod
+    def from_str(cls, datestr):
+        year, month, day = map(int, datestr.split("-"))
+        return cls(year, month, day)
+      
+    # Define a class method from_datetime accepting a datetime object
+    @classmethod
+    def from_datetime(cls, dateobj):
+      year, month, day = dateobj.year, dateobj.month, dateobj.day
+      return cls(year, month, day) 
+
+
+# You should be able to run the code below with no errors: 
+today = datetime.today()     
+bd = BetterDate.from_datetime(today)   
+print(bd.year)
+print(bd.month)
+print(bd.day)
+```
+
+## 2.2. Class inheritance
+
+**Inheritance**
+New class functionality = Old class functionality + extra
+
+<img src="/assets/images/20210501_OOPInPython/pic3.png" class="largepic"/>
+
+**Implementing class inheritance**
+```python
+class BankAccount:
+    def __init__(self, balance): 
+        self.balance = balance
+
+    def withdraw(self, amount):
+        self.balance -= amount
+
+
+# Empty class inherited from BankAccount 
+
+class SavingsAccount(BankAccount):
+    pass
+
+class MyChild(MyParent): 
+    # Do stuff here
+```
+
+* `MyParent`: class whose functionality is being extended/inherited
+* `MyChild`: class that will inherit the functionality and add more
+
+**Child class has all of the the parent data**
+
+```python
+# Constructor inherited from BankAccount 
+savings_acct = SavingsAccount(1000) 
+type(savings_acct)
+
+__main__.SavingsAccount
+
+# Attribute inherited from BankAccount 
+savings_acct.balance
+
+1000
+
+# Method inherited from BankAccount 
+savings_acct.withdraw(300)
+```
+
+**Inheritance: "is-a" relationship**
+
+A `SavingAccount` is a `BankAccount`
+
+```python
+
+savings_acct = SavingsAccount(1000) 
+isinstance(savings_acct, SavingsAccount)
+
+True
+
+isinstance(savings_acct, BankAccount)
+
+True
+
+acct = BankAccount(500) 
+isinstance(acct,SavingsAccount)
+
+False
+
+isinstance(acct,BankAccount)
+
+True
+```
+
+```python
+class Employee:
+  MIN_SALARY = 30000    
+
+  def __init__(self, name, salary=MIN_SALARY):
+      self.name = name
+      if salary >= Employee.MIN_SALARY:
+        self.salary = salary
+      else:
+        self.salary = Employee.MIN_SALARY
+        
+  def give_raise(self, amount):
+    self.salary += amount
+
+        
+# MODIFY Manager class and add a display method
+class Manager(Employee):
+  def display(self):
+    print("Manager ", self.name)
+
+
+mng = Manager("Debbie Lashko", 86500)
+print(mng.name)
+
+# Call mng.display()
+mng.display()
+```
+
+## 2.3. Customizing functionality via inheritance
+
+```python
+class BankAccount:
+    def __init__(self, balance): 
+        self.balance = balance
+    def withdraw(self, amount): 
+        self.balance -=amount
+
+# Empty class inherited from BankAccount 
+class SavingsAccount(BankAccount):
+    pass
+```
+
+**Customizing constructors**
+
+```python
+class SavingsAccount(BankAccount):
+    # Constructor speficially for SavingsAccount with an additional parameter 
+    def __init__(self, balance, interest_rate):
+    # Call the parent constructor using ClassName.__init__()
+    BankAccount.__init__(self,balance) # <--- self is a SavingsAccount but also a BankAccount
+    # Add more functionality self.interest_rate = interest_rate
+    self.interest_rate = interest_rate
+```
+
+* Can run constructor of the parent class first by `Parent.__init__(self, args...)`
+* Add more functionality
+* Don't have to call the parent constructors
+
+**Create objects with a customized constructor**
+
+```python
+# Construct the object using the new constructor 
+acct = SavingsAccount(1000, 0.03) 
+acct.interest_rate
+
+0.003
+```
+
+**Adding functionality**
+* Add methods as usual
+* Can use the data from both the parent and the child class
+
+```python
+class SavingsAccount(BankAccount):
+    def __init__(self, balance, interest_rate): 
+        BankAccount.__init__(self, balance)
+        self.interest_rate = interest_rate
+    
+    # New functionality
+    def compute_interest(self, n_periods = 1):
+        return self.balance * ( (1 + self.interest_rate) ** n_periods - 1)
+```
+
+**Customizing functionality**
+
+```python
+class CheckingAccount(BankAccount): 
+    def __init__(self, balance, limit):
+        BankAccount.__init__(self, content) 
+        self.limit = limit
+    def deposit(self, amount): 
+        self.balance += amount
+    def withdraw(self, amount, fee=0): 
+        if fee <= self.limit:
+            BankAccount.withdraw(self, amount - fee)
+        else:
+            BankAccount.withdraw(self,amount - self.limit)
+```
+
+* Can change the signature (add parameters)
+* Use `Parent.method(self, args...)` to call a method from the parent class
+
+```python
+check_acct = CheckingAccount(1000, 25)
+# Will call withdraw from CheckingAccount
+check_acct.withdraw(200)
+
+# Will call withdraw from CheckingAccount 
+check_acct.withdraw(200, fee=15)
+
+bank_acct = BankAccount(1000)
+# Will call withdraw from BankAccount
+bank_acct.withdraw(200)
+
+# Will produce an error 
+bank_acct.withdraw(200, fee=15)
+
+TypeError: withdraw() got an unexpected keyword argument 'fee'
+```
