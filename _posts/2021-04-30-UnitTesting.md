@@ -395,5 +395,16 @@ def test_on_six_rows():
 
 ## 2.2. Testing for exceptions instead of return values
 
+**Example**
+
+```python
+import numpy as np
+example_argument = np.array([2081, 314942, 1059, 186606, 1148, 206186])
+split_into_training_and_testing_sets(example_argument)
+```
+
+**Unit testing exceptions**
+**Goals**
+
 
 
