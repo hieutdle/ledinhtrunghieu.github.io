@@ -285,3 +285,115 @@ End to end tests check the whole software at once.. They start from one end, whi
 # 2. Intermediate unit testing
 
 Write more advanced unit tests. Starting from testing complicated data types like NumPy arrays to testing exception handling. Learn how to find the balance between writing too many tests and too few tests. Get introduced to a radically new programming methodology called **Test Driven Development (TDD)** and put it to practice. 
+
+# 2.1. Mastering assert statements
+
+**The optional message argume**
+
+```python
+assert boolean_expression, message
+```
+
+```python
+assert 1 == 2, "One is not equal to two!"
+```
+<img src="/assets/images/20210430_UnitTesting/pic20.png" class="largepic"/>
+
+
+```python
+assert 1 == 1, "This will not be printed since assertion passes"
+```
+
+<img src="/assets/images/20210430_UnitTesting/pic21.png" class="largepic"/>
+
+**Adding message to a unit test**
+* test module: `test_row_to_list.py`
+
+```python
+
+import pytest
+...
+def test_for_missing_area_with_message(): 
+    actual = row_to_list("\t293,410\n") 
+    expected = None
+    message = ("row_to_list('\t293,410\n') "
+    "returned {0} instead "
+    "of {1}".format(actual, expected)
+    )
+assert actual is expected, message
+```
+**Test result report with message**
+
+`test_on_missing_area_with_message()` output on failure
+
+<img src="/assets/images/20210430_UnitTesting/pic22.png" class="largepic"/>
+
+**Beware of float return values**
+```python
+0.1 + 0.1 + 0.1 == 0.3
+False
+0.3000000000000000004
+```
+
+**Do this**
+Use `pytest.approx()` to wrap expected return value.
+ 
+```python
+assert 0.1 + 0.1 + 0.1 == pytest.approx(0.3)
+```
+
+**NumPy arrays containing floats**
+
+```python
+assert np.array([0.1 + 0.1, 0.1 + 0.1 + 0.1]) == pytest.approx(np.array([0.2, 0.3]))
+```
+
+**Multiple assertions in one unit test**
+```python
+def test_on_string_with_one_comma(): 
+    return_value = convert_to_int("2,081") 
+    assert isinstance(return_value, int)
+    assert return_value == 2081
+```
+* Test will pass only if both assertions pass.
+
+**Practice**
+
+```python
+import numpy as np
+import pytest
+from as_numpy import get_data_as_numpy_array
+
+def test_on_clean_file():
+  expected = np.array([[2081.0, 314942.0],
+                       [1059.0, 186606.0],
+  					   [1148.0, 206186.0]
+                       ]
+                      )
+  actual = get_data_as_numpy_array("example_clean_data.txt", num_columns=2)
+  message = "Expected return value: {0}, Actual return value: {1}".format(expected, actual)
+  # Complete the assert statement
+  assert actual == pytest.approx(expected), message
+```
+
+```python
+def test_on_six_rows():
+    example_argument = np.array([[2081.0, 314942.0], [1059.0, 186606.0],
+                                 [1148.0, 206186.0], [1506.0, 248419.0],
+                                 [1210.0, 214114.0], [1697.0, 277794.0]]
+                                )
+    # Fill in with training array's expected number of rows
+    expected_training_array_num_rows = 4
+    # Fill in with testing array's expected number of rows
+    expected_testing_array_num_rows = 2
+    actual = split_into_training_and_testing_sets(example_argument)
+    # Write the assert statement checking training array's number of rows
+    assert actual[0].shape[0] == expected_training_array_num_rows, "The actual number of rows in the training array is not {}".format(expected_training_array_num_rows)
+    # Write the assert statement checking testing array's number of rows
+    assert actual[1].shape[0] == expected_testing_array_num_rows, "The actual number of rows in the testing array is not {}".format(expected_testing_array_num_rows)
+```
+
+## 2.2. Testing for exceptions instead of return values
+
+
+
