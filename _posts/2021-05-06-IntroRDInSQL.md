@@ -346,6 +346,354 @@ FROM professors;
 ## 3.2. Primary keys
 
 **Primary keys**
-* One primary key per database table, chosen from candidate keys \
-* Uniquely identifies records, e.g. for referencing in other tables Unique and not-null constraints both apply
-Primary keys are time-invariant: choose columns wisely!
+* One primary key per database table, chosen from candidate keys 
+* Uniquely identifies records, e.g. for referencing in other tables 
+* Unique and not-null constraints both apply
+* Primary keys are time-invariant: choose columns wisely!
+
+**Specifying primary keys**
+
+```sql
+CREATE TABLE products (
+    product_no integer UNIQUE NOT NULL, 
+    name text,
+    price numeric
+    );
+
+--Specify primary keys
+CREATE TABLE products (
+    product_no integer PRIMARY KEY, 
+    name text,
+    price numeric
+    );
+CREATE TABLE example ( 
+    a integer,
+    b integer, 
+    c integer,
+    PRIMARY KEY (a, c)
+);
+
+ALTER TABLE table_name
+ADD CONSTRAINT some_name PRIMARY KEY (column_name)
+```
+
+
+**Practice**
+```sql
+-- Rename the organization column to id
+ALTER TABLE organizations
+RENAME COLUMN organization TO id;
+
+-- Make id a primary key
+ALTER TABLE organizations
+ADD CONSTRAINT organization_pk PRIMARY KEY (id);
+```
+
+## 3.3. Surrogate keys
+
+**Surrogate keys**
+* Primary keys should be built from as few columns as possible 
+* Primary keys should never change over time
+
+**Adding a surrogate key with serial data type**
+```sql
+ALTER TABLE cars
+ADD COLUMN id serial PRIMARY KEY; 
+INSERT INTO cars
+VALUES ('Volkswagen','Blitz','black');
+```
+
+<img src="/assets/images/20210506_IntroRDInSQL/pic10.png" class="largepic"/>
+
+If you try to specify an ID that already exists, the primary key constraint will prevent you from doing so. So, after all, the "id" column uniquely identifies each record in this table – which is very useful, for example, when you want to refer to these records from another table
+
+```sql
+INSERT INTO cars
+VALUES ('Opel', 'Astra', 'green', 1);
+```
+
+<img src="/assets/images/20210506_IntroRDInSQL/pic11.png" class="largepic"/>
+
+**Another type of surrogate key**
+
+Another strategy for creating a surrogate key is to combine two existing columns into a new one.
+
+```sql
+ALTER TABLE table_name
+ADD COLUMN column_c varchar(256);
+
+UPDATE table_name
+SET column_c = CONCAT(column_a, column_b); 
+ALTER TABLE table_name
+ADD CONSTRAINT pk PRIMARY KEY (column_c);
+```
+
+**Practice**
+```sql
+-- Add the new column to the table
+ALTER TABLE professors 
+ADD COLUMN id serial;
+
+-- Make id a primary key
+ALTER TABLE professors 
+ADD CONSTRAINT professors_pkey PRIMARY KEY (id);
+
+-- Have a look at the first 10 rows of professors
+SELECT *
+FROM professors
+LIMIT 10;
+```
+
+```sql
+-- Count the number of distinct rows with columns make, model
+SELECT COUNT(DISTINCT(make, model)) 
+FROM cars;
+
+-- Add the id column
+ALTER TABLE cars
+ADD COLUMN id varchar(128);
+
+-- Update id with make + model
+UPDATE cars
+SET id = CONCAT(make, model);
+
+-- Make id a primary key
+ALTER TABLE cars
+ADD CONSTRAINT id_pk PRIMARY KEY(id);
+
+-- Have a look at the table
+SELECT * FROM cars;
+```
+
+```sql
+-- Create the table
+CREATE TABLE students (
+  last_name varchar(128) NOT NULL,
+  ssn integer PRIMARY KEY,
+  phone_no char(12)
+);
+```
+
+# 4. Glue together tables with foreign keys
+
+Leverage foreign keys to connect tables and establish relationships that will greatly benefit data quality. Run ad hoc analyses on new database.
+
+## 4.1. Model 1:N relationships with foreign keys
+
+**Implementing relationships with foreign keys**
+* A foreign key (FK) points to the primary key (PK) of another table 
+* Domain of FK must be equal to domain of PK
+* Each value of FK must exist in PK of the other table (FK constraint or "referential integrity") 
+* FKs are not actual keys
+
+**Specifying foreign keys**
+
+```sql
+CREATE TABLE manufacturers (
+name varchar(255) PRIMARY KEY);
+
+INSERT INTO  manufacturers 
+VALUES ('Ford'), ('VW'), ('GM'); 
+CREATE TABLE cars (
+model varchar(255) PRIMARY KEY,
+manufacturer_name varchar(255) REFERENCES manufacturers (name));
+
+INSERT INTO cars
+VALUES ('Ranger', 'Ford'), ('Beetle', 'VW');
+
+-- Throws an error! INSERT INTO cars
+VALUES ('Tundra', 'Toyota');
+```
+
+**Specifying foreign keys to existing tables**
+```sql
+ALTER TABLE a
+ADD CONSTRAINT a_fkey FOREIGN KEY (b_id) REFERENCES b (id);
+```
+```sql
+-- Rename the university_shortname column
+ALTER TABLE professors
+RENAME COLUMN university_shortname TO university_id;
+
+-- Add a foreign key on professors referencing universities
+ALTER TABLE professors
+ADD CONSTRAINT professors_fkey FOREIGN KEY (university_id) REFERENCES universities (id);
+```
+
+```sql
+-- Try to insert a new professor
+INSERT INTO professors (firstname, lastname, university_id)
+VALUES ('Albert', 'Einstein', 'MIT');
+
+insert or update on table "professors" violates foreign key constraint "professors_fkey"
+DETAIL:  Key (university_id)=(MIT) is not present in table "universities".
+
+-- Try to insert a new professor
+INSERT INTO professors (firstname, lastname, university_id)
+VALUES ('Albert', 'Einstein', 'UZH');
+```
+
+**JOIN tables linked by a foreign key**
+
+```sql
+-- Select all professors working for universities in the city of Zurich
+SELECT professors.lastname, universities.id, universities.university_city
+FROM professors
+JOIN universities
+ON professors.university_id = universities.id
+WHERE universities.university_city = 'Zurich';
+```
+
+## 4.2. Model more complex relationships
+
+**How to implement N:M-relationships**
+* Create a table
+* Add foreign keys for every connected table 
+* Add additional attributes
+```sql
+CREATE TABLE affiliations (
+professor_id integer REFERENCES professors (id), organization_id varchar(256) REFERENCES organizations (id), function varchar(256)
+);
+```
+* No primary key!
+* Possible PK = {professor_id, organization_id, function}
+
+```sql
+-- Add a professor_id column
+ALTER TABLE affiliations
+ADD COLUMN professor_id integer REFERENCES professors (id);
+
+-- Rename the organization column to organization_id
+ALTER TABLE affiliations
+RENAME organization TO organization_id;
+
+-- Add a foreign key on organization_id
+ALTER TABLE affiliations
+ADD CONSTRAINT affiliations_organization_fkey FOREIGN KEY (organization_id) REFERENCES organizations (id);
+```
+
+**Update columns of a table based on values in another table**
+```sql
+-- Update professor_id to professors.id where firstname, lastname correspond to rows in professors
+UPDATE affiliations
+SET professor_id = professors.id
+FROM professors
+WHERE affiliations.firstname = professors.firstname AND affiliations.lastname = professors.lastname;
+
+-- Have a look at the 10 first rows of affiliations again
+SELECT *
+FROM affiliations
+LIMIT 10;
+```
+
+**Drop "firstname" and "lastname"**
+
+The firstname and lastname columns of affiliations were used to establish a link to the professors table in the last exercise – so the appropriate professor IDs could be copied over. This only worked because there is exactly one corresponding professor for each row in affiliations. In other words: {firstname, lastname} is a candidate key of professors – a unique combination of columns.
+
+It isn't one in affiliations though, because, as said in the video, professors can have more than one affiliation.
+
+Because professors are referenced by professor_id now, the firstname and lastname columns are no longer needed, so it's time to drop them. After all, one of the goals of a database is to reduce redundancy where possible.
+
+```sql
+-- Drop the firstname column
+ALTER TABLE affiliations
+DROP COLUMN firstname;
+
+-- Drop the lastname column
+ALTER TABLE affiliations
+DROP COLUMN lastname;
+```
+
+## 4.3. Referential integrity
+
+**Referential integrity**
+* A record referencing another table must refer to an existing record in that table: A record in table A cannot point to a record in table B that does not exist
+* Specified between two tables 
+* Enforced through foreign keys
+So if you define a foreign key in the table "professors" referencing the table "universities", referential integrity is held from "professors" to "universities".
+
+**Referential integrity violations**
+Referential integrity from table A to table B is violated...
+* ...if a record in table B that is referenced from a record in table A is deleted. Let's say table A references table B. So if a record in table B that is already referenced from table A is deleted, you have a violation
+* ...if a record in table A referencing a non-existing record from table B is inserted: if you try to insert a record in table A that refers to something that does not exist in table B, you also violate the principle
+* Foreign keys prevent violations!: they will throw errors and stop you from accidentally doing these things.
+
+**Dealing with violations**
+```sql
+CREATE TABLE a (
+    id integer PRIMARY KEY, column_a varchar(64),
+    ...,
+    b_id integer REFERENCES b (id) ON DELETE NO ACTION
+);
+
+CREATE TABLE a (
+    id integer PRIMARY KEY, column_a varchar(64),
+    ...,
+    b_id integer REFERENCES b (id) ON DELETE CASCADE
+);
+```
+
+**ON DELETE...**
+* ...**NO ACTION**: Throw an error
+* ...**CASCADE**: Delete all referencing records
+* ...**RESTRICT**: Throw an error
+* ...**SET NULL**: Set the referencing column to NULL
+* ...**SET DEFAULT**: Set the referencing column to its default value
+
+```sql
+DELETE FROM universities WHERE id = 'EPF';
+
+update or delete on table "universities" violates foreign key constraint "professors_fkey" on table "professors"
+DETAIL:  Key (id)=(EPF) is still referenced from table "professors".
+```
+
+It fails because referential integrity from professors to universities is violated
+
+```sql
+
+-- Identify the correct constraint name
+SELECT constraint_name, table_name, constraint_type
+FROM information_schema.table_constraints
+WHERE constraint_type = 'FOREIGN KEY';
+
+-- Drop the right foreign key constraint
+ALTER TABLE affiliations
+DROP CONSTRAINT affiliations_organization_id_fkey;
+
+-- Add a new foreign key constraint from affiliations to organizations which cascades deletion
+ALTER TABLE affiliations
+ADD CONSTRAINT affiliations_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organizations (id) ON DELETE CASCADE;
+
+-- Delete an organization 
+DELETE FROM organizations 
+WHERE id = 'CUREM';
+
+-- Check that no more affiliations with this organization exist
+SELECT * FROM affiliations
+WHERE organization_id = 'CUREM';
+```
+
+## 4.4. Ad-hoc SQL query
+
+```sql
+-- Filter the table and sort it
+SELECT COUNT(*), organizations.organization_sector, 
+professors.id, universities.university_city
+FROM affiliations
+JOIN professors
+ON affiliations.professor_id = professors.id
+JOIN organizations
+ON affiliations.organization_id = organizations.id
+JOIN universities
+ON professors.university_id = universities.id
+WHERE organizations.organization_sector = 'Media & communication'
+GROUP BY organizations.organization_sector, 
+professors.id, universities.university_city
+ORDER BY COUNT DESC;
+```
+# 5. Reference
+
+1. [Introduction to Relational Databases in SQL- DataCamp](https://learn.datacamp.com/courses/introduction-to-relational-databases-in-sql)
+
+
+
