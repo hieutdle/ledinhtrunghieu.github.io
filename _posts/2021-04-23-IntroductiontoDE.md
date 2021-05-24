@@ -305,7 +305,7 @@ print(athlete_events_dask.groupby('Year').Age.mean().compute())
 
 Hive Exmaple: 
 
-```
+```sql
 SELECT year, AVG(age) 
 FROM views.athlete_events 
 GROUP BY year
@@ -339,7 +339,7 @@ Have a look at the following PySpark example. Similar to the Hive Query you saw 
 
 simillar to
 
-```
+```sql
 SELECT year, AVG(age) 
 FROM views.athlete_events 
 GROUP BY year
