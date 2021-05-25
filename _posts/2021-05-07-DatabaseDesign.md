@@ -32,19 +32,19 @@ Learn about the two approaches to data processing, OLTP and OLAP. Get familiar w
 **OLTP vs OLAP**
 
 **OLTP** 
-Purpose       support daily transactions                     
-Design          application-oriented                            
-Data            up-to-date, operational                        
-Size            snapshot, gigabytes                             
-Queries         simple transactions & frequent updates        
-Users           thousands                                       
+* Purpose: support daily transactions                     
+* Design: application-oriented                            
+* Data: up-to-date, operational                        
+* Size: snapshot, gigabytes                             
+* Queries: simple transactions & frequent updates        
+* Users: thousands                                       
 **OLAP**
-Purpose     report and analyze data
-Design     subject-oriented (certain subject that's under analysis)
-Data        consolidated, historical (over a large period of time, consolidated for long-term analysis.)
-Size         archive, terabytes (large amount)
-Queries    complex, aggregate queries & limited updates
-Users           hundreds
+Purpose: report and analyze data
+Design: ubject-oriented (certain subject that's under analysis)
+Data: consolidated, historical (over a large period of time, consolidated for long-term analysis.)
+Size: archive, terabytes (large amount)
+Queries: complex, aggregate queries & limited updates
+Users: hundreds
 
 **Working togerther**
 
@@ -408,6 +408,20 @@ GROUP BY
 -- Output records that need to be updated in the star schema
 SELECT * FROM dim_store_star
 WHERE country != 'USA' AND country !='CA';
+
+--Extending the snowflake schema
+
+-- Add a continent_id column with default value of 1
+ALTER TABLE dim_country_sf
+ADD continent_id int NOT NULL DEFAULT(1);
+
+-- Add the foreign key constraint
+ALTER TABLE dim_country_sf ADD CONSTRAINT country_continent
+   FOREIGN KEY (continent_id) REFERENCES dim_continent_sf(continent_id);
+   
+-- Output updated table
+SELECT * FROM dim_country_sf;
+
 ```
 
 ## 2.3. Normal forms
@@ -477,3 +491,342 @@ What is risked if we don't normalize enough? Why we would want to put effort int
 **Data inconsistency caused by data redundancy when updating**
 <img src="/assets/images/20210507_DatabaseDesign/pic30.png" class="largepic"/>
 To update student `520`'s email:
+* Need to update more than one record, otherwise, there will be inconsistency 
+* User updating needs to know about redundancy
+
+This is a simple example - as we scale, it's harder to keep track of these redundancies.
+
+**Insertion anomaly**
+**Unable to add a record due to missing attributes**
+<img src="/assets/images/20210507_DatabaseDesign/pic31.png" class="largepic"/>
+
+An insertion anomaly is when you are unable to add a new record due to missing attributes. For example, if a student signs up for DataCamp, but doesn't start any courses, they cannot be put into this database
+
+**Deletion anomaly**
+**Deletion of record(s) causes unintentional loss of data**
+<img src="/assets/images/20210507_DatabaseDesign/pic32.png" class="largepic"/>
+
+If you were to delete any of these students, you would lose the course information provided in the columns enrolled_in and taught_by. This could be resolved if we put that information in another table.
+
+```sql
+
+--1NF
+
+-- Create a new table to hold the cars rented by customers
+CREATE TABLE cust_rentals (
+  customer_id INT NOT NULL,
+  car_id VARCHAR(128) NULL,
+  invoice_id VARCHAR(128) NULL
+);
+
+-- Drop a column from customers table to satisfy 1NF
+ALTER TABLE customers
+DROP COLUMN cars_rented,
+DROP COLUMN invoice_id;
+
+-- Create a new table to satisfy 2NF
+CREATE TABLE cars (
+  car_id VARCHAR(256) NULL,
+  model VARCHAR(128),
+  manufacturer VARCHAR(128),
+  type_car VARCHAR(128),
+  condition VARCHAR(128),
+  color VARCHAR(128)
+);
+
+-- 2NF
+-- Drop columns in customer_rentals to satisfy 2NF
+ALTER TABLE customer_rentals
+DROP COLUMN model,
+DROP COLUMN manufacturer, 
+DROP COLUMN type_car,
+DROP COLUMN condition,
+DROP COLUMN color;
+
+--3NF
+
+-- Create a new table to satisfy 3NF
+CREATE TABLE car_model(
+  model VARCHAR(128),
+  manufacturer VARCHAR(128),
+  type_car VARCHAR(128)
+);
+
+-- Drop columns in rental_cars to satisfy 3NF
+ALTER TABLE rental_cars
+DROP COLUMN manufacturer, 
+DROP COLUMN type_car;
+
+
+```
+
+# 3. Database Views
+
+Create and query views. Identifythe difference between materialized and non-materialized views.
+
+## 3.1. Database Views
+
+In a database, a **view** is the result set of a stored query on the data, which the database users can query just as they would in a persistent database collection object
+
+**Views** are **virtual table** that is not part of the physical schema
+* Query, not data, is stored in memory
+* Data is aggregated from data in the same tables
+* When the view is created, can be queried like a regular database table
+* No need to retype common queries, add virtual table without altering the database's schemas
+
+**Create a view (syntax)**
+```sql
+CREATE VIEW view_name AS
+SELECT col1, col2 
+FROM table_name 
+WHERE condition;
+```
+<img src="/assets/images/20210507_DatabaseDesign/pic33.png" class="largepic"/>
+
+Goal: Return titles and authors of the `science fiction` genre
+
+```sql
+CREATE VIEW scifi_books AS
+SELECT title, author, genre
+FROM dim_book_sf
+JOIN dim_genre_sf ON dim_genre_sf.genre_id = dim_book_sf.genre_id 
+JOIN dim_author_sf ON dim_author_sf.author_id = dim_book_sf.author_id 
+WHERE dim_genre_sf.genre = 'science fiction';
+```
+**Querying a view (example)**
+
+```sql
+SELECT * FROM scifi_books
+```
+<img src="/assets/images/20210507_DatabaseDesign/pic34.png" class="largepic"/>
+
+```sql
+SELECT * FROM scifi_books
+```
+**=**
+```sql
+CREATE VIEW scifi_books AS
+SELECT title, author, genre
+FROM dim_book_sf
+JOIN dim_genre_sf ON dim_genre_sf.genre_id = dim_book_sf.genre_id 
+JOIN dim_author_sf ON dim_author_sf.author_id = dim_book_sf.author_id 
+WHERE dim_genre_sf.genre = 'science fiction';
+```
+
+**Viewing views (in PostgreSQL)**
+
+Includes system views
+```sql
+SELECT * FROM INFORMATION_SCHEMA.views;
+```
+
+Excludes system views
+```sql
+SELECT * FROM information_schema.views
+WHERE table_schema NOT IN ('pg_catalog', 'information_schema');
+```
+**Benefits of views**
+* Doesn't take up storage
+* A form of **access control**
+    * Hide sensitive columns and restrict what user can see
+* Masks complexity of queries
+    * Useful for highly normalized schemas
+
+<img src="/assets/images/20210507_DatabaseDesign/pic35.png" class="largepic"/>
+
+<img src="/assets/images/20210507_DatabaseDesign/pic36.png" class="largepic"/>
+
+**Practice**
+```sql
+--Viewing views
+-- Get all non-systems views
+SELECT * FROM information_schema.views
+WHERE table_schema NOT IN ('pg_catalog', 'information_schema');
+
+-- Creating and querying a view
+
+-- Create a view for reviews with a score above 9
+CREATE VIEW high_scores AS
+SELECT * FROM REVIEWS
+WHERE score > 9;
+
+-- Count the number of self-released works in high_scores
+SELECT COUNT(*) FROM high_scores
+INNER JOIN labels ON high_scores.reviewid = labels.reviewid
+WHERE label = 'self-released';
+```
+## 3.2. Managing views
+
+**Creating more complex views**
+Aggregation: `SUM()`,`AVG()`,`COUNT()`,`MIN()`,`MAX`,`GROUP BY`, etc	
+Joins: `INNER JOIN`,`LEFT JOIN`,`RIGHT JOIN`,`FULL JOIN`
+Conditional: `WHERE`,`HAVING`,`UNIQUE`,`NOT NULL`,`AND`,`OR`,`>`,`<`,etc
+
+**Granting and revoking access to a view**
+`GRANT privilege(s)` or `REVOKE privilege(s)`
+`ON object`
+`TO role` or `FROM role`
+* **Privileges**: `SELECT`,`INSERT`,`UPDATE`,`DELETE`, etc
+* **Objects**: table, view, schema, etc
+* **Roles**: a database user or a group of database users
+
+**Example:**
+
+```sql
+GRANT UPDATE ON ratings TO PUBLIC;
+```
+The update privilege on an object called ratings is being granted to public. PUBLIC is a SQL term that encompasses all users. All users can now use the UPDATE command on the ratings object.
+```sql
+REVOKE INSERT ON films FROM db_user;
+```
+the user db_user will no longer be able to INSERT on the object films
+
+**Updating a view**
+```sql
+UPDATE films SET kind = 'Dramatic' WHERE kind = 'Drama';
+```
+If you remember correctly, a view isn't a physical table. Therefore, when you run an update, you are updating the tables behind the view.
+Not all views are updatable. There are criteria for a view to be considered updatable. The criteria depend on the type of SQL being used.
+* View is made up of one table
+* Doesn't use a window or aggregate function
+
+**Inserting into a view**
+```sql
+INSERT INTO films (code, title, did, date_prod, kind)  
+    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');
+```
+When you run an insert command into a view, you're again really inserting into the table behind it. The criteria for inserting is usually very similar to updatable views.
+Not all views are insertable
+Avoid modifying data through views
+
+**Dropping a view**
+```sql
+DROP VIEW view_name [CASADE|RESTRICT]
+```
+* `RESTRICT`: (default): returns an error if there are objects that depend on the view
+* `CASCADE`: drops view and any object that depends on that view
+
+**Redefining a view**
+```sql
+CREATE OR REPLACE VIEW view_name AS new_query
+```
+* If a view with `view_name` exists, it is replaced
+* `new_query` must generate the same column names, order, and data types as the old query
+* The column output may be different
+* New columns may be added at the end
+If these criteria can't be met, drop the existing view and create a new one
+
+**Altering a view**
+
+```sql
+ALTER VIEW [ IF EXISTS ] name ALTER [ COLUMN ] column_name SET DEFAULT expression
+ALTER VIEW [ IF	EXISTS ] name ALTER [ COLUMN ] column_name DROP DEFAULT
+ALTER VIEW [ IF	EXISTS ] name OWNER TO new_owner
+ALTER VIEW [ IF	EXISTS ] name RENAME TO new_name
+ALTER VIEW [ IF	EXISTS ] name SET SCHEMA new_schema
+ALTER VIEW [ IF	EXISTS ] name SET ( view_option_name [= view_option_value] [, ...
+ALTER VIEW [ IF	EXISTS ] name RESET ( view_option_name [, ... ] )
+```
+
+**Creating a view from other views**
+```sql
+-- Create a view with the top artists in 2017
+CREATE VIEW top_artists_2017 AS
+-- with only one column holding the artist field
+SELECT artist_title.artist FROM artist_title
+INNER JOIN top_15_2017
+ON artist_title.reviewid = top_15_2017.reviewid;
+
+-- Output the new view
+SELECT * FROM top_artists_2017;
+```
+
+**Granting and revoking access**
+```sql
+-- Revoke everyone's update and insert privileges
+REVOKE UPDATE, INSERT ON long_reviews FROM PUBLIC; 
+
+-- Grant editor update and insert privileges 
+GRANT UPDATE, INSERT ON long_reviews TO editor; 
+```
+**Redefining a view**
+```sql
+-- Redefine the artist_title view to have a label column
+CREATE OR REPLACE VIEW artist_title AS
+SELECT reviews.reviewid, reviews.title, artists.artist, labels.label
+FROM reviews
+INNER JOIN artists
+ON artists.reviewid = reviews.reviewid
+INNER JOIN labels
+ON labels.reviewid = reviews.reviewid;
+
+SELECT * FROM artist_title;
+```
+
+## 3.3. Materialized views
+
+**Two types of views**
+**Views**
+* Also known as **non-materialized views **
+* How we've defined views so far
+
+**Materialized views**
+* Physically materialized
+* Stores the **query results**, not the **query**
+* Querying a materialized view means accessing the stored query results 
+    * Not running the query like a non-materialized view
+* Refreshed or rematerialized when prompted or scheduled: query is run and the stored query results are updated. This can be scheduled depending on how often you expect the underlying query results are changing.
+
+**When to use materialized views**
+* Long running queries (complex long execution time)
+* Materialized views allow data scientists and analysts to run long queries and get results very quickly. 
+* Underlying query results don't change often
+* Data warehouses because OLAP is not write-intensive 
+    * Save on computational cost of frequent queries
+
+**Implementing materialized views (in PostgreSQL)**
+```sql
+CREATE MATERIALIZED VIEW my_mv AS SELECT * FROM existing_table;
+
+REFRESH MATERIALIZED VIEW my_mv;
+```
+
+**Managing dependencies**
+* Materialized views often depend on other materialized views
+* Creates a **dependency chain** when refreshing views
+* Not the most effcient to refresh all views at the same time
+
+Unlike non-materialized views, you need to manage when you refresh materialized views when you have dependencies. For example, let's say you have two materialized views: X and Y. Y uses X in its query; meaning Y depends on X. X doesn't depend on Y as it doesn't use Y in its query. Let' s say X has a more time-consuming query. If Y is refreshed before X's refresh is completed, then Y now has out-of-date data. This creates a dependency chain when refreshing views. 
+
+**Dependency example**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic37.png" class="largepic"/>
+
+**Tools for managing dependencies**
+* Use Directed Acyclic Graphs (DAGs) to keep track of views
+* Pipeline scheduler tools
+
+<img src="/assets/images/20210507_DatabaseDesign/pic38.png" class="largepic"/>
+
+<img src="/assets/images/20210507_DatabaseDesign/pic39.png" class="largepic"/>
+
+<img src="/assets/images/20210507_DatabaseDesign/pic40.png" class="largepic"/>
+
+**Creating and refreshing a materialized view**
+
+```sql
+-- Create a materialized view called genre_count 
+CREATE MATERIALIZED VIEW genre_count AS
+SELECT genre, COUNT(*) 
+FROM genres
+GROUP BY genre;
+
+INSERT INTO genres
+VALUES (50000, 'classical');
+
+-- Refresh genre_count
+REFRESH MATERIALIZED VIEW genre_count;
+
+SELECT * FROM genre_count;
+```
+
