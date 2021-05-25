@@ -447,3 +447,26 @@ All these rows are unique, but the courses_completed column has more than one co
 
 First is the instructor, which isn't dependent on the student_id - only the course_id. Meaning an instructor solely depends on the course, not the students who take the course. The same goes for the instructor_id column. However, the percent completed is dependent on both the student and the course id.
 
+<img src="/assets/images/20210507_DatabaseDesign/pic27.png" class="largepic"/>
+
+**3NF**
+* Satisfies 2NF
+* No transitive dependencies: non-key columns can't depend on other non-key columns 
+
+<img src="/assets/images/20210507_DatabaseDesign/pic28.png" class="largepic"/>
+
+Instructor_id and Instructor definitely depend on each other. 
+
+<img src="/assets/images/20210507_DatabaseDesign/pic29.png" class="largepic"/>
+
+**Data anomalies**
+
+What is risked if we don't normalize enough? Why we would want to put effort into normalizing a database even more? Why isn't 1NF enough? A database that isn't normalized enough is prone to three types of anomaly errors:
+1. **Update anomaly**
+2. **Insertion anomaly**
+3. **Deletion anomaly**
+
+**Update anomaly**
+**Data inconsistency caused by data redundancy when updating**
+<img src="/assets/images/20210507_DatabaseDesign/pic30.png" class="largepic"/>
+To update student `520`'s email:
