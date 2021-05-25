@@ -204,3 +204,14 @@ Snow ake schemas: more than one dimension. Because dimension tables are **normal
 * **Goal**: reduce redundancy and increase data integrity
 **Identify repeating groups of data and create new tables for them**
 
+**Book dimension of the star schema**
+Most likely to have repeating values:
+* Author 
+* Publisher
+* Genre
+
+<img src="/assets/images/20210507_DatabaseDesign/pic13.png" class="largepic"/>
+
+**Book dimension of the snowflake schema**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic14.png" class="largepic"/>
