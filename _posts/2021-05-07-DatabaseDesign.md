@@ -215,3 +215,235 @@ Most likely to have repeating values:
 **Book dimension of the snowflake schema**
 
 <img src="/assets/images/20210507_DatabaseDesign/pic14.png" class="largepic"/>
+
+**Store dimension of the star schema**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic15.png" class="largepic"/>
+
+* City
+* State 
+* Country
+
+**Store dimension of the snowflake schema**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic16.png" class="largepic"/>
+
+<img src="/assets/images/20210507_DatabaseDesign/pic17.png" class="largepic"/>
+
+**Adding foreign keys**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic18.png" class="largepic"/>
+
+```sql
+-- Add the book_id foreign key
+ALTER TABLE fact_booksales ADD CONSTRAINT sales_book
+    FOREIGN KEY (book_id) REFERENCES dim_book_star (book_id);
+    
+-- Add the time_id foreign key
+ALTER TABLE fact_booksales ADD CONSTRAINT sales_time
+   FOREIGN KEY (time_id) REFERENCES dim_time_star (time_id);
+    
+-- Add the store_id foreign key
+ALTER TABLE fact_booksales ADD CONSTRAINT sales_store
+   FOREIGN KEY (store_id) REFERENCES dim_store_star (store_id);
+```
+
+**Extending the book dimension**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic19.png" class="largepic"/>
+
+```sql
+-- Create a new table for dim_author with an author column
+CREATE TABLE dim_author (
+    author varchar(256)  NOT NULL
+);
+
+-- Insert authors 
+INSERT INTO dim_author
+SELECT DISTINCT author FROM dim_book_star;
+
+-- Add a primary key 
+ALTER TABLE dim_author ADD COLUMN author_id SERIAL PRIMARY KEY;
+
+-- Output the new table
+SELECT * FROM dim_author;
+```
+
+## 2.2. Normalized and denormalized databases
+
+**Denormalized: star schema**
+**Goals: get quantity of all Octavia E. Butler books sold in Vancouver in Q4 of 2018**
+```sql
+SELECT SUM(quantity) FROM fact_booksales
+    -- Join to get city	
+    INNER JOIN dim_store_star on fact_booksales.store_id = dim_store_star.store_id
+    -- Join to get author	
+    INNER JOIN dim_book_star on fact_booksales.book_id = dim_book_star.book_id
+    -- Join to get year and quarter	
+    INNER JOIN dim_time_star on fact_booksales.time_id = dim_time_star.time_id
+WHERE
+    dim_store_star.city = 'Vancouver' 
+    AND dim_book_star.author = 'Octavia E. Butler' 
+    AND dim_time_star.year = 2018 
+    AND dim_time_star.quarter = 4;
+```
+
+**Normalized: snowflake schema**
+```sql
+SELECT
+    SUM(fact_booksales.quantity) 
+FROM
+    fact_booksales
+    -- Join to get city
+    INNER JOIN dim_store_sf ON fact_booksales.store_id = dim_store_sf.store_id 
+    INNER JOIN dim_city ON dim_store_sf.city_id = dim_city_sf.city_id
+    -- Join to get author
+    INNER JOIN dim_book_sf ON fact_booksales.book_id = dim_book_sf.book_id 
+    INNER JOIN dim_author_sf ON	dim_book_sf.author_id = dim_author_sf.author_id
+    -- Join to get year and quarter
+    INNER JOIN dim_time_sf ON fact_booksales.time_id = dim_time_sf.time_id 
+    INNER JOIN dim_month_sf ON dim_time_sf.month_id = dim_month_sf.month_id
+    INNER JOIN dim_quarter_sf ON dim_month_sf.quarter_id = dim_quarter_sf.quarter_id 
+    INNER JOIN dim_year_sf ON dim_quarter_sf.year_id = dim_year_sf.year_id
+WHERE
+    dim_city_sf.city = `Vancouver` AND
+    dim_author_sf.author = `Octavia E. Butler` AND
+    dim_year_sf.year = 2018 AND dim_quarter_sf.quarter = 4;
+```
+
+3 joins vs 8 joins
+So, why would we want to normalize a databases?
+
+**Normalization saves space**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic20.png" class="largepic"/>
+
+Denormalized databases enables data redundancy
+
+**Normalization saves space**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic21.png" class="largepic"/>
+
+Normalization eliminates data redundancy
+
+**Normalization ensures better data integrity**
+1. Enforces data consistency
+    Must respect naming conventions because of referential integrity, e.g., 'California', not 'CA' or 'california'
+2. Safer updating, removing, and inserting
+    Less data redundancy = less records to alter
+3. Easier to redesign by extending
+    Smaller tables are easier to extend than larger tables
+
+**Database normalization**
+**Advantages**
+* Normalization eliminates data redundancy: save on storage 
+* Better data integrity: accurate and consistent data
+**Disadvantages**
+* Complex queries require more CPU
+
+**Normalization on OLTP and OLAP**
+**OLTP**
+* e.g., Operational databases 
+* Typically highly normalized
+* Write-intensive
+* Prioritize quicker and safer insertion of data
+
+
+**OLAP**
+* e.g., Data warehouses 
+* Typically less normalized
+* Read-intensive
+* Prioritize quicker queries for analytics
+
+**Querying the star schema**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic22.png" class="largepic"/>
+
+```sql
+-- Output each state and their total sales_amount
+SELECT dim_store_star.state, sum(sales_amount)
+FROM fact_booksales
+	-- Join to get book information
+    JOIN dim_book_star on fact_booksales.book_id = dim_book_star.book_id
+	-- Join to get store information
+    JOIN dim_store_star on fact_booksales.store_id = dim_store_star.store_id
+-- Get all books with in the novel genre
+WHERE  
+    dim_book_star.genre = 'novel'
+-- Group results by state
+GROUP BY
+    dim_store_star.state;
+```
+
+**Querying the snowflake schema**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic23.png" class="largepic"/>
+
+```sql
+-- Output each state and their total sales_amount
+SELECT dim_state_sf.state, sum(sales_amount)
+FROM fact_booksales
+    -- Joins for the genre
+    JOIN dim_book_sf on fact_booksales.book_id = dim_book_sf.book_id
+    JOIN dim_genre_sf on dim_book_sf.genre_id = dim_genre_sf.genre_id
+    -- Joins for the state 
+    JOIN dim_store_sf on fact_booksales.store_id = dim_store_sf.store_id 
+    JOIN dim_city_sf on dim_store_sf.city_id = dim_city_sf.city_id
+	JOIN dim_state_sf on  dim_city_sf.state_id = dim_state_sf.state_id
+-- Get all books with in the novel genre and group the results by state
+WHERE  
+    dim_genre_sf.genre = 'novel'
+GROUP BY
+   dim_state_sf.state;
+```
+**Updating**
+```sql
+-- Output records that need to be updated in the star schema
+SELECT * FROM dim_store_star
+WHERE country != 'USA' AND country !='CA';
+```
+
+## 2.3. Normal forms
+
+**Normalization**
+Identify repeating groups of data and create new tables for them 
+A more formal definition:
+    * The goals of normalization are to:
+        * Be able to characterize the level of redundancy in a relational schema 
+        * Provide mechanisms for transforming schemas in order to remove redundancy
+
+**Normal forms (NF)**
+Ordered from least to most normalized:
+* First normal form (1NF) 
+* Second normal form (2NF) 
+* Third normal form (3NF)
+* Elementary key normal form (EKNF) 
+* Boyce-Codd normal form (BCNF)
+* Fourth normal form (4NF) 
+* Essential tuple normal form (ETNF)
+* Fifth normal form (5NF)
+* Domain-key Normal Form (DKNF) 
+* Sixth normal form (6NF)
+
+**1NF rules**
+* Each record must be unique - no duplicate rows 
+* Each cell must hold one value
+
+**Initial data**
+<img src="/assets/images/20210507_DatabaseDesign/pic24.png" class="largepic"/>
+
+All these rows are unique, but the courses_completed column has more than one course in two records. To rectify this, we can split the original table as such. Now, all the records are unique and each column has one value.
+
+<img src="/assets/images/20210507_DatabaseDesign/pic25.png" class="largepic"/>
+
+**2NF**
+* Must satisfy 1NF AND
+    * If primary key is one column
+        * then automatically satisfies 2NF
+    * If there is a composite primary key
+        * then each non-key column must be dependent on all the keys 
+
+<img src="/assets/images/20210507_DatabaseDesign/pic26.png" class="largepic"/>
+
+First is the instructor, which isn't dependent on the student_id - only the course_id. Meaning an instructor solely depends on the course, not the students who take the course. The same goes for the instructor_id column. However, the percent completed is dependent on both the student and the course id.
+
