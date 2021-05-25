@@ -31,13 +31,20 @@ Learn about the two approaches to data processing, OLTP and OLAP. Get familiar w
 
 **OLTP vs OLAP**
 
-                **OLTP**                                        **OLAP**
-Purpose         support daily transactions                      report and analyze data
-Design          application-oriented                            subject-oriented (certain subject that's under analysis)
-Data            up-to-date, operational                         consolidated, historical (over a large period of time, consolidated for long-term analysis.)
-Size            snapshot, gigabytes                             archive, terabytes (large amount)
-Queries         simple transactions & frequent updates          complex, aggregate queries & limited updates
-Users           thousands                                       hundreds
+**OLTP** 
+Purpose       support daily transactions                     
+Design          application-oriented                            
+Data            up-to-date, operational                        
+Size            snapshot, gigabytes                             
+Queries         simple transactions & frequent updates        
+Users           thousands                                       
+**OLAP**
+Purpose     report and analyze data
+Design     subject-oriented (certain subject that's under analysis)
+Data        consolidated, historical (over a large period of time, consolidated for long-term analysis.)
+Size         archive, terabytes (large amount)
+Queries    complex, aggregate queries & limited updates
+Users           hundreds
 
 **Working togerther**
 
