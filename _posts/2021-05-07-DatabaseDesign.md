@@ -1123,34 +1123,56 @@ For data governance purposes, you need to consider lineage: for effective auditi
 * Types: key-value store, document store, columnar database, graph database
 
 **NoSQL DBMS - key-value store**
+<img src="/assets/images/20210507_DatabaseDesign/pic59.png" class="largepic"/>
+
 * Combinations of keys and values 
     * Key: unique identifier
     * Value: anything
 Use case: managing the shopping cart for an on-line buyer
 
-<img src="/assets/images/20210507_DatabaseDesign/pic59.png" class="largepic"/>
 
 Example:
 
 <img src="/assets/images/20210507_DatabaseDesign/pic60.png" class="largepic"/>
 
 **NoSQL DBMS - document store**
+<img src="/assets/images/20210507_DatabaseDesign/pic61.png" class="largepic"/>
+
 * Similar to key-value
 * Values (= documents) are structured 
 * Use case: content management 
-<img src="/assets/images/20210507_DatabaseDesign/pic61.png" class="largepic"/>
 
 Example:
 <img src="/assets/images/20210507_DatabaseDesign/pic62.png" class="largepic"/>
 
 **NoSQL DBMS - columnar database**
+<img src="/assets/images/20210507_DatabaseDesign/pic63.png" class="largepic"/>
+
+* Store data in columns
+* Scalable
+* Use case: big data analytics where speed is important
+
+Example:
+<img src="/assets/images/20210507_DatabaseDesign/pic64.png" class="largepic"/>
 
 **NoSQL DBMS - graph database**
 
+<img src="/assets/images/20210507_DatabaseDesign/pic65.png" class="largepic"/>
+
+* Data is interconnected and best represented as a graph
+* Use case: social media data, recommendations
+
+Example:
+
+<img src="/assets/images/20210507_DatabaseDesign/pic66.png" class="largepic"/>
+
 **Choosing a DBMS**
 
+<img src="/assets/images/20210507_DatabaseDesign/pic67.png" class="largepic"/>
 
+If your application has a fixed structure and doesn’t need frequent modifications, a SQL DBMS is preferable. Conversely, if you have applications where data is changing frequently and growing rapidly, like in big data analytics, NoSQL is the best option for you.
 
+<img src="/assets/images/20210507_DatabaseDesign/pic68.png" class="largepic"/>
 
 # 5. Reference
 
