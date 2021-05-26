@@ -830,3 +830,328 @@ REFRESH MATERIALIZED VIEW genre_count;
 SELECT * FROM genre_count;
 ```
 
+# 4. Database Management
+
+## 4.1. Database roles and access control
+
+* Manage database access permissions
+* A database role is an entity that contains information that: 
+    * Define the role's privileges
+        * Can you login?
+        * Can you create databases? 
+        * Can you write to tables?
+    * Interact with the client authentication system 
+        * Password
+* Roles can be assigned to one or more users
+* Roles are global across a database cluster installation
+
+**Create a role**
+* Empty role
+```sql
+CREATE ROLE data_analyst;
+```
+* Roles with some attributes set
+```sql
+CREATE ROLE intern WITH PASSWORD 'PasswordForIntern' VALID UNTIL '2020-01-01';
+CREATE ROLE admin CREATEDB;
+ALTER ROLE admin CREATEROLE;
+```
+
+**GRANT and REVOKE privileges from roles**
+```sql
+GRANT UPDATE ON ratings TO data_analyst;
+REVOKE UPDATE ON ratings FROM data_analyst;
+```
+The available privileges in PostgreSQL are:
+* `SELECT`,	`INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, `REFERENCES`, `TRIGGER`, `CREATE` , `CONNECT`, `TEMPORARY`, `EXECUTE`, and `USAGE`
+
+**Users and groups (are both roles)**
+* A role is an entity that can function as a user and/or a group 
+    * User roles
+    * Group roles
+
+<img src="/assets/images/20210507_DatabaseDesign/pic41.png" class="largepic"/>
+
+Group role
+
+```sql
+CREATE ROLE data_analyst;
+```
+
+User role
+
+```sql
+CREATE ROLE intern WITH PASSWORD 'PasswordForIntern' VALID UNTIL '2020-01-01';
+```
+
+```sql
+GRANT data_analyst TO alex;
+
+REVOKE data_analyst FROM alex;
+```
+
+**Common PostgreSQL roles**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic42.png" class="largepic"/>
+
+**Benefits and pitfalls of roles**
+**Benefits**
+* Roles live on after users are deleted
+* Roles can be created before user accounts 
+* Save DBAs time
+
+**Pitfalls**
+* Sometimes a role gives a specific user too much access 
+    * You need to pay a ention
+
+
+**Practice**
+```sql
+-- Create a role for Marta
+CREATE ROLE marta LOGIN;
+
+-- Create an admin role
+CREATE ROLE admin WITH CREATEDB CREATEROLE;
+
+-- Grant data_scientist update and insert privileges
+GRANT UPDATE, INSERT ON long_reviews TO data_scientist;
+
+-- Give Marta's role a password
+ALTER ROLE marta WITH PASSWORD 's3cur3p@ssw0rd';
+
+-- Add Marta to the data scientist group
+GRANT data_scientist TO Marta;
+
+-- Celebrate! You hired data scientists.
+
+-- Remove Marta from the data scientist group
+REVOKE data_scientist FROM Marta;
+```
+
+## 4.2. Table partitioning
+
+**Why partition?**
+*Tables grow (100s Gb / Tb)*
+**Problem:** queries/updates become slower 
+**Because:** e.g., indices don't fit memory
+**Solution:** split table into smaller parts (= partitioning)
+
+**Data modeling refresher**
+1. Conceptual data model
+2. Logical data model: For partitioning, logical data model is the same
+3. Physical data model: Partitioning is part of physical data model
+
+**Vertical partitioning**
+<img src="/assets/images/20210507_DatabaseDesign/pic43.png" class="largepic"/>
+<img src="/assets/images/20210507_DatabaseDesign/pic44.png" class="largepic"/>
+
+E.g., store	`long_description` on slower medium
+
+**Horizontal partitioning**
+<img src="/assets/images/20210507_DatabaseDesign/pic45.png" class="largepic"/>
+
+<img src="/assets/images/20210507_DatabaseDesign/pic46.png" class="largepic"/>
+
+```sql
+CREATE TABLE sales (
+    ...
+    timestamp DATE NOT NULL
+)
+PARTITION BY RANGE (timestamp);
+
+CREATE TABLE sales_2019_q1 PARTITION OF sales
+    FOR VALUES FROM ('2019-01-01') TO ('2019-03-31');
+
+...
+CREATE TABLE sales_2019_q4 PARTITION OF sales
+    FOR VALUES FROM ('2019-09-01') TO ('2019-12-31');
+CREATE INDEX ON sales ('timestamp');
+```
+**Pros/cons of horizontal partitioning**
+**Pros**
+* Increasing the chance **heavily-used parts** of the index fit in memory.
+* Move rarely accessed partitions to a slower medium
+* Used for both OLAP as OLTP
+**Cons**
+* Partitioning an existing table can be a hassle: you have to create a new table and copy over the data.
+* We can not always set the same type of constraints on a partitioned table, for example, the PRIMARY KEY constraint.
+
+**Relation to sharding**
+<img src="/assets/images/20210507_DatabaseDesign/pic47.png" class="largepic"/>
+
+We can take partitioning one step further and distribute the partitions over several machines. When horizontal partitioning is applied to spread a table over several machines, it's called sharding. You can see how this relates to massively parallel processing databases, where each node, or machine, can do calculations on specific shards.
+
+**Creating vertical partitions**
+```sql
+-- Create a new table called film_descriptions
+CREATE TABLE film_descriptions (
+    film_id INT,
+    long_description TEXT
+);
+
+-- Copy the descriptions from the film table
+INSERT INTO film_descriptions
+SELECT film_id, long_description FROM film;
+    
+-- Drop the column in the original table
+ALTER TABLE film DROP COLUMN long_description;
+
+-- Join to create the original table
+SELECT * FROM film 
+JOIN film_descriptions USING(film_id);
+```
+
+**Creating horizontal partitions**
+```sql
+-- Create a new table called film_partitioned
+CREATE TABLE film_partitioned (
+  film_id INT,
+  title TEXT NOT NULL,
+  release_year TEXT
+)
+PARTITION BY LIST (release_year);
+
+-- Create the partitions for 2019, 2018, and 2017
+CREATE TABLE film_2019
+	PARTITION OF film_partitioned FOR VALUES IN ('2019');
+
+CREATE TABLE film_2018
+	PARTITION OF film_partitioned FOR VALUES IN ('2018');
+
+CREATE TABLE film_2017
+	PARTITION OF film_partitioned FOR VALUES IN ('2017');
+
+-- Insert the data into film_partitioned
+INSERT INTO film_partitioned
+SELECT film_id, title, release_year FROM film;
+
+-- View film_partitioned
+SELECT * FROM film_partitioned;
+```
+
+## 4.3. Data integration
+
+**What is data integration**
+**Data Integration** combines data from different sources, formats, technologies to provide users with a translated and unified view of that data.
+
+**Business case examples**
+* 360-degree customer view : To see all information departments have about a customer in a unified place
+* Acquisition: One company acquiring another, and needs to combine their respective databases.
+* Legacy systems: An insurance company with claims in old and new systems, would need to integrate data to query all claims at once.
+
+**Unified data model format**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic48.png" class="largepic"/>
+
+**Update cadence -sales**
+<img src="/assets/images/20210507_DatabaseDesign/pic49.png" class="largepic"/>
+
+**Update cadence -air traffic**
+<img src="/assets/images/20210507_DatabaseDesign/pic50.png" class="largepic"/>
+
+**Different update cadences**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic51.png" class="largepic"/>
+
+Your sources are in different formats, you need to make sure they can be assembled together.
+
+**Transformations**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic52.png" class="largepic"/>
+
+**Transformation - tools**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic53.png" class="largepic"/>
+
+**Choosing a data integration tool**
+* Flexible
+* Reliable
+* Scalable
+
+**Automated testing and proactive alerts**
+<img src="/assets/images/20210507_DatabaseDesign/pic55.png" class="largepic"/>
+
+You should have automated testing and proactive alerts. If any data gets corrupted on its way to the unified data model, the system lets you know. For example, you could aggregate sales data after each transformation and ensure that the total amount remains the same.
+
+
+**Security**
+<img src="/assets/images/20210507_DatabaseDesign/pic56.png" class="largepic"/>
+
+Security is also a concern: if data access was originally restricted, it should remain restricted in the unified data model.Business analysts using the unified data model should not have access to the credit card numbers. You should anonymize the data during ETL so that analysts can only access the first four numbers, to identify the type of card being used.
+
+**Data governance - lineage**
+<img src="/assets/images/20210507_DatabaseDesign/pic57.png" class="largepic"/>
+
+For data governance purposes, you need to consider lineage: for effective auditing, you should know where the data originated and where it is used at all times.
+
+## 4.4. Picking a Database Management System (DBMS)
+
+**DBMS**
+* DataBase Management System 
+* Create and maintain databases
+    * Data
+    * Database schema 
+    * Database engine
+* Interface between database and end users
+
+<img src="/assets/images/20210507_DatabaseDesign/pic54.png" class="largepic"/>
+
+**DBMS types**
+* Choice of DBMS depends on database type
+* Two types: 
+    * SQL DBMS
+    * NoSQL DBMS
+
+**SQL DBMS**
+* Relational DataBase Management System (RDBMS)
+* Based on the relational model of data 
+* Query language: SQL
+* Best option when:
+    * Data is structured and unchanging 
+    * Data must be consistent
+
+<img src="/assets/images/20210507_DatabaseDesign/pic58.png" class="largepic"/>
+
+**NoSQL DBMS**
+* Less structured
+* Document-centered rather than table-centered
+* Data doesn’t have to fit into well-defined rows and columns 
+* Best option when:
+    * Rapid growth
+    * No clear schema definitions 
+    * Large quantities of data
+* Types: key-value store, document store, columnar database, graph database
+
+**NoSQL DBMS - key-value store**
+* Combinations of keys and values 
+    * Key: unique identifier
+    * Value: anything
+Use case: managing the shopping cart for an on-line buyer
+
+<img src="/assets/images/20210507_DatabaseDesign/pic59.png" class="largepic"/>
+
+Example:
+
+<img src="/assets/images/20210507_DatabaseDesign/pic60.png" class="largepic"/>
+
+**NoSQL DBMS - document store**
+* Similar to key-value
+* Values (= documents) are structured 
+* Use case: content management 
+<img src="/assets/images/20210507_DatabaseDesign/pic61.png" class="largepic"/>
+
+Example:
+<img src="/assets/images/20210507_DatabaseDesign/pic62.png" class="largepic"/>
+
+**NoSQL DBMS - columnar database**
+
+**NoSQL DBMS - graph database**
+
+**Choosing a DBMS**
+
+
+
+
+# 5. Reference
+
+1. [Database Design- DataCamp](https://learn.datacamp.com/courses/database-design)
