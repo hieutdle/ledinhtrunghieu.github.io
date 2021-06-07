@@ -116,9 +116,27 @@ etl_dag = DAG('example_etl', default_args=default_args)
 
 ## 1.3. Airflow web interface
 
+<img src="/assets/images/20210502_AirflowPython/pic4.png" class="largepic"/>
+
+<img src="/assets/images/20210502_AirflowPython/pic5.png" class="largepic"/>
+
+Starting the Airflow webserver
+
+```
+airflow webserver -p 9090
+```
+
+Remember that the Airflow UI allows various methods to view the state of DAGs. The `Tree View` lists the tasks and any ordering between them in a tree structure, with the ability to compress / expand the nodes. The `Graph View` shows any tasks and their dependencies in a graph structure, along with the ability to access further details about task runs. The Code view provides full access to the Python code that makes up the DAG.
 
 
 # 2. Implementing Airflow DAGs
+
+Learn the basics of implementing Airflow DAGs, how to set up and deploy operators, tasks, and scheduling.
+
+## 2.1. Airflow operators
+
+
+
 
 
 
