@@ -10,7 +10,109 @@ Introduction to the components of Apache Airflow and learn how and why we should
 
 ## 1.1. Running a task in Airflow
 
+**Data Engineering**: Taking any action involving data and turning it into a **reliable, repeatable, and maintainable** process.
+
+A **work flow is**: 
+* A set of steps to accomplish a given data engineering task. Such as: downloading files, copying data, filtering information, writing to a database, etc.
+* The complexity of a workflow is completely dependent on the needs of the user
+* A term with various meaning depending on context
+
+<img src="/assets/images/20210502_AirflowPython/pic1.png" class="largepic"/>
+
+**Airflow**: 
+
+<img src="/assets/images/20210502_AirflowPython/pic2.png" class="largepic"/>
+
+
+* A platform to program workflows (general), including the creation, scheduling, and monitoring of said workflows.
+* Airflow can use various tools and languages, but the actual workflow code is written with Python.
+* Airflow implements workflows as DAGs, or Directed Acyclic Graphs. 
+* Airflow can be accessed and controlled via code, via the command-line, or via a built-in web interface. 
+
+**Other workflow**
+* Luigi
+* SSIS
+* Bash Scripting
+
+**Directed Acyclic Graph**
+
+<img src="/assets/images/20210502_AirflowPython/pic3.png" class="largepic"/>
+
+* In Airflow, this represents the set of tasks that make up your workflow. 
+* It consists of the tasks and the dependencies between tasks. 
+* DAGs are created with various details about the DAG, including the name, start date, owner, email alerting options, etc.
+
+```python
+    etl_dag = DAG( dag_id='etl_pipeline',
+                   default_args={"start_date": "2020-01-08"}
+)
+```
+
+**Running a workflow in Airflow**
+Running a simple Airflow task
+```
+airflow run <dag_id> <task_id> <start_date>
+
+airflow run eexample-etl download-file 2020-01-10
+```
+
 ## 1.2. Airflow DAGs
+
+**Directed Acyclic Graph**:
+* **Directed**, meaning there is an inherent flow representing the dependencies or order between execution of components. These dependencies (even implicit ones) provide context to the tools on how to order the running of components
+* **Acyclic** - it does not loop or repeat. This does not imply that the entire DAG cannot be rerun, only that the individual components are executed once per run
+* **Graph** represents the components and the relationships (or dependencies) between them. 
+
+**DAG in Airflow**
+* Are written in Python
+* Are made up of components (typically tasks) to be executed, such as operators, sensors, etc.  Typically refers to these as tasks.
+* Airflow DAGs contain dependencies that are defined, either explicitly or implicitly. These dependencies define the execution order so Airflow knows which components should be run at what point within the workflow. For example, you would likely want to copy a file to a server prior to trying to import it to a database.
+
+**Define a DAG**
+```python
+from airflow.models import DAG
+
+from datetime import datetime 
+default_arguments = {
+    'owner': 'jdoe',
+    'email': 'jdoe@datacamp.com', 
+    'start_date': datetime(2020, 1, 20)
+}
+
+etl_dag = DAG( 'etl_workflow', default_args=default_arguments )
+```
+The **`start_date`** represents the earliest datetime that a DAG could be run.
+
+**DAGs on the command line**
+* The `airflow` command line program contains many subcommands. 
+* `airflow -h` for descriptions
+* `airflow list_dags` to show all recognized DAGs
+
+
+**Use python to**
+* Create a DAG
+* Edit the individual properties of a DAG
+
+**Use the command line tool to**
+* Start Airflow processes
+* Manually run DAGs/task
+* Get logging information from Airflow
+
+
+```python
+# Import the DAG object
+from airflow.models import DAG
+
+# Define the default_args dictionary
+default_args = {
+  'owner': 'dsmith',
+  'start_date': datetime(2020, 1, 14),
+  'retries': 2
+}
+
+# Instantiate the DAG object to a variable called etl_dag with a DAG named example_etl.
+etl_dag = DAG('example_etl', default_args=default_args)
+```
 
 ## 1.3. Airflow web interface
 
