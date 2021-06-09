@@ -208,8 +208,32 @@ task2 = BashOperator(task_id='second_task',
 
 # Set first_task to run before second_task 
 task1 >> task2	# or task2 << task1
+```
 
+**Task dependencies in the Airflow UI**
 
+<img src="/assets/images/20210502_AirflowPython/pic6.png" class="largepic"/>
+
+**Multiple dependencies**
+
+**Chained dependencies**
+
+```py
+task1 >> task2 >> task3 >> task4
+```
+<img src="/assets/images/20210502_AirflowPython/pic7.png" class="largepic"/>
+
+**Mixed dependencies**
+
+```py
+task1 >> task2 << task3
+```
+
+```py
+task1	>>	task2
+task3	>>	task2
+```
+<img src="/assets/images/20210502_AirflowPython/pic8.png" class="largepic"/>
 
 
 # 5. Reference
