@@ -135,7 +135,79 @@ Learn the basics of implementing Airflow DAGs, how to set up and deploy operator
 
 ## 2.1. Airflow operators
 
+**Operator**
+* Airflow operators represent a single task in a workflow. This can be any type of task from running a command, sending an email, running a Python script,...
+* Airflow operators run independently - meaning that all resources needed to complete the task are contained within the operator.
+* Airflow operators do not share information between each other. This is to simplify workflows and allow Airflow to run the tasks in the most efficient manner. It is possible to share information between operators.
+* Airflow contains many various operators to perform different tasks. For example, the DummyOperator can be used to represent a task for troubleshooting or a task that has not yet been implemented
+```python
+DummyOperator(task_id='example', dag=dag)
+```
 
+**BashOperator**
+```bash
+BashOperator(
+task_id='bash_example', bash_command='echo "Example!"', dag=ml_dag)
+```
+```bash
+BashOperator(
+task_id='bash_script_example', bash_command='runcleanup.sh', dag=ml_dag)
+```
+* Executes a given Bash command or script.
+* Runs the command in a temporary directory.
+* Can specify environment variables for the command.
+
+**Example**
+```py
+from airflow.operators.bash_operator import BashOperator 
+
+example_task = BashOperator(task_id='bash_ex',
+                            bash_command='echo 1', 
+                            dag=dag)
+
+bash_task = BashOperator(task_id='clean_addresses', 
+                         bash_command='cat addresses.txt | awk "NF==10" > cleaned.txt', 
+                         dag=dag)
+```
+
+**Note**
+* Individual operators are not guaranteed to run in the same location or environment. This means that just because one operator ran in a given directory with a certain setup, it does not necessarily mean that the next operator will have access to that same information.
+* You may need to set up environment variables, especially for the BashOperator. For example, it's common in bash to use the tilde character to represent a home directory. This is not defined by default in Airflow. Another example of an environment variable could be AWS credentials, database connectivity details, or other information specific to running a script.
+* It can also be tricky to run tasks with any form of elevated privilege. This means that any access to resources must be setup for the specific user running the tasks. If you're uncertain what elevated privileges are, think of running a command as root or the administrator on a system.
+
+## 2.2. Airflow tasks
+
+**Tasks** are:
+* Instances of operators
+* Usually assigned to a variable in Python
+```
+example_task = BashOperator(task_id='bash_example',bash_command='echo "Example!"', dag=dag)
+```
+* Referred to by the task_id within the Airflow tools
+
+**Task dependencies**
+* Define a given order of task completion
+* Are not required for a given workflow, but usually present in most 
+* Are referred to as *upstream* or *downstream* tasks. An upstream task means that it must complete prior to any downstream tasks.
+* In Air ow 1.8 and later, are defined using the bitshift operators
+  * **>>** or the upstream operator
+  * **<<** or the downstream operator
+* Upstream means before and downstream means after. This means that any upstream tasks would need to complete prior to any downstream ones.
+
+**Example**
+
+```python
+ Define the tasks
+task1 = BashOperator(task_id='first_task',
+                     bash_command='echo 1', 
+                     dag=example_dag)
+
+task2 = BashOperator(task_id='second_task',
+                     bash_command='echo 2', 
+                     dag=example_dag)
+
+# Set first_task to run before second_task 
+task1 >> task2	# or task2 << task1
 
 
 
