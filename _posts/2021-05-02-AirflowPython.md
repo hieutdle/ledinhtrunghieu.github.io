@@ -235,6 +235,116 @@ task3	>>	task2
 ```
 <img src="/assets/images/20210502_AirflowPython/pic8.png" class="largepic"/>
 
+## 2.3. Additional operators
+
+**Python Operators**
+* Executes a Python function / callable
+* Operates similarly to the BashOperator, with more options 
+* Can pass in arguments to the Python code
+
+```py
+from airflow.operators.python_operator import PythonOperator
+
+def printme():
+    print("This goes in the logs!") 
+python_task = PythonOperator(
+    task_id='simple_print', 
+    python_callable=printme, 
+    dag=example_dag
+)
+```
+
+**Arguments**
+* Supports arguments to tasks
+  * Positional
+  * Keyword
+* Use the `op_kwargs` dictionary
+
+**op_kwargs Example**
+```py
+def sleep(length_of_time): 
+    time.sleep(length_of_time)
+
+sleep_task = PythonOperator( 
+    task_id='sleep', 
+    python_callable=sleep, 
+    op_kwargs={'length_of_time': 5} 
+    dag=example_dag
+)
+```
+
+We'll add our `op_kwargs` dictionary with the length of time variable and the value of 5. Note that the dictionary key must match the name of the function argument
+
+
+**Email Operator**
+* Found in the `airflow.operators` library
+* Send an email 
+* Can contain typical comments
+  * HTML content
+  * Attachments
+* Does require the Airflow system to be configured with email server details
+
+```py
+from airflow.operators.email_operator import EmailOperator
+
+email_task = EmailOperator( 
+    task_id='email_sales_report', 
+    to='sales_manager@example.com', 
+    subject='Automated Sales Report',
+    html_content='Attached is the latest sales report', 
+    files='latest_sales.xlsx',
+    dag=example_dag
+)
+```
+
+**Using the PythonOperator Practice**
+```py
+def pull_file(URL, savepath):
+    r = requests.get(URL)
+    with open(savepath, 'wb') as f:
+        f.write(r.content)   
+    # Use the print method for logging
+    print(f"File pulled from {URL} and saved to {savepath}")
+
+from airflow.operators.python_operator import PythonOperator
+
+# Create the task
+pull_file_task = PythonOperator(
+    task_id='pull_file',
+    # Add the callable
+    python_callable=pull_file,
+    # Define the arguments
+    op_kwargs={'URL':'http://dataserver/sales.json', 'savepath':'latestsales.json'},
+    dag=process_sales_dag
+)
+```
+
+**Email Operators**
+```py
+# Import the Operator
+from airflow.operators.email_operator import EmailOperator
+
+
+# Define the task
+email_manager_task = EmailOperator(
+    task_id='email_manager',
+    to='manager@datacamp.com',
+    subject='Latest sales JSON',
+    html_content='Attached is the latest sales JSON file as requested.',
+    files='parsedfile.json',
+    dag=process_sales_dag
+)
+
+# Set the order of tasks
+pull_file_task >> parse_file_task >> email_manager_task
+```
+
+## 2.4. Airflow scheduling
+
+
+
+
+
 
 # 5. Reference
 
