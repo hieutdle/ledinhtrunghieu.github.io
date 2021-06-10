@@ -341,9 +341,87 @@ pull_file_task >> parse_file_task >> email_manager_task
 
 ## 2.4. Airflow scheduling
 
+**DAG Runs**
+* A specific instance of a work ow at a point in time 
+* Can be run manually or via `schedule_interval`
+* Maintain state for each workflow and the tasks within
+  * `running`
+  * `failed`
+  * `sucess`
+
+**DAG Runs View**
+<img src="/assets/images/20210502_AirflowPython/pic9.png" class="largepic"/>
 
 
+**Schedule details**
+When scheduling a DAG, there are several attributes of note:
+* `start_date` - The date / time to initially schedule the DAG run
+* `end_date` - Optional attribute for when to stop running new DAG instances
+* `max_tries` - Optional attribute for how many times to retry before fully failing the DAG run
+* `schedule_interval` - How often to schedule the DAG for execution
 
+**Schedule interval**
+* How often to schedule the DAG
+* Occurs between the `start_date` and the potential `end_date`
+* Can be defined with a `cron` style syntax or via built-in presets.
+
+**cron syntax**
+<img src="/assets/images/20210502_AirflowPython/pic10.png" class="largepic"/>
+
+* Is pulled from the Unix cron format 
+* Consists of 5 fields separated by a space. Starting with the minute value (0 through 59), the hour (0 through 23), the day of the month (1 through 31), the month (1 through 12), and the day of week (0 through 6).
+* An asterisk `*` represents running for every interval (ie, every minute, every day, etc)
+* Can be comma separated values in fields for a list of values. For example, an asterisk in the minute field means run every minute
+* A list of values can be given on a field via comma separated values.
+
+**cron example**
+```
+0 12 * * *                  # Run daily at noon
+
+* * 25 2 *                  # Run once per minute on February 25
+
+0,15,30,45 * * * *          # Run every 15 minutes
+```
+
+
+**Airflow scheduler presets**
+Preset:
+* @hourly : `0 * * * *`
+* @daily : `0 0 * * *`
+* @weekly: `0 0 * * 0`
+* @monthly: `0 0 1 * *`
+* @yearly: `0 0 1 1 *`
+
+**Special present**
+* `None`- Don't schedule ever, used for manually triggered DAGs
+* `@once` - Schedule only once
+
+**schedule_interval issues**
+When scheduling a DAG, Airflow will:
+* Use the `start_date` as the earliest possible value
+* Schedule the task at `start_date` + `schedule_interval`
+```py
+'start_date': datetime(2020, 2, 25), 
+'schedule_interval': @daily
+```
+This means the earliest starting time to run the DAG is on February 26th, 2020
+
+```py
+# Update the scheduling arguments as defined
+default_args = {
+  'owner': 'Engineering',
+  'start_date': datetime(2019,  11, 1),
+  'email': ['airflowresults@datacamp.com'],
+  'email_on_failure': False,
+  'email_on_retry': False,
+  'retries': 3,
+  'retry_delay': timedelta(minutes=20)
+}
+
+dag = DAG('update_dataflows', default_args=default_args, schedule_interval='30 12 * * 3')
+```
+
+# 3. Maintaining and monitoring Airflow workflows
 
 
 # 5. Reference
