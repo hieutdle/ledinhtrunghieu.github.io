@@ -423,6 +423,11 @@ dag = DAG('update_dataflows', default_args=default_args, schedule_interval='30 1
 
 # 3. Maintaining and monitoring Airflow workflows
 
+# 3.1. Airflow sensors
+
+# 3.2. Airflow executors
+
+
 
 # 5. Reference
 
