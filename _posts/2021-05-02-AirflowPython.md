@@ -446,9 +446,21 @@ Save time using Airflow components such as sensors and executors while monitorin
 * Also includes normal operator attributes: `task_id` and `dag`
 
 **File Sensor**
+* Is part of the `airflow.contrib.sensors` library
+* Checks for the existence of a file at a certain location
+* Can also check if any files exist within a directory
 
+```py
+from airflow.contrib.sensors.file_sensor import FileSensor
 
+file_sensor_task = FileSensor(task_id='file_sense',
+                              filepath='salesdata.csv', 
+                              poke_interval=300, 
+                              dag=sales_report_dag)
 
+init_sales_cleanup >> file_sensor_task >> generate_report
+
+```
 
 
 
