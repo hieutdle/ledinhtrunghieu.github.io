@@ -439,9 +439,9 @@ Save time using Airflow components such as sensors and executors while monitorin
 * Derived from `airflow.sensors.base_sensor_operator`
 * Sensor arguments:
 * `mode`- How to check for the condition
-  * `mode='poke'` - The default, run repeatedly
+  * `mode='poke'` - The default is poke, and means to continue checking until complete without giving up a worker slot.
   * `mode='reschedule'` - Give up task slot and try again later
-* `poke_interval` -	How often to wait between checks
+* `poke_interval` -	How often to wait between checks. 
 * `timeout` - How long to wait before failing task
 * Also includes normal operator attributes: `task_id` and `dag`
 
@@ -461,10 +461,22 @@ file_sensor_task = FileSensor(task_id='file_sense',
 init_sales_cleanup >> file_sensor_task >> generate_report
 
 ```
+**Other sensors**
+* `ExternalTaskSensor` - wait for a task in another DAG to complete
+* `HttpSensor` - - Request a web URL and check for content
+* `SqlSensor` - Runs a SQL query to check for content
+* Many others in `airflow.sensors` and `airflow.contrib.sensors`
 
-
+**Sensors vs Operators**
+Use a sensor when:
+* Uncertain when conditions will be true
+* If you want to continue to check for a condition but not necessarily fail the entire DAG immediately.
+* If you want to repeatedly run a check without adding cycles to your DAG, sensors are a good choice.
 
 # 3.2. Airflow executors
+
+
+
 
 # 4. Building production pipelines in Airflow
 
