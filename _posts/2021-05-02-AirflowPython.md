@@ -423,7 +423,34 @@ dag = DAG('update_dataflows', default_args=default_args, schedule_interval='30 1
 
 # 3. Maintaining and monitoring Airflow workflows
 
+Save time using Airflow components such as sensors and executors while monitoring and troubleshooting Airflow workflows.
+
 # 3.1. Airflow sensors
+
+**Sensor**
+* An operator that waits for a certain condition to be true
+  * Creation of a file
+  * Upload of a database record
+  * Certain response from a web request
+* Can define how often to check for the condition to be true
+* Are assigned to tasks
+
+**Sensor details**
+* Derived from `airflow.sensors.base_sensor_operator`
+* Sensor arguments:
+* `mode`- How to check for the condition
+  * `mode='poke'` - The default, run repeatedly
+  * `mode='reschedule'` - Give up task slot and try again later
+* `poke_interval` -	How often to wait between checks
+* `timeout` - How long to wait before failing task
+* Also includes normal operator attributes: `task_id` and `dag`
+
+**File Sensor**
+
+
+
+
+
 
 # 3.2. Airflow executors
 
