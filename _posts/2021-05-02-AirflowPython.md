@@ -511,8 +511,73 @@ Use a sensor when:
 `INFO - Using SequentialExecutor`
 <img src="/assets/images/20210502_AirflowPython/pic12.png" class="largepic"/>
 
+```py
+from airflow.models import DAG
+from airflow.operators.bash_operator import BashOperator
+from airflow.contrib.sensors.file_sensor import FileSensor
+from datetime import datetime
 
+report_dag = DAG(
+    dag_id = 'execute_report',
+    schedule_interval = "0 0 * * *"
+)
 
+precheck = FileSensor(
+    task_id='check_for_datafile',
+    filepath='salesdata_ready.csv',
+    start_date=datetime(2020,2,20),
+    mode='reschedule',
+    dag=report_dag
+)
+
+generate_report_task = BashOperator(
+    task_id='generate_report',
+    bash_command='generate_report.sh',
+    start_date=datetime(2020,2,20),
+    dag=report_dag
+)
+
+precheck >> generate_report_task
+```
+
+## 3.3. Debugging and troubleshooting in Airflow
+
+**Typical issues...**
+* DAG won't run on schedule
+* DAG won't load
+* Syntax errors
+
+**DAG won't run on schedule**
+* Check if scheduler is running
+<img src="/assets/images/20210502_AirflowPython/pic13.png" class="largepic"/>
+* Fix by running `airflow scheduler` from the command line
+* At least one `scheduler_interval` hasn't passed from the `start_date` or last DAG run
+  * Modify the attributes to meet your requirements
+* The executor does not have enough free slots to run tasks.
+  * Changing the executor type to something capable of more tasks (LocalExecutor or CeleryExecutor)
+  * Adding more systems or system resources (RAM, CPUs)
+  * Changing the scheduling of your DAGs.
+
+**DAG won't load**
+* DAG not in web UI 
+* DAG not in `airflow list_dags`
+* Possible solution:
+  * Verify DAG le is in correct folder 
+  * Determine the DAGs folder via `airflow.cfg`
+  * The folder must be an absolute path
+<img src="/assets/images/20210502_AirflowPython/pic14.png" class="largepic"/>
+
+**Syntex error**
+* The most common reason a DAG le won't appear
+* Sometimes difficult to find errors in DAG
+* Two quick methods: 
+  * Run `airflow list_dags`
+<img src="/assets/images/20210502_AirflowPython/pic15.png" class="largepic"/>
+  * Run `python3 <dagfile.py>
+    * With Errors:
+<img src="/assets/images/20210502_AirflowPython/pic16.png" class="largepic"/>
+    * Without Errors: Return to command line
+<img src="/assets/images/20210502_AirflowPython/pic17.png" class="largepic"/>
 
 
 
