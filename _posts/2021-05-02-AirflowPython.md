@@ -475,6 +475,44 @@ Use a sensor when:
 
 # 3.2. Airflow executors
 
+**Executors**
+* Executors run tasks
+* Different executors handle running the tasks differently
+* Example executors:
+  * `SequentialExecutors`
+  * `LocalExecutor`
+  * `CeleryExecutor`
+
+**Sequential Executors**
+* The default Airflow executor
+* Runs one task at a time. This means having multiple workflows scheduled around the same timeframe may cause things to take longer than expected
+* Useful for debugging
+* While functional, not really recommended for production due to the limitations of task
+
+**Local Executor**
+* Runs entirely on a single system. 
+* Treats tasks as processes on the local system
+* Able to start as many concurrent tasks as desired / requested / and permitted by the system resources (ie, CPU cores, memory, etc). 
+* This concurrency is the parallelism of the system, and it is defined by the user in one of two ways - either unlimited, or limited to a certain number of simultaneous tasks.
+* Is a good choice for a single production Airflow system and can utilize all resources of a given host system
+
+**Celery Executor**
+* General queuing system written in Python that allows multiple systems to communicate as a basic cluster.
+* Uses a Celery backend as task manager
+* Significantly more difficult to setup and configure
+* It requires a working Celery configuration prior to configuring Airflow, not to mention some method to share DAGs between the systems (ie, a git server, Network File System, etc).
+* Powerful choice for anyoneWorking with a large number of DAGs and / or expects their processing needs to grow.
+
+**Determine your executor**
+* Via the `airflow.cfg` file
+* Look for the `executor=` line
+<img src="/assets/images/20210502_AirflowPython/pic11.png" class="largepic"/>
+* Via the first line of `airflow list_dags`
+`INFO - Using SequentialExecutor`
+<img src="/assets/images/20210502_AirflowPython/pic12.png" class="largepic"/>
+
+
+
 
 
 
