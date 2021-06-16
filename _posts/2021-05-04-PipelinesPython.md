@@ -10,6 +10,7 @@ Explain what a data platform is, how data ends up in it, and how data engineers 
 
 ## 1.1. Components of a data platform
 
+**Democratizing data increases insights**
 
 
 
