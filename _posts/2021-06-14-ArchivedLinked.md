@@ -22,3 +22,9 @@ https://www.mltut.com/best-data-engineering-books/
 https://towardsdatascience.com/the-facebook-data-engineer-interview-345235afaac0
 
 https://www.educative.io/courses/grokking-adv-system-design-intvw?aid=5082902844932096
+
+data warehouse toolkit by Kimball
+
+Read martin kleppmans designing data intensive applications.
+
+
