@@ -28,3 +28,5 @@ data warehouse toolkit by Kimball
 Read martin kleppmans designing data intensive applications.
 
 https://www.reddit.com/r/dataengineering/comments/g3hpt1/what_skills_are_expected_from_a_data_engineer/
+
+https://www.reddit.com/r/dataengineering/comments/o210i3/i_wrote_a_childrens_book_illustrated_guide_to/
