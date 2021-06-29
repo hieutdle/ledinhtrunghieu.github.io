@@ -35,3 +35,4 @@ By considering a number of different algorithms, we can begin to develop pattern
 
 We define a **class** to be a description of what the data look like (**the state**) and what the data can do (**the behavior**). Classes are analogous to abstract data types because a user of a class only sees the state and behavior of a data item. Data items are called **objects** in the object-oriented paradigm. An object is an instance of a class.
 
+Python has two main built-in numeric classes that implement the integer and floating point data types. These Python classes are called int and float. The standard arithmetic operators, +, -, *, /, and ** (exponentiation), can be used with parentheses forcing the order of operations away from normal operator precedence. Other very useful operations are the remainder (modulo) operator (%) and integer division (//)
