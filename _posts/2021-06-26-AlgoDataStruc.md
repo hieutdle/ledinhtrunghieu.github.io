@@ -52,3 +52,87 @@ The standard arithmetic operators, +, -, *, /, and ** (exponentiation), can be u
 `Dict`
 
 `Tuple`
+
+https://runestone.academy/runestone/books/published/pythonds3/Introduction/GettingStartedwithData.html#built-in-collection-data-types
+
+**Input and Ouput**
+
+```py
+a_name = input("Please enter your name ")
+print("Your name in all capitals is",a_name.upper(),
+      "and has length", len(a_name))
+```
+```py
+>>> s_radius = input("Please enter the radius of the circle ")
+Please enter the radius of the circle 10
+>>> s_radius
+'10'
+>>> radius = float(s_radius)
+>>> radius
+10.0
+>>> diameter = 2 * radius
+>>> diameter
+20.0
+>>>
+```
+**String Formatting**
+
+https://runestone.academy/runestone/books/published/pythonds3/Introduction/InputandOutput.html
+
+```py
+>>> print("Hello")
+Hello
+>>> print("Hello", "World")
+Hello World
+>>> print("Hello", "World", sep="***")
+Hello***World
+>>> print("Hello", "World", end="***")
+Hello World***>>>
+```
+
+
+```py
+>>> price = 24
+>>> item = "banana"
+>>> print("The %s costs %d cents" % (item, price))
+The banana costs 24 cents
+>>> print("The %+10s costs %5.2f cents" % (item, price))
+The     banana costs 24.00 cents
+>>> print("The %+10s costs %10.2f cents" % (item, price))
+The     banana costs      24.00 cents
+>>> itemdict = {"item": "banana", "cost": 24}
+>>> print("The %(item)s costs %(cost)7.1f cents" % itemdict)
+The banana costs    24.0 cents
+>>>
+```
+
+`format` method `formatter` class
+
+```py
+>>> print("The {} costs {} cents".format(item, price))
+The banana costs 24 cents
+>>> print("The {:s} costs {:d} cents".format(item, price))
+The banana costs 24 cents
+>>>
+```
+
+`f-string`
+```py
+>>> print(f"The {item:10} costs {price:10.2f} cents")
+The banana     costs      24.00 cents
+>>> print(f"The {item:<10} costs {price:<10.2f} cents")
+The banana     costs 24.00      cents
+>>> print(f"The {item:^10} costs {price:^10.2f} cents")
+The   banana   costs   24.00    cents
+>>> print(f"The {item:>10} costs {price:>10.2f} cents")
+The     banana costs      24.00 cents
+>>> print(f"The {item:>10} costs {price:>010.2f} cents")
+The     banana costs 0000024.00 cents
+>>> itemdict = {"item": "banana", "price": 24}
+>>> print(f"Item:{itemdict['item']:.>10}\n" +
+... f"Price:{'$':.>4}{itemdict['price']:5.2f}")
+Item:....banana
+Price:...$24.00
+>>>
+```
+
