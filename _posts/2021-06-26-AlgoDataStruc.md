@@ -47,8 +47,8 @@ The standard arithmetic operators, +, -, *, /, and ** (exponentiation), can be u
 
 `List`
 
-| Method Name | Use | Explanation |
-| ------------------- | ------------- | ------------- |
-| append  | a_list.append(item) | Adds a new item to the end of a list |
-| insert  | a_list.insert(i,item) | Inserts an item at the ith position in a list |
+`Set`
 
+`Dict`
+
+`Tuple`
