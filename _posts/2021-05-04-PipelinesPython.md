@@ -469,6 +469,18 @@ better_frame.show()
 
 Here, we replace the values that are illogical by using a condition in the “when()” function. When the condition is met, we replace the values with Python’s “None”, which in Spark gets translated to “null”. Otherwise, we leave the column unaltered.
 
+```py
+from pyspark.sql.functions import col, when
+
+# Add/relabel the column
+categorized_ratings = ratings.withColumn(
+    "comfort",
+    # Express the condition in terms of column operations
+    when(col("comfort") > 3, "sufficient").otherwise("insufficient"))
+
+categorized_ratings.show()
+```
+
 
 # 3. Testing your data pipeline
 
