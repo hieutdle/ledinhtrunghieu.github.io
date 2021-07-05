@@ -661,13 +661,241 @@ unit_prices_with_ratings = (prices_with_ratings
                             .join(…) # transform
                             .withColumn(…))	# transform
 ```
+<img src="/assets/images/20210501_OOPInPython/pic44.png" class="largepic"/>
+
+We will rewrite the transformations in this piece of code from our pipeline to allow testing. Now, the transformations operate on DataFrames, which we obtained through interacting with the file system. As mentioned, we would like to remove that dependency and focus solely on the transformations. If(2) the transformations would no longer get data from files, how do we still feed them data?
+
+**Solution: construct DataFrames in-memory**
+
+```py
+# Extract the data
+df = spark.read.csv(path_to_file)
+```
+* Depends on input/output (network access, filesystem permission,...)
+* Unclear how big the data is
+* Unclear what data goes
+
+```py
+from pyspark.sql import Row 
+purchase = Row("price",
+               "quantity",
+               "product")
+record = purchase(12.99, 1, "cake")
+df = spark.createDataFrame((record,))
+```
+* inputs are clear
+* data is close to where it is being used (“code-proximity”)
+
+**Create small, resuable and well-named functions**
+```py
+unit_prices_with_ratings = (prices_with_ratings
+                            .join(exchange_rates, ["currency", "date"])
+                            .withColumn("unit_price_in_euro",
+                                        col("price") / col("quantity")
+                                        * col("exchange_rate_to_euro"))
+```
+
+Our original code did a lot at once. It linked one DataFrame to another and added a column based on some mathematical function. Combining steps makes it hard to test the functionality. We could separate these steps and apply them in sequence
+
+```py
+def link_with_exchange_rates(prices, rates):
+    return prices.join(rates, ["currency", "date"])
+
+def calculate_unit_price_in_euro(df):
+    return df.withColumn(
+        "unit_price_in_euro",
+        col("price") / col("quantity") * col("exchange_rate_to_euro"))
+
+unit_prices_with_ratings = (
+    calculate_unit_price_in_euro(
+        link_with_exchange_rates(prices, exchange_rates)
+    )
+)
+```
+
+**Testing a single unit**
+```py
+def test_calculate_unit_price_in_euro():
+    record = dict(price=10,
+                  quantity=5,
+                  exchange_rate_to_euro=2.)
+    df = spark.createDataFrame([Row(**record)])
+    result = calculate_unit_price_in_euro(df)
+
+    expected_record = Row(**record, unit_price_in_euro=4.)
+    expected = spark.createDataFrame([expected_record])
+
+    assertDataFrameEqual(result, expected)
+```
+
+Our expectation is that the `unit_price_in_euro` field is added and that the math is correct. We can calculate this value easily ourselves, which is another advantage to running tests with in-memory DataFrames. You now also see why we used a starting dictionary: it is repeated in both the initial and expected DataFrames.
+Finally, we must compare the resulting and expected DataFrames. We’re using a helper function here, assertDataFrameEqual(), which does exactly that.
+
+1. Interacting with external data sources is costly
+2. Creating in-memory DataFrames makes testing easier
+    * the data is plain sights,
+    * focus is on just a small number of examples.
+3. Your code should be refactored so that you create small, reusable and well-named functions, which are also easier to test.
+
+**Practice**
+**Creating in-memory DataFrames**
+```py
+from datetime import date
+from pyspark.sql import Row
+
+Record = Row("country", "utm_campaign", "airtime_in_minutes", "start_date", "end_date")
+
+# Create a tuple of records
+data = (
+  Record("USA", "DiapersFirst", 28, date(2017, 1, 20), date(2017, 1, 27)),
+  Record("Germany", "WindelKind", 31, date(2017, 1, 25), None),
+  Record("India", "CloseToCloth", 32, date(2017, 1, 25), date(2017, 2, 2))
+)
+
+# Create a DataFrame from these records
+frame = spark.createDataFrame(data)
+frame.show()
+```
+```py
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, lower, sum
+
+from .catalog import catalog
 
 
+def extract_demographics(sparksession, catalog):
+    return sparksession.read.parquet(catalog["clean/demographics"])
 
 
+def store_chinese_demographics(frame, catalog):
+    frame.write.parquet(catalog["business/chinese_demographics"])
 
 
+# Improved aggregation function, grouped by country and province
+def aggregate_inhabitants_by_province(frame):
+    return (frame
+            .groupBy("country", "province")
+            .agg(sum(col("inhabitants")).alias("inhabitants"))
+            )
 
+
+def main():
+    spark = SparkSession.builder.getOrCreate()
+    frame = extract_demographics(spark, catalog)
+    chinese_demographics = frame.filter(lower(col("country")) == "china")
+    aggregated_demographics = aggregate_inhabitants_by_province(chinese_demographics)
+    store_chinese_demographics(aggregated_demographics, catalog)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+## 3.3. Continuous testing
+
+**Running a test suite**
+Several modules to execute tests:
+<img src="/assets/images/20210501_OOPInPython/pic45.png" class="largepic"/>
+Core task: assert or raise
+
+Examples:
+```py
+assert computed == expected
+with pytest.raises(ValueError):	# pytest specific
+```
+
+**Manually triggering tests**
+In a Unix Shell:
+```bash
+cd ~/workspace/my_good_python_project
+pytest .
+
+# Lots of output…
+== 19 passed, 2 warnings in 36.80 seconds ==
+
+cd ~/workspace/my_bad_python_project
+pytest .
+
+# Lots of output…
+== 3 failed, 1 passed in 6.72 seconds 
+```
+Note: spark increase time to run unit tests
+
+**Automating tests**
+Problem:
+* forget to run unit tests when making changes
+Solution:
+* Automation
+* Git -> configure hooks
+* Configure CI/CD pipeline to run tests automatically
+
+**CI/CD**
+**Continuous Integration:**
+* Represent the practice of integrating code changes as soon as possible with the code that runs in production, which is called the master branch. This should only be allowed if the changes didn’t break anything, which tests can detect to some degree. So Continuous Integration focuses a lot on running tests and having plenty of them. 
+
+**Continuous Delivery:**
+* All artifacts should always be in deployable state at any time without any problem. When you push your code as part of some version control system to some remote server, you can also trigger running unit tests and static code checks, like compliancy with PEP8, which is the Python style guide.
+
+**Configuring a CI/CD tools**
+<img src="/assets/images/20210501_OOPInPython/pic46.png" class="largepic"/>
+
+CircleCI is a service that runs tests automatically for you. 
+Like many of these tools, it’s looking for a specific file in your code repository. For CircleCI, it’s `config.yml` in the .circleci folder, which should be at the root of your code repository. 
+The syntax is YAML, which is a superset of JSON, but has a different focus and adds many features. 
+Example:
+```
+jobs:
+    test:
+        docker:
+            - image: 
+        circleci/python:3.6.4 steps:
+            - checkout
+            - run: pip install -r requirements.txt
+            - run: pytest .
+```
+In the config file there’s a section called “jobs”. Each job has a name, like “test”. The job is a collection of steps that get executed in some environment, in this case a Docker image designed for a specific version of Python. The steps are executed in sequence and would typically be the steps that you would execute manually if you were given a new project. 
+In this case, we instruct CircleCI to:
+* check out the code from the code repository
+* install the modules we require
+* run the test suite with pytest.
+* If your tests were successful, you could package/build the application and deploy it on a server or store it for later use (artefacts) (update docs/install app/...)
+
+**A high-level view on CI/CD**
+
+<img src="/assets/images/20210501_OOPInPython/pic47.png" class="largepic"/>
+
+**Improving style guide compliancy**
+
+One of the reasons why Python is an easy language to get into, is because there’s a lot of similarity between code from different developers. That’s because the Python syntax relies on indents for scoping rules. Many developers follow the style guide of Python, known as PEP8.
+
+In the project you've been building so far, you want to enforce that people follow the rules laid out in PEP8. You can do so with Flake8, which is a static code checker (it does not run your code). You run flake8 in the same way that you run pytest. It will show warnings and errors for code that is not compliant with PEP8.
+
+Add flake8 to the development section in the Pipfile, which is in the project’s root folder. This file serves a similar purpose as the requirements.txt files you might have seen in other Python projects. It solves some problems with those though. To add flake8 correctly, look at the line that mentions pytest.
+Add flake8 to the .circleci/config.yml file, just before the line that tells CircleCI to run pytest. Make sure to duplicate the syntax of pipenv run. When you have done that, you can optionally execute flake8 from the shell in the project’s root folder with this command: pipenv run flake8. It will show you how many errors and warnings were generated. This is what CircleCI would automatically execute for you and it could stop executing subsequent steps, when this command generates errors, like in this case.
+
+```
+version: 2
+jobs:
+  build:
+    working_directory: ~/data_scientists/optimal_diapers/
+    docker:
+      - image: gcr.io/my-companys-container-registry-on-google-cloud-123456/python:3.6.4
+    steps:
+      - checkout
+      - run:
+          command: |
+            sudo pip install pipenv
+            pipenv install
+      - run:
+          command: |
+            pipenv run flake8 .
+            pipenv run pytest .
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: tr1
+```
 
 # 4. Managing and orchestrating a workflow
 
