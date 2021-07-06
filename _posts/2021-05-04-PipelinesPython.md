@@ -873,6 +873,26 @@ In the project you've been building so far, you want to enforce that people foll
 Add flake8 to the development section in the Pipfile, which is in the project’s root folder. This file serves a similar purpose as the requirements.txt files you might have seen in other Python projects. It solves some problems with those though. To add flake8 correctly, look at the line that mentions pytest.
 Add flake8 to the .circleci/config.yml file, just before the line that tells CircleCI to run pytest. Make sure to duplicate the syntax of pipenv run. When you have done that, you can optionally execute flake8 from the shell in the project’s root folder with this command: pipenv run flake8. It will show you how many errors and warnings were generated. This is what CircleCI would automatically execute for you and it could stop executing subsequent steps, when this command generates errors, like in this case.
 
+**Pipefile**
+```
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pyspark-stubs = ">=2.4.0"
+pytest = "*"
+flake8 = "*"
+
+[packages]
+pyspark = ">=2.4.0"
+
+[requires]
+python_version = "3.6"
+```
+
+**`config.yml**
 ```
 version: 2
 jobs:
