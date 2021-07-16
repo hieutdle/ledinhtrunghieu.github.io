@@ -316,6 +316,13 @@ tap-marketing-api | target-csv --config ingest/data_lake.conf
 
 # 2. Creating a data transformation pipeline with PySpark
 
+Process data in the data lake in a structured way using PySpark
+
+## 2.1 Basic introduction to PySpark
+
+
+
+
 # 3. Testing your data pipeline
 
 # 4. Managing and orchestrating a workflow
