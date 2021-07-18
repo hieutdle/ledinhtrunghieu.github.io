@@ -320,7 +320,16 @@ Process data in the data lake in a structured way using PySpark
 
 ## 2.1 Basic introduction to PySpark
 
-test
+**Spark**
+* A fast and general engine for large-scale data processing
+* 4 libraries built on top of Spark core:
+<img src="/assets/images/20210501_OOPInPython/pic17.png" class="largepic"/>
+    * **Spark SQL** for manipulating mostly tabular data
+    * **Spark Streaming** for manipulating streaming data 
+    * **MLlib** for machine learning 
+    *  **GraphX** for graph analysis
+* API in several languages
+    * Java, Scala, Python()
 
 
 # 3. Testing your data pipeline
