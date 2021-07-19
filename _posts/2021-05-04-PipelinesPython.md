@@ -331,12 +331,155 @@ Process data in the data lake in a structured way using PySpark
 * API in several languages
     * Java, Scala, Python()
 
+**When to use Spark**
+* Data processing at scale: scales incredibly well to dataset sizes of billions of records by parallelizing its execution over multiple machines. 
+* Interactive analytics: notebooks in which data scientists explore data interactively, validate hypotheses about the data quickly and drill deeper into the results.
+* Machine learning
+
+**Spark is not used for**
+* When you have only little data
+* When you have only simple operations
+
+**Business case: finding the perfect diaper**
+Find the perfect diaper based on:
+* qualitative attributes e.g. comfort
+* quantitative attributes e.g. price
+
+Scraped data available:
+* prices.csv : pricing details per model per store
+* ratings.csv: user ratings per model
+
+
+**Starting the Spark analytics engine**
+```py
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+prices = spark.read.options(header="true").csv("mnt/data_lake/landing/prices.csv")
+
+prices.show()
+```
+<img src="/assets/images/20210501_OOPInPython/pic19.png" class="largepic"/>
+
+**Spark Automatically inferred data types**
+```py
+from pprint import pprint
+pprint(prices.dtypes)
+```
+<img src="/assets/images/20210501_OOPInPython/pic18.png" class="largepic"/>
+
+**Enforcing a schema**
+```py
+schema = StructType([StructField("store", StringType(), nullable=False), 
+                     StructField("countrycode", StringType(), nullable=False), 
+                     StructField("brand", StringType(), nullable=False), 
+                     StructField("price", FloatType(), nullable=False), 
+                     StructField("currency", StringType(), nullable=True), 
+                     StructField("quantity", IntegerType(), nullable=True), 
+                     StructField("date", DateType(), nullable=False)])
+
+prices = spark.read.options(header="true").schema(schema).csv("mnt/data_lake/landing/prices.csv")
+print(prices.dtypes)
+```
+<img src="/assets/images/20210501_OOPInPython/pic20.png" class="largepic"/>
+
+## 2.2. Cleaning data
+
+**Reasons to clean data**
+* Incorrect data types
+* Invalid rows (Especially when parsing manually entered data, from sources such as Microsoft Excel, some rows simply contain bogus information.)
+* Incom plete rows (Sometimes almost all fields in a row are valid, except one or two. These fields are not critical and can be left empty, sometimes they can be given a default value)
+* Badly chosen placeholders (strings such as “N/A” or “Unknown”)
+
+**We can automate data cleaning**
+
+**Select data types**
+<img src="/assets/images/20210501_OOPInPython/pic21.png" class="largepic"/>
+
+**Badly formatted source data**
+```
+cat bad_data.csv	# prints the entire file on stdout
+```
+<img src="/assets/images/20210501_OOPInPython/pic22.png" class="largepic"/>
+
+Spark’s default handling of bad source data
+
+```py
+prices = spark.read.options(header="true").csv('landing/prices.csv')
+
+prices.show()
+```
+<img src="/assets/images/20210501_OOPInPython/pic23.png" class="largepic"/>
+
+
+Spark makes an effort to incorporate the invalid row. That’s not what we want.
+
+**Handle invalid rows**
+```py
+prices = (spark
+          .read
+          .options(header="true", mode="DROPMALFORMED")
+          .csv('landing/prices.csv'))
+```
+<img src="/assets/images/20210501_OOPInPython/pic24.png" class="largepic"/>
+
+**The signigicance of null**
+<img src="/assets/images/20210501_OOPInPython/pic25.png" class="largepic"/>
+
+Sometimes data isn’t malformed, but simply incomplete. In this example, the 2nd row is missing a country code and a quantity. Removing the row entirely is not ideal, as it still contains useful information. As you can see, Spark’s default way of handling this is to fill the blanks with “null”, which is a well-established way to express missing or unknown values.
+
+```py
+
+prices = (spark.read.options(header="true")
+          .schema(schema)
+          .csv('/landing/prices_with_incomplete_rows.csv'))
+prices.show()
+```
+<img src="/assets/images/20210501_OOPInPython/pic26.png" class="largepic"/>
+
+**Supplying default values for missing data**
+```py
+prices.fillna(25, subset=['quantity']).show()
+```
+<img src="/assets/images/20210501_OOPInPython/pic27.png" class="largepic"/>
+You could instruct Spark to fill the missing data with specific values. For that, we use the “fillna” method, which optionally accepts a list of column names as input. Only those columns will be affected, as you can see.
+
+
+**Badly chosen placeholders**
+Example: contracts of employees
+```py
+employees = spark.read.options(header="true").schema(schema).csv('employees.csv')
+```
+<img src="/assets/images/20210501_OOPInPython/pic28.png" class="largepic"/>
+
+People often put placeholders for fields they don’t know the value of. In this example, someone gave an unrealistic date for the end of Alice’s employment contract. Such placeholders are bad for analytics purposes. In most cases, it’s better to have unknown data simply represented by the “null” value. Many libraries have built-in functionality to deal with this appropriately.
+
+**Conditionally replace values**
+```py
+from pyspark.sql.functions import col, when
+from datetime import date, timedelta
+
+one_year_from_now = date.today().replace(year=date.today().year + 1)
+better_frame = employees.withColumn("end_date",
+    when(col("end_date") > one_year_from_now, None).otherwise(col("end_date")))
+better_frame.show()
+```
+<img src="/assets/images/20210501_OOPInPython/pic29.png" class="largepic"/>
+
+Here, we replace the values that are illogical by using a condition in the “when()” function. When the condition is met, we replace the values with Python’s “None”, which in Spark gets translated to “null”. Otherwise, we leave the column unaltered.
+
 
 # 3. Testing your data pipeline
 
+
+
+
+
+
 # 4. Managing and orchestrating a workflow
 
-## 4.1 Modern day workflow management
+## 4.1. Modern day workflow management
 
 **Workflow remind**
 A workflow is a **sequence of tasks** that are either scheduled to run or that **could be triggered** by the occurrence of an event. Workflows are typically used to orchestrate data processing pipelines.
@@ -660,12 +803,6 @@ with dag:
 
     say_hello >> say_world >> shout
 ```
-
-
-
-
-
-
 
 # 5. Reference
 
