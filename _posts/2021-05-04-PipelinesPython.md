@@ -481,6 +481,42 @@ categorized_ratings = ratings.withColumn(
 categorized_ratings.show()
 ```
 
+## 2.3. Transforming data with Spark
+
+**why we need transform data?**
+
+**Process:**
+1. Collect data
+2. “Massage” data: involves cleaning and business logic
+3. Derive insights
+
+**Example:**
+1. Collect data from booking.com  and hotels.com .
+2. Standardize hotelnam es, norm alizing review scores.
+3. Join datasets, filter on location and rank results.
+
+**Common data transformations:**
+1. **Filtering** data (**rows**). It allows us to focus only on the data that are useful for a particular analysis. (Remove rows have country not in Europe)
+<img src="/assets/images/20210501_OOPInPython/pic30.png" class="largepic"/>
+2. **Selecting** and **renaming** **columns** allows us to focus only on fields of interest and possibly renaming them to make their meaning more clear.
+<img src="/assets/images/20210501_OOPInPython/pic31.png" class="largepic"/>
+3. **Grouping and aggerating**: Grouping rows by a particular field and then aggregating some metrics, like the mean price and the number of samples. If you have sales data, for example, you can group it by country, and calculate the total revenue per country.
+<img src="/assets/images/20210501_OOPInPython/pic32.png" class="largepic"/>
+4. **Joining** multiple datasets: Joining DataFrames by linking them through certain fields allows you to add more attributes to records in your data.
+<img src="/assets/images/20210501_OOPInPython/pic33.png" class="largepic"/>
+5. **Ordering** data to prioritize.
+<img src="/assets/images/20210501_OOPInPython/pic34.png" class="largepic"/>
+
+**The prices dataset**
+```py
+prices = spark.read.options(header="true").schema(schema).csv('landing/prices.csv')
+```
+<img src="/assets/images/20210501_OOPInPython/pic35.png" class="largepic"/>
+
+**Filtering and ordering rows**
+
+
+
 
 # 3. Testing your data pipeline
 
