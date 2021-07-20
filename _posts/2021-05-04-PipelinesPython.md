@@ -514,11 +514,155 @@ prices = spark.read.options(header="true").schema(schema).csv('landing/prices.cs
 <img src="/assets/images/20210501_OOPInPython/pic35.png" class="largepic"/>
 
 **Filtering and ordering rows**
+```py
+prices_in_belgium = prices.filter(col('countrycode') == 'BE').orderBy(col('date'))
+```
+<img src="/assets/images/20210501_OOPInPython/pic36.png" class="largepic"/>
+* Function `col` creates Column objects
+* Method `orderBy` sorts values by a certain column
 
+**Selecting, renaming columns and reducing duplicates values**
+```py
+prices.select(
+    col("store"),
+    col("brand").alias("brandname")
+).distinct()
+```
 
+**Grouping and aggregating with `mean()`**
+```py
+(prices
+    .groupBy(col('brand'))
+    .mean('price')
+).show()
 
+# More aggerating function, use agg. method
+(prices
+    .groupBy(col('brand'))
+    .agg(
+        avg('price').alias('average_price'),
+        count('brand').alias('number_of_items')
+        )
+).show()
+```
+
+**Joining related data**
+Executing a join with 2 foreign keys
+```py
+ratings_with_prices = ratings.join(prices, ["brand", "model"])
+```
+<img src="/assets/images/20210501_OOPInPython/pic37.png" class="largepic"/>
+
+**Aggerating practice**
+```py
+from pyspark.sql.functions import col, avg, stddev_samp, max as sfmax
+
+aggregated = (purchased
+              # Group rows by 'Country'
+              .groupBy(col('Country'))
+              .agg(
+                # Calculate the average salary per group
+                avg('Salary').alias('average_salary'),
+                # Calculate the standard deviation per group and rename. stddev_samp()
+                stddev_samp('Salary'),
+                # Retain the highest salary per group and rename
+                sfmax('Salary').alias('highest_salary')
+              )
+             )
+
+aggregated.show()
+```
+
+## 2.4. Packaging the application
+
+**Running pipeline locally**
+```py
+python hello_world.py
+```
+
+**Using `spark-submit` helper program
+`spark-submit`comes with any Spark installation
+1.	script helps setting up the launch environment in a manner appropriate for the cluster manager and the selected deploy mode. 
+2.	invokes main class/app/module/function or main method.
+<img src="/assets/images/20210501_OOPInPython/pic38.png" class="largepic"/>
+
+**Basic arguments of “spark-submit”**
+<img src="/assets/images/20210501_OOPInPython/pic39.png" class="largepic"/>
+
+**Collecting alldependencies in one archive**
+<img src="/assets/images/20210501_OOPInPython/pic40.png" class="largepic"/>
+* The `--py-files` option can take a comma separated list of files that will be added on each worker’s PYTHONPATH, which lists the places where the Python interpreter will look for modules. Zip files are a common way to package and distribute your code. 
+* invoke the `zip` utility, enabling it to recursively add all files in all subfolders, by passing the `--recurse-paths` flag.
+* Provide a name for the resulting compressed archive and finally provide the name of the folder you want to compress. 
+* The resulting zip file can be passed as is to `spark-submit`’s `--py-files` argument.
 
 # 3. Testing your data pipeline
+
+Stating “it works on my machine” is not a guarantee it will work reliably elsewhere and in the future. Requirements for your project will change. In this chapter, we explore different forms of testing and learn how to write unit tests for our PySpark data transformation pipeline, so that we make robust and reusable parts.
+
+## 3.1. The importance of tests
+
+**Software tends to change**
+Common reasons for change:
+* New functionality desired
+* Bugs need to get squashed
+* Perform ance needs to be improved
+
+Core functionality should rarely evolves
+How to ensure stability in light of changes ?
+
+**Rationale behind testing**
+The answer is tests. Tests are written and executed to assert our expectations are matched. By committing tests to our code base, we have a written copy of our expectations as they were at some time in the past. 
+* improves chance of code being correct in the future 
+    * reduces the chances of introducing breaking changes. 
+If you need to change a small function somewhere so that it returns a tuple, rather than a single object, how sure are you that that function wasn’t used elsewhere where it required the return value to be a single object? Without tests, you would not be informed until this function was called. This is costly.
+Automated tests help in preventing this. Tests are rarely exhaustive though. A function that tests whether a certain day is a holiday, would need to test every day of every year to be sure it works.
+You would need a lookup table of thousands of records. Clearly this is insane. Instead, we choose to test only a few samples. Therefore, tests don’t assert correctness in all cases. But they raise confidence that our expectations are met in a few cases and that already is a very good reason to have them.
+
+So test also:
+* raises confidence (not a guarantee) that code is correct now
+    * assert actuals match expectations
+
+Another great argument for the need of tests is that they are the most up-to-date form of documentation. 
+
+* Oftentimes, people write documents describing the functionality of some piece of software manually. That’s fine, as long as the description remains high-level. Details about certain functions should be avoided, because they have a tendency to grow out of sync with what’s actually running. A well-written test can clarify what a piece of code does, even if it treats that piece as a black box. There are more reasons to test code, but these three reasons alone should provide sufficient incentive to have them.
+
+**The test pyram id: where to invest your efforts**
+* Thinking what to test
+* Writing tests
+* Running tests
+
+Testing has a high return on investm ent
+* When targeted at the correct layer
+* When testing the non-trivialparts, e.g. distance between 2 coordinates ? uppercasing a first name
+Sometimes people avoid writing tests, because it takes time they believe is better spent on adding more features to software. While it is true that testing takes time, it is an investment that pays back as your project gets bigger, especially when tests aren’t duplicated at different places and test non-trivial parts.
+
+A useful concept to keep in mind when designing tests, is the test pyramid. It tells you where to invest your efforts. 
+
+<img src="/assets/images/20210501_OOPInPython/pic41.png" class="largepic"/>
+
+* Testing pieces of code that do not rely on integration with external components are unit tests.These can run fast and their development effort is cheap. An example of this is a data cleaning function that transforms all variations of yes and no strings to proper booleans. Because these tests run so fast, you should have many of them.
+* Interactions with file systems and databases are integration tests or service tests, as they integrate different services or components. They run more slowly and their setup also takes more effort. You can have less of them, because your unit tests should already cover some parts, like the conversion to booleans before inserting records into a database.
+* The same goes for end-to-end tests, which often mimic the experience a user would get when interacting through a user interface (UI). They’re even more costly, as they run slowly and are often difficult to write robustly, but are close to the end-user’s experience.
+
+<img src="/assets/images/20210501_OOPInPython/pic42.png" class="largepic"/>
+
+## 3.2. Writing unit tests for PySpark
+
+**ETL pipeline**
+<img src="/assets/images/20210501_OOPInPython/pic43.png" class="largepic"/>
+
+**Separate transform from extract and load**
+
+```
+prices_with_ratings = spark.read.csv(…) # extract exchange_rates = spark.read.csv(…) # extract
+
+unit_prices_with_ratings = (prices_with_ratings
+                            .join(…) # transform
+                            .withColumn(…))	# transform
+```
+
+
 
 
 
