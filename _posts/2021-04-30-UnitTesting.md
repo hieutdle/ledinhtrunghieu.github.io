@@ -11,15 +11,18 @@ In this chapter, you will get introduced to the pytest package and use it to wri
 
 ## 1.1. Why unit test?
 
+
 **How can we test an implementation**
 
-The easiest way is to open an interpreter, test the function on a few arguments and check whether the return value is correct. 
+Suppose we have just implemented a Python function. How can we test whether our implementation is correct? The easiest way is to open an interpreter, test the function on a few arguments and check whether the return value is correct. If correct, we can accept the implementation and move on. While testing on the interpreter is easy, it is actually very inefficient. This will become clear if we think about the big picture of a function's life cycle in a data science project.
 
 ```python
 my_function(argument_1)
 my_function(argument_2)
 my_function(argument_3)
 ```
+<img src="/assets/images/20210430_UnitTesting/pic24.png" class="largepic"/>
+
 **Life cycle of a function**
 
 <img src="/assets/images/20210430_UnitTesting/pic1.png" class="largepic"/>
@@ -395,6 +398,7 @@ def test_on_six_rows():
 
 ## 2.2. Testing for exceptions instead of return values
 
+So far, we have used the assert statement to check if a function returns the expected value. However, some functions may not return anything, but rather raise an exception, when called on certain arguments.
 **Example**
 
 ```python
