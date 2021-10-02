@@ -25,6 +25,7 @@ There are four general steps through which **data flows** within an organization
 3. Once the data is clean and organized, it can be **exploited**. We explore it, visualize it, build dashboards to track changes or compare two sets of data.
 4. Finally, once we have a good grasp of our data, we're ready to **run experiments**, like evaluate which article title gets the most hits, or to build predictive models, for example to forecast stock prices.
 
+<img src="/assets/images/20210422_DEForEveryone/pic11.png" class="largepic"/>
 
 ## 1.2. Data Engineer's responsibilities
 
@@ -37,6 +38,7 @@ Data engineers:
 * Remove corrupted data (manage data corruption)
 * Develop, construct, test, and maintain architectures such as databases and large-scale processing systems to process and handle massive amounts of data. 
 
+<img src="/assets/images/20210422_DEForEveryone/pic12.png" class="largepic"/>
 
 ## 1.3. Big Data
 
@@ -109,6 +111,9 @@ Some albums data can be extracted and stored directly. For example, album cover 
 
 In a nutshell, **data pipelines** ensure the data flows efficiently through the organization. They automate extracting, transforming, combining, validating, and loading data, to reduce human intervention and errors, and decrease the time it takes for data to flow through the organization.
 
+<img src="/assets/images/20210422_DEForEveryone/pic13.png" class="largepic"/>
+
+<img src="/assets/images/20210422_DEForEveryone/pic14.png" class="largepic"/>
 
 ## 1.6. Introduction to ETL
 
@@ -180,6 +185,8 @@ We can use AI to search and organize unstructured data or add information to mak
 
 **Database schema**: Databases are made of many tables. The database schema governs how tables are related.
 
+<img src="/assets/images/20210422_DEForEveryone/pic15.png" class="largepic"/>
+
 
 ## 2.3. Data Warehouses, Data Lakes and Data Catalog
 
@@ -227,6 +234,9 @@ Database:
 
 Data warehouse is a type of database
 
+<img src="/assets/images/20210422_DEForEveryone/pic16.png" class="largepic"/>
+
+
 
 # 3. Moving and Processing Data
 
@@ -247,6 +257,8 @@ Data warehouse is a type of database
 * Store data in a sanely structured database
 * Create views on top of the database tables
 * Optimizing the performance of the database
+
+<img src="/assets/images/20210422_DEForEveryone/pic17.png" class="largepic"/>
 
 
 ## 3.2. Views
@@ -273,9 +285,12 @@ There are different ways to glue things together:
 
 Sensor scheduling sounds like the best option but it requires having sensor always listening to see if somethings been added. This requires more resources and may not be worth it in this case. Manual and automated systems can also also work together: if a user manually upgrades their subscription tier on the app, automated tasks need to propagate this information to other parts of the system, to unlock new features and update billing information.
 
+<img src="/assets/images/20210422_DEForEveryone/pic18.png" class="largepic"/>
+
 Software: Apache Spark
 
 <img src="/assets/images/20210422_DEForEveryone/pic8.png" class="largepic"/>
+
 
 **Batches and streams**
 
