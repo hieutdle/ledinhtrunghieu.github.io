@@ -304,6 +304,11 @@ Software: Apache Spark
 
 There's a third option called real-time, used for example in fraud detection, but for the sake of simplification and because streaming is almost always real-time, we will consider them to be the same in this blog.
 
+**Batch processing** can be scheduled when resources aren't being used elsewhere, which makes it cheap. 
+**Stream processing**, on the other hand is used if you need the latest data: the urgency of showing the latest data help you decide if you need it.
+
+<img src="/assets/images/20210422_DEForEveryone/pic19.png" class="largepic"/>
+
 Software: Apache Airflow and Luigi
 
 <img src="/assets/images/20210422_DEForEveryone/pic9.png" class="largepic"/>
@@ -329,6 +334,7 @@ Risks:
 * Communication time (splitting a task into subtasks and merging the results of the subtasks back into one final result requires some communication between processes). In other words, if you have 2 processing units, a task that takes a few hundred milliseconds might not be worth splitting up. Additionally, due to the overhead, the speed does not increase linearly. 
 * This effect is also called parallel slowdown.Therefore, task needs to be large and you need several processing units to be worth the splitting up.
 
+<img src="/assets/images/20210422_DEForEveryone/pic20.png" class="largepic"/>
 
 ## 3.5. Cloud computing
 
@@ -381,6 +387,9 @@ Disadvantages:
 * Some services from one provider may not be compatible with services from another one
 * Make managing security and governance harder.
 
+<img src="/assets/images/20210422_DEForEveryone/pic21.png" class="largepic"/>
+
+<img src="/assets/images/20210422_DEForEveryone/pic22.png" class="largepic"/>
 
 # 4. Reference
 

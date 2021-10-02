@@ -26,13 +26,15 @@ Data engineer to the rescue!
 * Optimized the database scheme so it becomes faster to query. 
 * Removed corrupt data
 
+Data Engineers set up scheduled ingestion of data from the application databases to an analytical database.
+
 Data Engineer make your life as a data scientist easier.
 
 **Data engineer's Definition**: An engineer that develops, constructs, tests, and maintains architectures such as databases and large-scale processing systems.
 
 **The data engineer nowadays** is focused on processing and handling massive amounts of data, and setting up clusters of machines to do the computing.
 
-**Different between Data Engineer and Data Analyst**
+**Different between Data Engineer and Data Scientist**
 
 Data Engineer: 
 * Develop scalable data architecture
@@ -47,6 +49,10 @@ Data Scientist:
 * Building predictive models using machine learning
 * Developing tools to monitor essential business processes
 * Cleaning data by removing statistical outliers
+
+Data Engineer problem example: Data scientists are querying the online store databases directly and slowing down the functioning of the application since it's using the same database.
+
+<img src="/assets/images/20210423_IntroductiontoDE/pic34.png" class="largepic"/>
 
 ## 1.2. Tools of the data engineer
 
