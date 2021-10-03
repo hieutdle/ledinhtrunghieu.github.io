@@ -109,6 +109,9 @@ You can think of the data engineering **pipeline** through this diagram. It **ex
 
 You can see my last post about cloud computing [here](https://ledinhtrunghieu.github.io/2021/04/22/DEForEveryone.html#35-cloud-computing) 
 
+<img src="/assets/images/20210423_IntroductiontoDE/pic35.png" class="largepic"/>
+
+
 # 2. Data Engineering toolbox
 
 Now that you know the primary differences between a data engineer and a data scientist, get ready to explore the data engineer's toolbox! Learn in detail about different types of databases data engineers use, how parallel computing is a cornerstone of the data engineer's toolkit, and how to schedule data processing jobs using scheduling frameworks.
@@ -122,6 +125,9 @@ Now that you know the primary differences between a data engineer and a data sci
 * Organizes data
 * Retrieve/Search data through DBMS
 * A usually large collection of data organized especially for rapid search and retrieval
+
+<img src="/assets/images/20210423_IntroductiontoDE/pic36.png" class="largepic"/>
+
 
 **Database vs Storage file system**: The main difference between databases and simple storage systems like file systems is the **level of organization** and the fact that the database management systems abstract away a lot of **complicated data operations** like search, replication and much more. File systems host less such functionality.
 
@@ -769,6 +775,7 @@ As I mentioned before, there are two different types of databases.
 **Column- and row-oriented**
 
 **Column-oriented**:  In a column-oriented database, we store data per column.  There are multiple reasons why this is optimal for analytics. Without getting too technical, you can think of analytical queries to be mostly about a small subset of columns in a table. By storing data per column, it's faster to loop over these specific columns to resolve a query. In a row-oriented system, we would lose time skipping unused columns for each row. Column-oriented databases also lend themselves better to parallelization.
+
 **Row-oriented**: Most application databases are row-oriented. That means we store data per record, which makes it easy to add new rows in small transactions. For example, in a row-oriented database, adding a customer record is easy and fast.
 
 **Massive Parallel Processing Databases (MPP Databases)**
