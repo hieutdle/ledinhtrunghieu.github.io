@@ -32,18 +32,25 @@ doubled_numbers = [x * 2 for x in numbers]
 
 **The Zen of Python by Tim Peters**
 ```
-Beautiful is better than ugly. 
-Explicit is better than implicit. 
+Beautiful is better than ugly.
+Explicit is better than implicit.
 Simple is better than complex.
 Complex is better than complicated.
 Flat is better than nested.
-Sparse is better than dense. 
+Sparse is better than dense.
 Readability counts.
-Special cases aren't special enough to break the rules. 
+Special cases aren't special enough to break the rules.
 Although practicality beats purity.
-Errors should never pass silently. 
+Errors should never pass silently.
 Unless explicitly silenced.
 In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Although that way may not be obvious at first unless you're Dutch.
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!
 ```
 
 **Example**:
@@ -164,6 +171,14 @@ print(list(sqrd_nums))
 **Example**
 You can convert the range object into a list by using the list() function or by unpacking it into a list using the star character (*)
 ```python
+# Create a range object that goes from 0 to 5
+nums = range(0,6)
+print(type(nums))
+
+# Convert nums to a list
+nums_list = list(nums)
+print(nums_list)
+
 # Create a new list of odd numbers from 1 to 11 by unpacking a range object
 nums_list2 = [*range(1,12,2)]
 print(nums_list2)
@@ -349,6 +364,19 @@ guest_welcomes = [*welcome_map]
 print(*guest_welcomes, sep='\n')
 ```
 
+```
+[10, 20, 30, 40, 50]
+
+[ 7 17 27 37 47]
+
+[('Jerry', 7), ('Kramer', 17), ('Elaine', 27), ('George', 37), ('Newman', 47)]
+
+Welcome to Festivus Jerry... You're 7 min late.
+Welcome to Festivus Kramer... You're 17 min late.
+Welcome to Festivus Elaine... You're 27 min late.
+Welcome to Festivus George... You're 37 min late.
+Welcome to Festivus Newman... You're 47 min late.
+```
 # 2. Timing and profiling code
 Learn how to gather and compare runtimes between different coding approaches. Practice using the line_profiler and memory_profiler packages to profile your code base and spot bottlenecks. Then, you'll put your learnings to practice by replacing these bottlenecks with efficient Python code.
 
@@ -361,6 +389,7 @@ Learn how to gather and compare runtimes between different coding approaches. Pr
     * Link to docs [here](https://ipython.readthedocs.io/en/stable/interactive/magics.html)
     * See all available magic commands with `%lsmagic`
 
+<img src="/assets/images/20210425_EfficientPython/pic27.png" class="largepic"/>
 
 **Using `%timeit`**
 Code to be timed
@@ -454,6 +483,20 @@ nums_unpack = [*range(50)]
 print(nums_unpack)
 ```
 
+```
+%timeit nums_list_comp = [num for num in range(51)]
+2.09 us +- 124 ns per loop (mean +- std. dev. of 7 runs, 1000000 loops each)
+%timeit nums_list_comp = nums_unpack = [*range(50)]
+390 ns +- 4.14 ns per loop (mean +- std. dev. of 7 runs, 1000000 loops each)
+```
+**What is the correct syntax when using %timeit and only using 5 runs with 25 loops per each run?**
+```python
+# A list of 480 superheroes has been loaded into your session (called heroes). You'd like to analyze the runtime for converting this heroes list into a set. Instead of relying on the default settings for %timeit, you'd like to only use 5 runs and 25 loops per each run.
+
+
+
+```
+
 ```python
 # Create a list using the formal name
 formal_list = list()
@@ -462,18 +505,46 @@ print(formal_list)
 # Create a list using the literal syntax
 literal_list = []
 print(literal_list)
+
+# Print out the type of formal_list
+print(type(formal_list))
+
+# Print out the type of literal_list
+print(type(literal_list))
+
+# Using the literal syntax ([]) to create a list is faster.
 ```
 
+```
+[]
+[]
+<class 'list'>
+<class 'list'>
+```
+
+
+
+
+
 ```python
+
 In [2]:
+
 %%timeit hero_wts_lbs = []
 for wt in wts:
     hero_wts_lbs.append(wt * 2.20462)
+
 746 us +- 9.66 us per loop (mean +- std. dev. of 7 runs, 1000 loops each)
+
 In [3]:
+
 %%timeit wts_np = np.array(wts)
 hero_wts_lbs_np = wts_np * 2.20462
+
 948 ns +- 51.5 ns per loop (mean +- std. dev. of 7 runs, 1000000 loops each)
+
+
+The numpy technique was faster.
 ```
 
 ## 2.2. Code profiling for runtime
@@ -506,6 +577,16 @@ def convert_units(heroes, heights, weights):
 
     return hero_data
 ```
+
+Suppose you have a list of superheroes (named heroes) along with each hero's height (in centimeters) and weight (in kilograms) loaded as NumPy arrays (named hts and wts respectively).
+**What are the necessary steps you need to take in order to profile the convert_units() function acting on your superheroes data if you'd like to see line-by-line runtimes?**
+* Use `%load_ext line_profiler` to load the `line_profiler` within your IPython session.
+* Use `%lprun -f convert_units convert_units(heroes, hts, wts)` to get line-by-line runtimes
+
+<img src="/assets/images/20210425_EfficientPython/pic28.png" class="largepic"/>
+
+
+
 ```python
 convert_units(heroes, hts, wts)
 ```
@@ -528,7 +609,7 @@ A lot of manual work and not very efficientn
 * Using `line_profiler` package
 
 ```
-%load_exit line_profiler
+%load_ext line_profiler
 ```
 Magic command for line-by-line times
 ```
@@ -536,6 +617,19 @@ Magic command for line-by-line times
 ```
 
 <img src="/assets/images/20210425_EfficientPython/pic6.png" class="largepic"/>
+
+* First, We use the -f flag to indicate we'd like to profile a function.
+* Next, we specify the name of the function we'd like to profile. Note, the name of the function is passed without any parentheses.
+* Finally, we provide the exact function call we'd like to profile by including any arguments that are needed.
+
+The output from %lprun provides a nice table that summarizes the profiling statistics.
+1. First, a column specifying the line number followed by a column displaying the number of times that line was executed (called the Hits column).
+2. Next, the Time column shows the total amount of time each line took to execute. This column uses a specific timer unit that can be found in the first line of the output. Here, the timer unit is listed in microseconds using scientific notation.
+3. The Per Hit column gives the average amount of time spent executing a single line. This is calculated by dividing the Time column by the Hits column.
+4. The % Time column shows the percentage of time spent on a line relative to the total amount of time spent in the function. This can be a nice way to see which lines of code are taking up the most time within a function.
+5. Finally, the source code is displayed for each line in the Line Contents column.
+
+<img src="/assets/images/20210425_EfficientPython/pic29.png" class="largepic"/>
 
 ## 2.3. Code profiling for memory usage
 
@@ -580,6 +674,32 @@ from hero_funcs import convert_units
 %mprun -f convert_units convert_units(heroes, hts, wts)
 ```
 <img src="/assets/images/20210425_EfficientPython/pic7.png" class="largepic"/>
+
+```python
+In [3]:
+%load_ext memory_profiler
+In [4]:
+from bmi_lists import calc_bmi_lists
+In [5]:
+%mprun -f calc_bmi_lists calc_bmi_lists(sample_indices, hts, wts)
+Filename: /tmp/tmpfz_omoyf/bmi_lists.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+     1     91.9 MiB     91.9 MiB   def calc_bmi_lists(sample_indices, hts, wts):
+     2                             
+     3                                 # Gather sample heights and weights as lists
+     4     92.4 MiB      0.3 MiB       s_hts = [hts[i] for i in sample_indices]
+     5     93.2 MiB      0.3 MiB       s_wts = [wts[i] for i in sample_indices]
+     6                             
+     7                                 # Convert heights from cm to m and square with list comprehension
+     8     94.3 MiB      0.4 MiB       s_hts_m_sqr = [(ht / 100) ** 2 for ht in s_hts]
+     9                             
+    10                                 # Calculate BMIs as a list with list comprehension
+    11     95.0 MiB      0.3 MiB       bmis = [s_wts[i] / s_hts_m_sqr[i] for i in range(len(sample_indices))]
+    12                             
+    13     95.0 MiB      0.0 MiB       return bmis
+```
 
 
 * Small memory allocations could result in 0.0 MiB output.
@@ -725,28 +845,54 @@ print(combos)
 <img src="/assets/images/20210425_EfficientPython/pic12.png" class="largepic"/>
 
 **Practice**
+
 ```python
+
+The first five items in the names list are: ['Abomasnow', 'Abra', 'Absol', 'Accelgor', 'Aerodactyl']
+
+The first five items in the primary_types list are: ['Grass', 'Psychic', 'Dark', 'Bug', 'Rock']
+
+The first five items in the secondary_types list are: ['Ice', nan, nan, nan, 'Flying']
+
 # Combine names and primary_types
 names_type1 = [*zip(names, primary_types)]
 
 print(*names_type1[:5], sep='\n')
+
+
+<script.py> output:
+    ('Abomasnow', 'Grass')
+    ('Abra', 'Psychic')
+    ('Absol', 'Dark')
+    ('Accelgor', 'Bug')
+    ('Aerodactyl', 'Rock')
 
 # Combine all three lists together
 names_types = [*zip(names,primary_types,secondary_types)]
 
 print(*names_types[:5], sep='\n')
 
+
+<script.py> output:
+    ('Abomasnow', 'Grass', 'Ice')
+    ('Abra', 'Psychic', nan)
+    ('Absol', 'Dark', nan)
+    ('Accelgor', 'Bug', nan)
+    ('Aerodactyl', 'Rock', 'Flying')
+
 # Combine five items from names and three items from primary_types
 differing_lengths = [*zip(names[:5],(primary_types[:3]))]
 
 print(*differing_lengths, sep='\n')
+
+
+<script.py> output:
+    ('Abomasnow', 'Grass')
+    ('Abra', 'Psychic')
+    ('Absol', 'Dark')
 ```
 
-```
-('Abomasnow', 'Grass')
-('Abra', 'Psychic')
-('Absol', 'Dark')
-```
+
 
 ```python
 # Collect the count of primary types

@@ -782,6 +782,26 @@ query = """SELECT * FROM hpd311calls
 # Query the database
 brooklyn_calls = pd.read_sql(query, engine) print(brookyn_calls.borough.unique())
 ```
+**Selecting rows**
+```python
+# Create query to get hpd311calls records about safety
+query = """
+SELECT *
+FROM hpd311calls
+WHERE complaint_type = 'SAFETY';
+"""
+
+# Query the database and assign result to safety_calls
+safety_calls = pd.read_sql(query,engine)
+
+# Graph the number of safety calls by borough
+call_counts = safety_calls.groupby('borough').unique_key.count()
+call_counts.plot.barh()
+plt.show()
+```
+<img src="/assets/images/20210424_ImportData/pic46.png" class="largepic"/>
+
+
 
 **Combining conditions: AND and OR**
 ```python
@@ -1140,6 +1160,40 @@ print(df.head(4))
 ```
 <img src="/assets/images/20210424_ImportData/pic4.png" class="largepic"/>
 
+**Flatten nested JSONs**
+```python
+# Load json_normalize()
+from pandas.io.json import json_normalize
+
+# Isolate the JSON data from the API response
+data = response.json()
+
+# Flatten business data into a data frame, replace separator
+cafes = json_normalize(data["businesses"],
+             sep="_")
+
+# View data
+print(cafes.head())
+```
+
+```python
+flat_cafes = json_normalize(data["businesses"],
+							sep="_",
+							record_path="categories", 
+							meta=["name",
+								"alias",
+								"rating",
+								["coordinates", "latitude"], 
+								["coordinates", "longitude"]],
+								meta_prefix="biz_")
+
+
+# View the data
+print(flat_cafes.head())
+```
+
+
+<img src="/assets/images/20210424_ImportData/pic47.png" class="largepic"/>
 
 ## 4.4. Combining multiple datasets
 
