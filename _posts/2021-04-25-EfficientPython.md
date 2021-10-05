@@ -933,7 +933,7 @@ combos_2 = [*combos_obj]
 print(combos_2, '\n')
 
 # Collect all possible combinations of 4 Pokémon directly into a list
-combos_4 = [*combinations(pokemon,4)]n
+combos_4 = [*combinations(pokemon,4)]
 print(combos_4)
 ```
 
@@ -1055,6 +1055,10 @@ print(ash_only)
 # Find the Pokémon that are in only one set (not both)
 unique_to_set = ash_set.symmetric_difference(misty_set)
 print(unique_to_set)
+
+{'Squirtle', 'Psyduck'}
+{'Koffing', 'Spearow', 'Zubat', 'Wigglytuff', 'Rattata', 'Vulpix', 'Pikachu', 'Bulbasaur'}
+{'Koffing', 'Spearow', 'Zubat', 'Starmie', 'Slowbro', 'Krabby', 'Poliwag', 'Magikarp', 'Vaporeon', 'Wigglytuff', 'Tentacool', 'Rattata', 'Vulpix', 'Horsea', 'Pikachu', 'Bulbasaur'}
 ```
 
 ```python
@@ -1062,13 +1066,45 @@ print(unique_to_set)
 brock_pokedex_set = set(brock_pokedex)
 print(brock_pokedex_set)
 
+{'Geodude', 'Zubat', 'Tauros', 'Onix', 'Dugtrio', 'Golem', 'Vulpix', 'Kabutops', 'Machop', 'Omastar'}
+
 # Check if Psyduck is in Ash's list and Brock's set
 print('Psyduck' in ash_pokedex)
 print('Psyduck' in brock_pokedex_set)
 
+True
+False
+
 # Check if Machop is in Ash's list and Brock's set
 print("Machop" in ash_pokedex)
 print("Psyduck" in brock_pokedex_set)
+
+False
+False
+```
+**Gathering unique Pokémon**
+```python
+A sample of 500 Pokémon has been created with replacement (meaning a Pokémon could be selected more than once and duplicates exist within the sample).
+
+Three lists have been loaded into your session:
+
+The names list contains the names of each Pokémon in the sample.
+The primary_types list containing the corresponding primary type of each Pokémon in the sample.
+The generations list contains the corresponding generation of each Pokémon in the sample.
+The below function was written to gather unique values from each list:
+
+def find_unique_items(data):
+    uniques = []
+
+    for item in data:
+        if item not in uniques:
+            uniques.append(item)
+
+    return uniques
+```
+
+```python
+
 ```
 
 ## 3.3. Eliminating loops
