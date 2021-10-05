@@ -1104,7 +1104,21 @@ def find_unique_items(data):
 ```
 
 ```python
+# Use find_unique_items() to collect unique Pokémon names
+uniq_names_func = find_unique_items(names)
+print(len(uniq_names_func))
 
+# Convert the names list to a set to collect unique Pokémon names
+uniq_names_set = set(names)
+print(len(uniq_names_set))
+
+# Check that both unique collections are equivalent
+print(sorted(uniq_names_func) == sorted(uniq_names_set))
+
+# Use the best approach to collect unique primary types and generations
+uniq_types = set(primary_types)
+uniq_gens = set(generations)
+print(uniq_types, uniq_gens, sep='\n') 
 ```
 
 ## 3.3. Eliminating loops
@@ -1178,6 +1192,11 @@ print(avgs)
 avgs_np = poke_stats.mean(axis=1) 
 print(avgs_np)
 ```
+
+**Gathering Pokémon without a loop**
+A list containing 720 Pokémon has been loaded into your session as poke_names. Another list containing each Pokémon's corresponding generation has been loaded as poke_gens.
+
+A for loop has been created to filter the Pokémon that belong to generation one or two, and collect the number of letters in each Pokémon's name
 
 ```python
 
@@ -1280,7 +1299,17 @@ print(poke_data)
 ```
 
 **Practice**:
-
+Bad function:
+```python
+for gen,count in gen_counts.items():
+    total_count = len(generations)
+    gen_percent = round(count / total_count * 100, 2)
+    print(
+      'generation {}: count = {:3} percentage = {}'
+      .format(gen, count, gen_percent)
+    )
+```
+Improve:
 ```python
 # Import Counter
 from collections import Counter
@@ -1294,8 +1323,25 @@ for gen,count in gen_counts.items():
     gen_percent = round(count / total_count * 100, 2)
     print('generation {}: count = {:3} percentage = {}'
           .format(gen, count, gen_percent))
+
+           
+<script.py> output:
+    generation 4: count = 112 percentage = 15.56
+    generation 1: count = 151 percentage = 20.97
+    generation 3: count = 136 percentage = 18.89
+    generation 5: count = 154 percentage = 21.39
+    generation 2: count =  99 percentage = 13.75
+    generation 6: count =  68 percentage = 9.44
 ```
 ```python
+# Original fuction
+enumerated_pairs = []
+
+for i,pair in enumerate(possible_pairs, 1):
+    enumerated_pair_tuple = (i,) + pair
+    enumerated_pair_list = list(enumerated_pair_tuple)
+    enumerated_pairs.append(enumerated_pair_list)
+
 # Collect all possible pairs using combinations()
 possible_pairs = [*combinations(pokemon_types, 2)]
 
@@ -1310,7 +1356,31 @@ for i,pair in enumerate(possible_pairs, 1):
 # Convert all tuples in enumerated_tuples to a list
 enumerated_pairs = [*map(list, enumerated_tuples)]
 print(enumerated_pairs)
+
+[[1, 'Bug', 'Dark'], [2, 'Bug', 'Dragon'], [3, 'Bug', 'Electric'], [4, 'Bug', 'Fairy'], [5, 'Bug', 'Fighting'], [6, 'Bug', 'Fire'], [7, 'Bug', 'Flying'], [8, 'Bug', 'Ghost'], [9, 'Bug', 'Grass'], [10, 'Bug', 'Ground'], [11, 'Bug', 'Ice'], [12, 'Bug', 'Normal'], [13, 'Bug', 'Poison'], [14, 'Bug', 'Psychic'], [15, 'Bug', 'Rock'], [16, 'Bug', 'Steel'], [17, 'Bug', 'Water'], [18, 'Dark', 'Dragon'], [19, 'Dark', 'Electric'], [20, 'Dark', 'Fairy'], [21, 'Dark', 'Fighting'], [22, 'Dark', 'Fire'], [23, 'Dark', 'Flying'], [24, 'Dark', 'Ghost'], [25, 'Dark', 'Grass'], [26, 'Dark', 'Ground'], [27, 'Dark', 'Ice'], [28, 'Dark', 'Normal'], [29, 'Dark', 'Poison'], [30, 'Dark', 'Psychic'],... , [150, 'Psychic', 'Water'], [151, 'Rock', 'Steel'], [152, 'Rock', 'Water'], [153, 'Steel', 'Water']]
 ```
+
+**Pokémon z-scores**
+
+A list of 720 Pokémon has been loaded into your session as names. Each Pokémon's corresponding Health Points is stored in a NumPy array called hps. You want to analyze the Health Points using the z-score to see how many standard deviations each Pokémon's HP is from the mean of all HPs.
+
+Original code:
+```python
+poke_zscores = []
+
+for name,hp in zip(names, hps):
+    hp_avg = hps.mean()
+    hp_std = hps.std()
+    z_score = (hp - hp_avg)/hp_std
+    poke_zscores.append((name, hp, z_score))
+
+highest_hp_pokemon = []
+
+for name,hp,zscore in poke_zscores:
+    if zscore > 2:
+        highest_hp_pokemon.append((name, hp, zscore))
+```
+
 ```python
 # Calculate the total HP avg and total HP standard deviation
 hp_avg = hps.mean()
@@ -1322,6 +1392,10 @@ z_scores = (hps - hp_avg)/hp_std
 # Combine names, hps, and z_scores
 poke_zscores2 = [*zip(names, hps, z_scores)]
 print(*poke_zscores2[:3], sep='\n')
+
+('Abomasnow', 80.0, 0.46797638117739043)
+('Abra', 60.0, -0.3271693284337512)
+('Absol', 131.0, 2.4955979406858013)
 ```
 
 ```python
@@ -1339,6 +1413,28 @@ print(*poke_zscores2[:3], sep='\n')
 # Use list comprehension with the same logic as the highest_hp_pokemon code block
 highest_hp_pokemon2 = [(name, hp, zscore) for name,hp,zscore in poke_zscores2 if zscore > 2]
 print(*highest_hp_pokemon2, sep='\n')
+
+('Abomasnow', 80.0, 0.46797638117739043)
+('Abra', 60.0, -0.3271693284337512)
+('Absol', 131.0, 2.4955979406858013)
+('Absol', 131.0, 2.4955979406858013)
+('Bonsly', 127.0, 2.3365687987635733)
+('Caterpie', 122.0, 2.137782371360788)
+('Cofagrigus', 133.0, 2.575112511646916)
+('Cresselia', 126.0, 2.296811513283016)
+('Dewgong', 122.0, 2.137782371360788)
+('Druddigon', 126.0, 2.296811513283016)
+('Froakie', 123.0, 2.1775396568413448)
+('Kadabra', 135.0, 2.65462708260803)
+('Klang', 123.0, 2.1775396568413448)
+('Kricketune', 122.0, 2.137782371360788)
+('Lumineon', 129.0, 2.4160833697246873)
+('Magnemite', 137.0, 2.734141653569144)
+('Nidorina', 119.0, 2.0185105149191167)
+('Onix', 126.0, 2.296811513283016)
+('Prinplup', 124.0, 2.217296942321902)
+('Skuntank', 128.0, 2.3763260842441305)
+('Swellow', 125.0, 2.2570542278024592)
 ```
 
 # 4. Intro to pandas DataFrame iteration
@@ -1411,6 +1507,41 @@ for i,row in pit_df.iterrows():
     print(row)
     print(type(row))
 ```
+```
+0
+Team         PIT
+League        NL
+Year        2012
+RS           651
+RA           674
+W             79
+G            162
+Playoffs       0
+Name: 0, dtype: object
+<class 'pandas.core.series.Series'>
+1
+Team         PIT
+League        NL
+Year        2011
+RS           610
+RA           712
+W             72
+G            162
+Playoffs       0
+...
+4
+Team         PIT
+League        NL
+Year        2008
+RS           735
+RA           884
+W             67
+G            162
+Playoffs       0
+Name: 4, dtype: object
+<class 'pandas.core.series.Series'>
+```
+
 
 ```
 <class 'pandas.core.series.Series'>
@@ -1424,6 +1555,34 @@ for row_tuple in pit_df.iterrows():
 ```
 
 ```
+(0, Team         PIT
+League        NL
+Year        2012
+RS           651
+RA           674
+W             79
+G            162
+Playoffs       0
+Name: 0, dtype: object)
+<class 'tuple'>
+(1, Team         PIT
+League        NL
+Year        2011
+RS           610
+RA           712
+W             72
+G            162
+Playoffs       0
+...
+(4, Team         PIT
+League        NL
+Year        2008
+RS           735
+RA           884
+W             67
+G            162
+Playoffs       0
+Name: 4, dtype: object)
 <class 'tuple'>
 ```
 
@@ -1434,6 +1593,16 @@ If using i,row, you can access things from the row using square brackets (i.e., 
 With either approach, using `.iterrows()` will still be substantially faster than using `.iloc`.
 
 ```python
+
+# Original function
+def calc_run_diff(runs_scored, runs_allowed):
+
+    run_diff = runs_scored - runs_allowed
+
+    return run_diff
+
+#Improved:
+
 # Create an empty list to store run differentials
 run_diffs = []
 
@@ -1451,7 +1620,16 @@ for i,row in giants_df.iterrows():
 giants_df['RD'] = run_diffs
 print(giants_df)
 ```
+```
 
+<script.py> output:
+      Team League  Year   RS   RA   W    G  Playoffs   RD
+    0  SFG     NL  2012  718  649  94  162         1   69
+    1  SFG     NL  2011  570  578  86  162         0   -8
+    2  SFG     NL  2010  697  583  92  162         1  114
+    3  SFG     NL  2009  657  611  88  162         0   46
+    4  SFG     NL  2008  640  759  72  162         0 -119
+```
 ## 4.2. Another iterator method: .itertuples()
 
 **Iterating with .iterrows()**
@@ -1507,17 +1685,53 @@ When using `.iterrows()`, we can use square brackets to reference a column withi
 When using `.itertuples()`, we have to use a dot when referring to a column within our DataFrame
 
 **Practice**
+**Iterating with .itertuples()**
+```python
+# Loop over the DataFrame and print each row
+for row in rangers_df.itertuples():
+  print(row)
 
+Pandas(Index=0, Team='TEX', League='AL', Year=2012, RS=808, RA=707, W=93, G=162, Playoffs=1)
+Pandas(Index=1, Team='TEX', League='AL', Year=2011, RS=855, RA=677, W=96, G=162, Playoffs=1)
+...
+Pandas(Index=35, Team='TEX', League='AL', Year=1974, RS=690, RA=698, W=83, G=161, Playoffs=0)
+Pandas(Index=36, Team='TEX', League='AL', Year=1973, RS=619, RA=844, W=57, G=162, Playoffs=0)
+```
 ```python
 # Loop over the DataFrame and print each row's Index, Year and Wins (W)
 for row in rangers_df.itertuples():
   i = row.Index
   year = row.Year
   wins = row.W
-  
+
+0 2012 93
+1 2011 96
+2 2010 90
+...
+33 1976 76
+34 1975 79
+35 1974 83
+36 1973 57
+
   # Check if rangers made Playoffs (1 means yes; 0 means no)
   if row.Playoffs == 1:
     print(i,year, wins)
+
+<script.py> output:
+    0 2012 93
+    1 2011 96
+    2 2010 90
+    13 1999 95
+    14 1998 88
+    16 1996 90
+```
+**Run differentials with .itertuples()**
+```python
+def calc_run_diff(runs_scored, runs_allowed):
+
+    run_diff = runs_scored - runs_allowed
+
+    return run_diff
 
 run_diffs = []
 
@@ -1536,6 +1750,13 @@ yankees_df['RD'] = run_diffs
 # Sort to take highest run differential
 final_df = yankees_df.sort_values(by=['RD'], ascending=False)
 print(final_df )
+
+<script.py> output:
+       Team League  Year   RS   RA    W    G  Playoffs   RD
+    0   NYY     AL  2012  804  668   95  162         1  136
+    1   NYY     AL  2011  867  657   97  162         1  210
+    2   NYY     AL  2010  859  693   95  162         1  166
+    3   NYY     AL  2009  915  753  103  162         1  162
 ```
 
 ## 4.3. pandas alternative to looping
@@ -1558,6 +1779,12 @@ baseball_df['RD'] = run_diffs_iterrows
 * Example:
 
 ```python
+def calc_run_diff(runs_scored, runs_allowed):
+
+    run_diff = runs_scored - runs_allowed
+
+    return run_diff
+
 baseball_df.apply(
     lambda row: calc_run_diff(row['RS'], row['RA']), 
     axis=1
@@ -1580,27 +1807,106 @@ Faster than iterrows.
 # Gather sum of all columns
 stat_totals = rays_df.apply(sum, axis=0)
 
+RS          3783
+RA          3265
+W            458
+Playoffs       3
+dtype: int64
+
 
 # Gather total runs scored in all games per year
 total_runs_scored = rays_df[['RS', 'RA']].apply(sum, axis=1)
 
+2012    1274
+2011    1321
+2010    1451
+2009    1557
+2008    1445
+dtype: int64
+
+def text_playoffs(num_playoffs): 
+    if num_playoffs == 1:
+        return 'Yes'
+    else:
+        return 'No' 
+
 # Convert numeric playoffs to text by applying text_playoffs()
 textual_playoffs = rays_df.apply(lambda row: text_playoffs(row['Playoffs']), axis=1)
+
+2012     No
+2011    Yes
+2010    Yes
+2009     No
+2008    Yes
+dtype: object
+
 
 # Display the first five rows of the DataFrame
 print(dbacks_df.head())
 
-# Create a win percentage Series 
+  Team League  Year   RS   RA   W    G  Playoffs
+0  ARI     NL  2012  734  688  81  162         0
+1  ARI     NL  2011  731  662  94  162         1
+2  ARI     NL  2010  713  836  65  162         0
+3  ARI     NL  2009  720  782  70  162         0
+4  ARI     NL  2008  720  706  82  162         0
+
+# Create a win percentage Series
+def calc_win_perc(wins, games_played):
+    win_perc = wins / games_played
+    return np.round(win_perc,2)
+ 
 win_percs = dbacks_df.apply(lambda row: calc_win_perc(row['W'], row['G']), axis=1)
 print(win_percs, '\n')
+
+0     0.50
+1     0.58
+2     0.40
+3     0.43
+4     0.51
+5     0.56
+6     0.47
+7     0.48
+8     0.31
+9     0.52
+10    0.60
+11    0.57
+12    0.52
+13    0.62
+14    0.40
+dtype: float64 
 
 # Append a new column to dbacks_df
 dbacks_df['WP'] = win_percs
 print(dbacks_df, '\n')
 
+   Team League  Year   RS   RA    W    G  Playoffs    WP
+0   ARI     NL  2012  734  688   81  162         0  0.50
+1   ARI     NL  2011  731  662   94  162         1  0.58
+4   ARI     NL  2008  720  706   82  162         0  0.51
+5   ARI     NL  2007  712  732   90  162         1  0.56
+9   ARI     NL  2003  717  685   84  162         0  0.52
+10  ARI     NL  2002  819  674   98  162         1  0.60
+11  ARI     NL  2001  818  677   92  162         1  0.57
+12  ARI     NL  2000  792  754   85  162         0  0.52
+13  ARI     NL  1999  908  676  100  162         1  0.62
+
+
+# The manager who claimed the team has not made the playoffs every year they've had a win percentage of 0.50 or greater.
+
 # Display dbacks_df where WP is greater than 0.50
 print(dbacks_df[dbacks_df['WP'] >= 0.50])
 
+   Team League  Year   RS   RA    W    G  Playoffs    WP
+0   ARI     NL  2012  734  688   81  162         0  0.50
+1   ARI     NL  2011  731  662   94  162         1  0.58
+4   ARI     NL  2008  720  706   82  162         0  0.51
+5   ARI     NL  2007  712  732   90  162         1  0.56
+9   ARI     NL  2003  717  685   84  162         0  0.52
+10  ARI     NL  2002  819  674   98  162         1  0.60
+11  ARI     NL  2001  818  677   92  162         1  0.57
+12  ARI     NL  2000  792  754   85  162         0  0.52
+13  ARI     NL  1999  908  676  100  162         1  0.62
 ```
 
 ## 4.4. Optimal pandas iterating
@@ -1647,6 +1953,60 @@ baseball_df['RD'] = run_diffs_np
 
 **Last Practice**
 ```python
+OrderedDict([('Team', 'Abbreviated team name'),
+             ('League', 'Specifies National League or American League'),
+             ('Year', "Each season's year"),
+             ('RS', 'Runs scored in a season'),
+             ('RA', 'Runs allowed in a season'),
+             ('W', 'Wins in a season'),
+             ('G', 'Games played in a season'),
+             ('Playoffs', '`1` if a team made the playoffs; `0` if they did not'),
+             ('WP', 'True win percentage for a season')])
+```
+
+```python
+def calc_win_perc(wins, games_played):
+    win_perc = wins / games_played
+    return np.round(win_perc,2)
+
+win_percs_list = []
+
+for i in range(len(baseball_df)):
+    row = baseball_df.iloc[i]
+
+    wins = row['W']
+    games_played = row['G']
+
+    win_perc = calc_win_perc(wins, games_played)
+
+    win_percs_list.append(win_perc)
+
+baseball_df['WP'] = win_percs_list
+```
+
+```python
+# Use the W array and G array to calculate win percentages
+win_percs_np = calc_win_perc(baseball_df['W'].values, baseball_df['G'].values)
+
+# Append a new column to baseball_df that stores all win percentages
+baseball_df['WP'] = win_percs_np
+
+print(baseball_df.head())
+
+<script.py> output:
+      Team League  Year   RS   RA   W    G  Playoffs    WP
+    0  ARI     NL  2012  734  688  81  162         0  0.50
+    1  ATL     NL  2012  700  600  94  162         1  0.58
+    2  BAL     AL  2012  712  705  93  162         1  0.57
+    3  BOS     AL  2012  734  806  69  162         0  0.43
+    4  CHC     NL  2012  613  759  61  162         0  0.38
+```
+
+```python
+def predict_win_perc(RS, RA):
+    prediction = RS ** 2 / (RS ** 2 + RA ** 2)
+    return np.round(prediction, 2)
+
 win_perc_preds_loop = []
 
 # Use a loop and .itertuples() to collect each row's predicted win percentage
@@ -1659,11 +2019,34 @@ for row in baseball_df.itertuples():
 # Apply predict_win_perc to each row of the DataFrame
 win_perc_preds_apply = baseball_df.apply(lambda row: predict_win_perc(row['RS'], row['RA']), axis=1)
 
+print(win_perc_preds_apply)
+0       0.53
+1       0.58
+2       0.50
+...
+1229    0.62
+1230    0.58
+1231    0.41
+Length: 1232, dtype: float64
+
+
 # Calculate the win percentage predictions using NumPy arrays
 win_perc_preds_np = predict_win_perc(baseball_df['RS'].values, baseball_df['RA'].values)
 baseball_df['WP_preds'] = win_perc_preds_np
 print(baseball_df.head())
+
+  Team League  Year   RS   RA   W    G  Playoffs    WP  WP_preds
+0  ARI     NL  2012  734  688  81  162         0  0.50      0.53
+1  ATL     NL  2012  700  600  94  162         1  0.58      0.58
+2  BAL     AL  2012  712  705  93  162         1  0.57      0.50
+3  BOS     AL  2012  734  806  69  162         0  0.43      0.45
+4  CHC     NL  2012  613  759  61  162         0  0.38      0.39
+
+
 ```
+
+**After `%timeit` test, Using NumPy arrays was the fastest approach, followed by the `.itertuples()` approach, and the `.apply()` approach was slowest.**
+
 
 # 5. Reference
 
