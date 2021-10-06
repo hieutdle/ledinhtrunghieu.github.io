@@ -30,7 +30,7 @@ An **absolute path** is like a latitude and longitude: it has the same value no 
 
 As examples: 
 * If you are in the directory `/home/repl`, the relative path `seasonal` specifies the same directory as the absolute path `/home/repl/seasonal`.
-* If you are in the directory `/home/repl/seasonal`, the relative path `winter.csv` specifies the same file as the absolute `path /home/repl/seasonal/winter.csv`.
+* If you are in the directory `/home/repl/seasonal`, the relative path `winter.csv` specifies the same file as the absolute path `/home/repl/seasonal/winter.csv`.
 
 **Move to another directory**
 `cd`: change directory
@@ -55,11 +55,16 @@ cp original.txt duplicate.txt
 
 creates a copy of `original.txt` called `duplicate.txt`. If there already was a file called `duplicate.txt`, it is overwritten. If the last parameter to cp is an existing directory, then a command like:
 
+**Make a copy of seasonal/summer.csv in the backup directory (which is also in /home/repl), calling the new file summer.bck.**
+```
+cp seasonal/summer.csv backup/summer.bck
+```
+
+**Copy spring.csv and summer.csv from the seasonal directory into the backup directory without changing your current working directory (/home/repl).**
 ```
 cp seasonal/autumn.csv seasonal/winter.csv backup
 ```
 
-copies all of the files into that directory (backup)
 
 **Move files**
 `mv`: moves
@@ -70,6 +75,12 @@ copies all of the files into that directory (backup)
 mv course.txt old-course.txt
 ```
 then the file `course.txt` in the current working directory is "moved" to the file `old-course.txt`. This is different from the way file browsers work, but is often handy.
+
+**You are in /home/repl, which has sub-directories seasonal and backup. Using a single command, move spring.csv and summer.csv from seasonal to backup.**
+
+```bash
+mv seasonal/spring.csv seasonal/summer.csv backup
+```
 
 **Delete files**
 `rm`: removes,unlike graphical file browsers, the shell doesn't have a trash can, so when you type the command above, your thesis is gone for good.
@@ -96,9 +107,17 @@ Since a directory is not a file, you must use the command `mkdir` directory_name
 **View a file's contents**
 `cat`: prints the contents of files onto the screen. (Its name is short for "concatenate", meaning "to link things together", since it will print all the files whose names you give it, one after the other.)
 
+```
+cat course.txt
+```
+
 **view a file's contents piece by piece**
 When you `less` a file, one page is displayed at a time; you can press spacebar to page down or type q to quit.
 If you give `less` the names of several files, you can type `:n` (colon and a lower-case 'n') to move to the next file, `:p` to go back to the previous one, or `:q` to quit.
+
+```
+less seasonal/spring.csv seasonal/summer.csv
+```
 
 **Look at the start of a file**
 `head` seasonal/summer.csv
@@ -114,6 +133,13 @@ head -n 3 seasonal/summer.csv
 will only display the first three lines of the file. If you run head `-n 100`, it will display the first 100 (assuming there are that many), and so on.
 
 A flag's name usually indicates its purpose (for example, `-n` is meant to signal "number of lines"). Command flags don't have to be a - followed by a single letter, but it's a widely-used convention.
+
+
+**Display the first 5 lines of winter.csv in the seasonal directory.**
+```
+$ head -n 5 seasonal/winter.csv
+```
+
 
 **List everything below a directory**
 
@@ -156,6 +182,7 @@ The one-line description under NAME tells you briefly what the command does, and
 
 Use `tail` with the flag -n +7 to display all but the first six lines of seasonal/spring.csv.
 
+
 **Select columns from a file?**
 
 ```
@@ -181,10 +208,47 @@ Ranjit"
 Rupinder"
 ```
 
+**What is the output of cut -d : -f 2-4 on the line:**
+```
+first:second:third:
+```
+
+```
+second:third:
+```
+
+
+
+
 **Repeat commands**
 
 `history` will print a list of commands you have run recently. Each one is preceded by a serial number to make it easy to re-run particular commands: just type `!55` to re-run the 55th command in your history
 You can also re-run a command by typing an exclamation mark followed by the command's name, such as `!head` or `!cut`, which will re-run the most recent use of that command.
+
+```
+$ head summer.csv
+head: cannot open 'summer.csv' for reading: No such file or directory
+```
+
+```
+$ cd seasonal
+$ !head
+head summer.csv
+Date,Tooth
+2017-01-11,canine
+2017-01-18,wisdom
+2017-01-21,bicuspid
+2017-02-02,molar
+2017-02-27,wisdom
+2017-02-27,wisdom
+2017-03-07,bicuspid
+2017-03-15,wisdom
+2017-03-20,canine
+```
+Use `history` to look at what you have done.
+
+
+
 
 **Select lines containing specific values**
 
@@ -200,8 +264,13 @@ some of `grep`'s more common flags:
 * `-n`: print line numbers for matching lines
 * `-v`: invert the match, i.e., only show lines that don't match
 
-Invert the match to find all of the lines that don't contain the word molar in seasonal/spring.csv, and show their line numbers
 
+Print the contents of all of the lines containing the word molar in seasonal/autumn.csv by running a single command while in your home directory. Don't use any flags.
+```
+grep molar seasonal/autumn.csv
+```
+
+Invert the match to find all of the lines that don't contain the word molar in seasonal/spring.csv, and show their line numbers
 ```
 grep -v -n molar seasonal/spring.csv
 ```
@@ -210,6 +279,8 @@ Count how many lines contain the word `incisor` in `autumn.csv` and `winter.csv`
 
 ```
 grep -c incisor seasonal/autumn.csv  seasonal/winter.csv
+
+
 ```
 
 **Why isn't it always safe to treat data as text?**
@@ -286,6 +357,12 @@ The shell has other wildcards as well, though they are less commonly used:
 * `[...]` matches any one of the characters inside the square brackets, so `201[78].txt` matches `2017.txt` or `2018.txt`, but not `2016.txt`.
 * `{...}` matches any of the comma-separated patterns inside the curly brackets, so `{*.txt, *.csv}` matches any file whose name ends with .txt or .csv, but not files whose names end with `.pdf`.
 
+**Which expression would match singh.pdf and johel.txt but not sandhu.pdf or sandhu.txt?**
+```
+{singh.pdf, j*.txt}
+```
+
+
 **Sort lines of text**
 
 `sort` puts data in order. By default it does this in ascending alphabetical order, but the flags `-n` and `-r` can be used to sort numerically and reverse the order of its output, while `-b` tells it to ignore leading blanks and `-f` tells it to fold case (i.e., be case-insensitive). Pipelines often use `grep` to get rid of unwanted records and then sort to put the remaining records in order.
@@ -361,6 +438,11 @@ To get the variable's value, you must put a dollar sign `$` in front of it. Typi
 
 echo `$USER` prints `repl`
 
+```
+$ echo $OSTYPE
+linux-gnu
+```
+
 **How else does the shell store information**
 
 The other kind of variable is called a **shell variable**, which is like a local variable in a programming language.
@@ -372,6 +454,12 @@ training=seasonal/summer.csv
 ```
 echo $training
 seasonal/summer.csv
+```
+
+```
+$ testing=seasonal/winter.csv
+$ head -n 1 $testing
+Date,Tooth
 ```
 
 **Repeat a command many times**
@@ -485,9 +573,15 @@ Unix has a bewildering variety of text editors. For this course, we will use a s
 **How can I record what I just did**
 ```
 head steps.txt
-    2  cp seasonal/spring.csv seasonal/summer.csv ~
-    3  grep -h -v Tooth spring.csv summer.csv > temp.csv
-    4  history | tail -n 3 > steps.csv
+
+Copy the files seasonal/spring.csv and seasonal/summer.csv to your home directory.
+cp seasonal/spring.csv seasonal/summer.csv ~
+    
+Use grep with the -h flag (to stop it from printing filenames) and -v Tooth (to select lines that don't match the header line) to select the data records from spring.csv and summer.csv in that order and redirect the output to temp.csv.
+grep -h -v Tooth spring.csv summer.csv > temp.csv
+
+Pipe history into tail -n 3 and redirect the output to steps.txt to save the last three commands in a file. (You need to save three instead of just two because the history command itself will be in the list.)
+history | tail -n 3 > steps.csv
 ```
 
 **Save commands to re-run later?**
@@ -555,9 +649,24 @@ bash column.sh seasonal/autumn.csv 1
 
 Notice how the script uses the two parameters in reverse order.
 
+
+The script get-field.sh is supposed to take a filename, the number of the row to select, the number of the column to select, and print just that field from a CSV file. For example:
+
+bash get-field.sh seasonal/summer.csv 4 2
+should select the second field from line 4 of seasonal/summer.csv. Which of the following commands should be put in get-field.sh to do that?
+
+```
+head -n $2 $1 | tail -n 1 | cut -d , -f $3
+```
+
 **How can one shell script do many things?**
 
 Our shells scripts so far have had a single command or pipe, but a script can contain many lines of commands. For example, you can create one that tells you how many records are in the shortest and longest of your data files, i.e., the range of your datasets' lengths.
+
+Note that in Nano, "copy and paste" is achieved by navigating to the line you want to copy, pressing CTRL + K to cut the line, then CTRL + U twice to paste two copies of it.
+
+As a reminder, to save what you have written in Nano, type Ctrl + O to write the file out, then Enter to confirm the filename, then Ctrl + X to exit the editor.
+
 
 **How can I write loops in a shell script?**
 
