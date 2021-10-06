@@ -129,6 +129,49 @@ print(inspect.getdoc(the_answer))
 ```
 <img src="/assets/images/20210426_FunctionsInPython/pic2.png" class="largepic"/>
 
+```python
+def count_letter(content, letter):
+  """Count the number of times `letter` appears in `content`.
+
+  Args:
+    content (str): The string to search.
+    letter (str): The letter to search for.
+
+  Returns:
+    int
+
+  # Add a section detailing what errors might be raised
+  Raises:
+    ValueError: If `letter` is not a one-character string.
+  """
+  if (not isinstance(letter, str)) or len(letter) != 1:
+    raise ValueError('`letter` must be a single character string.')
+  return len([char for char in content if char == letter])
+```
+
+```python
+import inspect
+
+def build_tooltip(function):
+  """Create a tooltip for any function that shows the
+  function's docstring.
+
+  Args:
+    function (callable): The function we want a tooltip for.
+
+  Returns:
+    str
+  """
+  # Get the docstring for the "function" argument by using inspect
+  docstring = inspect.getdoc(function)
+  border = '#' * 28
+  return '{}\n{}\n{}'.format(border, docstring, border)
+
+print(build_tooltip(count_letter))
+print(build_tooltip(range))
+print(build_tooltip(print))
+```
+
 
 ## 1.2. DRY and "Do One Thing"
 
@@ -224,6 +267,89 @@ def plot_data(X):
 * Simpler to debug
 * Easier to change
 
+**Extract a function**
+```python
+# Standardize the GPAs for each year
+df['y1_z'] = (df.y1_gpa - df.y1_gpa.mean()) / df.y1_gpa.std()
+df['y2_z'] = (df.y2_gpa - df.y2_gpa.mean()) / df.y2_gpa.std()
+df['y3_z'] = (df.y3_gpa - df.y3_gpa.mean()) / df.y3_gpa.std()
+df['y4_z'] = (df.y4_gpa - df.y4_gpa.mean()) / df.y4_gpa.std()
+```
+
+```python
+def standardize(column):
+  """Standardize the values in a column.
+
+  Args:
+    column (pandas Series): The data to standardize.
+
+  Returns:
+    pandas Series: the values as z-scores
+  """
+  # Finish the function so that it returns the z-scores
+  z_score = (column - column.mean()) / column.std()
+  return z_score
+
+# Use the standardize() function to calculate the z-scores
+df['y1_z'] = standardize(df.y1_gpa)
+df['y2_z'] = standardize(df.y2_gpa)
+df['y3_z'] = standardize(df.y3_gpa)
+df['y4_z'] = standardize(df.y4_gpa)
+```
+
+**Split up the a function**
+```python
+def mean_and_median(values):
+  """Get the mean and median of a sorted list of `values`
+
+  Args:
+    values (iterable of float): A list of numbers
+
+  Returns:
+    tuple (float, float): The mean and median
+  """
+  mean = sum(values) / len(values)
+  midpoint = int(len(values) / 2)
+  if len(values) % 2 == 0:
+    median = (values[midpoint - 1] + values[midpoint]) / 2
+  else:
+    median = values[midpoint]
+
+  return mean, median
+```
+```python
+def mean(values):
+  """Get the mean of a sorted list of values
+
+  Args:
+    values (iterable of float): A list of numbers
+
+  Returns:
+    float
+  """
+  # Write the mean() function
+  mean = sum(values) / len(values)
+  return mean
+
+def median(values):
+  """Get the median of a sorted list of values
+
+  Args:
+    values (iterable of float): A list of numbers
+
+  Returns:
+    float
+  """
+  # Write the median() function
+  midpoint = int(len(values) / 2)
+  if len(values) % 2 == 0:
+    median = (values[midpoint - 1] + values[midpoint]) / 2
+  else:
+    median = values[midpoint]
+  return median
+```
+
+
 ## 1.3. Pass by assignment
 
 <img src="/assets/images/20210426_FunctionsInPython/pic2.png" class="largepic"/>
@@ -233,6 +359,73 @@ In Python, integers are immutable, meaning they can't be changed.
 <img src="/assets/images/20210426_FunctionsInPython/pic4.png" class="largepic"/>
 
 There are only a few immutable data types in Python because almost everything is represented as an object. The only way to tell if something is mutable is to see if there is a function or method that will change the object without assigning it to a new variable.
+
+```python
+def store_lower(_dict, _string):
+  """Add a mapping between `_string` and a lowercased version of `_string` to `_dict`
+
+  Args:
+    _dict (dict): The dictionary to update.
+    _string (str): The string to add.
+  """
+  orig_string = _string
+  _string = _string.lower()
+  _dict[orig_string] = _string
+
+d = {}
+s = 'Hello'
+
+store_lower(d, s)
+```
+
+```
+d = {'Hello': 'hello'}, s = 'Hello'
+
+Dictionaries are mutable objects in Python, so the function can directly change it in the `_dict[_orig_string] = _string` statement. Strings, on the other hand, are immutable. When the function creates the lowercase version, it has to assign it to the `_string` variable. This disconnects what happens to `_string` from the external `s` variable.
+```
+
+
+**Best practice for default arguments**
+One of your co-workers (who obviously didn't take this course) has written this function for adding a column to a pandas DataFrame. Unfortunately, they used a mutable variable as a default argument value! Please show them a better way to do this so that they don't get unexpected behavior.
+
+```python
+def add_column(values, df=pandas.DataFrame()):
+  """Add a column of `values` to a DataFrame `df`.
+  The column will be named "col_<n>" where "n" is
+  the numerical index of the column.
+
+  Args:
+    values (iterable): The values of the new column
+    df (DataFrame, optional): The DataFrame to update.
+      If no DataFrame is passed, one is created by default.
+
+  Returns:
+    DataFrame
+  """
+  df['col_{}'.format(len(df.columns))] = values
+  return df
+
+# Use an immutable variable for the default argument
+def better_add_column(values, df=None):
+  """Add a column of `values` to a DataFrame `df`.
+  The column will be named "col_<n>" where "n" is
+  the numerical index of the column.
+
+  Args:
+    values (iterable): The values of the new column
+    df (DataFrame, optional): The DataFrame to update.
+      If no DataFrame is passed, one is created by default.
+
+  Returns:
+    DataFrame
+  """
+  # Update the function to create a default DataFrame
+  if df is None:
+    df = pandas.DataFrame()
+  df['col_{}'.format(len(df.columns))] = values
+  return df
+```
+
 
 # 2. Context Managers
 
@@ -270,6 +463,18 @@ with <context-manager>(<args>) as <variable-name>:
 ```
 
 **Practice**
+```python
+# Open "alice.txt" and assign the file to "file"
+with open('alice.txt') as file:
+  text = file.read()
+
+n = 0
+for word in text.split():
+  if word.lower() in ['cat', 'cats']:
+    n += 1
+
+print('Lewis Carroll uses the word "cat" {} times'.format(n))
+```
 
 ```python
 image = get_image_from_instagram()
@@ -283,6 +488,14 @@ with timer():
 with timer():
   print('Pytorch version')
   process_with_pytorch(image)
+
+<script.py> output:
+    Numpy version
+    Processing..........done!
+    Elapsed: 1.52 seconds
+    Pytorch version
+    Processing..........done!
+    Elapsed: 0.33 seconds
 ```
 
 ## 2.2. Writing context managers
@@ -365,12 +578,49 @@ with database(url) as my_db:
     os.chdir(old_dir)
 ```
 
-```pyhon
+```python
 with in_dir('/data/project_1/'): 
     project_files = os.listdir()
 ```
 
 **Practice**
+```python
+# Add a decorator that will make timer() a context manager
+@contextlib.contextmanager
+def timer():
+  """Time the execution of a context block.
+
+  Yields:
+    None
+  """
+  start = time.time()
+  # Send control back to the context block
+  yield
+  end = time.time()
+  print('Elapsed: {:.2f}s'.format(end - start))
+
+with timer():
+  print('This should take approximately 0.25 seconds')
+  time.sleep(0.25)
+
+<script.py> output:
+    This should take approximately 0.25 seconds
+    Elapsed: 0.25s
+```
+
+**A read-only open() context manager**
+
+```
+The regular open() context manager:
+
+takes a filename and a mode ('r' for read, 'w' for write, or 'a' for append)
+opens the file for reading, writing, or appending
+yields control back to the context, along with a reference to the file
+waits for the context to finish
+and then closes the file before exiting
+Your context manager will do the same thing, except it will only take the filename as an argument and it will only open the file for reading.
+```
+
 ```python
 @contextlib.contextmanager
 def open_read_only(filename):
@@ -390,9 +640,12 @@ def open_read_only(filename):
 
 with open_read_only('my_file.txt') as my_file:
   print(my_file.read())
+
+<script.py> output:
+    Congratulations! You wrote a context manager that acts like "open()" but operates in read-only mode!
 ```
 
-## 1.3. Advanced topics
+## 2.3. Advanced topics
 
 **Nested context**
 
@@ -496,6 +749,19 @@ with stock('NVDA') as nvda:
       value = nvda.price()
       print('Logging ${:.2f} for NVDA'.format(value))
       f_out.write('{:.2f}\n'.format(value))
+
+Opening stock ticker for NVDA
+Logging $140.39 for NVDA
+Logging $140.33 for NVDA
+Logging $140.27 for NVDA
+Logging $140.23 for NVDA
+Logging $140.20 for NVDA
+Logging $140.28 for NVDA
+Logging $140.34 for NVDA
+Logging $140.39 for NVDA
+Logging $140.29 for NVDA
+Logging $140.27 for NVDA
+Closing stock ticker
 ```
 
 ```python
@@ -612,6 +878,18 @@ new_func('This is a sentence.')
 **Practice**
 
 ```python
+def has_docstring(func):
+  """Check to see if the function 
+  `func` has a docstring.
+
+  Args:
+    func (callable): A function.
+
+  Returns:
+    bool
+  """
+  return func.__doc__ is not None
+
 # Call has_docstring() on the log_product() function
 ok = has_docstring(log_product)
 
@@ -639,6 +917,9 @@ print('5 + 2 = {}'.format(add(5, 2)))
 
 subtract = create_math_function('subtract')
 print('5 - 2 = {}'.format(subtract(5, 2)))
+
+5 + 2 = 7
+5 - 2 = 3
 ```
 
 ## 3.2. Scope
@@ -651,6 +932,104 @@ print('5 - 2 = {}'.format(subtract(5, 2)))
 
 **The global keyword**
 Note that Python only gives you read access to variables defined outside of your current scope. If what we had really wanted was to change the value of x in the global scope, then we have to declare that we mean the global x by using the global keyword. 
+
+**Understanding scope**
+```python
+x = 50
+
+def one():
+  x = 10
+
+def two():
+  global x
+  x = 30
+
+def three():
+  x = 100
+  print(x)
+
+for func in [one, two, three]:
+  func()
+  print(x)
+
+
+50, 30, 100, 30
+```
+
+**Modifying variables outside local scope**
+
+```python
+call_count = 0
+
+def my_function():
+  # Use a keyword that lets us update call_count 
+  global call_count
+  call_count += 1
+  
+  print("You've called my_function() {} times!".format(
+    call_count
+  ))
+  
+for _ in range(20):
+  my_function()
+
+You've called my_function() 1 times!
+You've called my_function() 2 times!
+You've called my_function() 3 times!
+You've called my_function() 4 times!
+You've called my_function() 5 times!
+...
+You've called my_function() 19 times!
+You've called my_function() 20 times!
+```
+
+
+```python
+def read_files():
+  file_contents = None
+  
+  def save_contents(filename):
+    # Add a keyword that lets us modify file_contents
+    nonlocal file_contents
+    if file_contents is None:
+      file_contents = []
+    with open(filename) as fin:
+      file_contents.append(fin.read())
+      
+  for filename in ['1984.txt', 'MobyDick.txt', 'CatsEye.txt']:
+    save_contents(filename)
+    
+  return file_contents
+
+print('\n'.join(read_files()))
+
+
+It was a bright day in April, and the clocks were striking thirteen.
+Call me Ishmael.
+Time is not a line but a dimension, like the dimensions of space.
+```
+
+
+```python
+def wait_until_done():
+  def check_is_done():
+    # Add a keyword so that wait_until_done() 
+    # doesn't run forever
+    global done
+    if random.random() < 0.1:
+      done = True
+      
+  while not done:
+    check_is_done()
+
+done = False
+wait_until_done()
+
+print('Work done? {}'.format(done))
+
+Work done? True
+```
+
 
 
 ```python
@@ -818,9 +1197,13 @@ closure_values = [
   my_func.__closure__[i].cell_contents for i in range(2)
 ]
 print(closure_values == [2, 17])
+
+True
+True
+True
 ```
 
-## 4.4. Decorators
+## 3.4. Decorators
 
 
 <img src="/assets/images/20210426_FunctionsInPython/pic12.png" class="largepic"/>
@@ -995,6 +1378,63 @@ def bar():
 def baz():
     # do something else
 ```
+**Practice**
+
+**Print the return type**
+```python
+def print_return_type(func):
+  # Define wrapper(), the decorated function
+  def wrapper(*args, **kwargs):
+    # Call the function being decorated
+    result = func(*args, **kwargs)
+    print('{}() returned type {}'.format(
+      func.__name__, type(result)
+    ))
+    return result
+  # Return the decorated function
+  return wrapper
+  
+@print_return_type
+def foo(value):
+  return value
+  
+print(foo(42))
+print(foo([1, 2, 3]))
+print(foo({'a': 42}))
+
+<script.py> output:
+    foo() returned type <class 'int'>
+    42
+    foo() returned type <class 'list'>
+    [1, 2, 3]
+    foo() returned type <class 'dict'>
+    {'a': 42}
+```
+**Counter**
+```python
+def counter(func):
+  def wrapper(*args, **kwargs):
+    wrapper.count += 1
+    # Call the function being decorated and return the result
+    return func(*args, **kwargs)
+  wrapper.count = 0
+  # Return the new decorated function
+  return wrapper
+
+# Decorate foo() with the counter() decorator
+@counter
+def foo():
+  print('calling foo()')
+  
+foo()
+foo()
+
+print('foo() was called {} times.'.format(foo.count))
+
+calling foo()
+calling foo()
+foo() was called 2 times.
+```
 
 ## 4.2. Decorators and metadata
 
@@ -1060,20 +1500,29 @@ If we use this updated version of the timer() decorator to decorate sleep_n_seco
 
 **Decorate print_sum() with the add_hello() decorator to replicate the issue that your friend saw - that the docstring disappears.**
 ```python
+from functools import wraps
+
 def add_hello(func):
+  # Decorate wrapper() so that it keeps func()'s metadata
+  @wraps(func)
   def wrapper(*args, **kwargs):
+    """Print 'hello' and then call the decorated function."""
     print('Hello')
     return func(*args, **kwargs)
   return wrapper
-
-# Decorate print_sum() with the add_hello() decorator
+  
 @add_hello
 def print_sum(a, b):
   """Adds two numbers and prints the sum"""
   print(a + b)
   
 print_sum(10, 20)
-print(print_sum.__doc__)
+print_sum_docstring = print_sum.__doc__
+print(print_sum_docstring)
+
+Hello
+30
+Adds two numbers and prints the sum
 ```
 
 ```python
@@ -1095,6 +1544,11 @@ undecorated_time = t_end - t_start
 
 print('Decorated time: {:.5f}s'.format(decorated_time))
 print('Undecorated time: {:.5f}s'.format(undecorated_time))
+
+Finished checking inputs
+Finished checking outputs
+Decorated time: 1.51298s
+Undecorated time: 0.00007s
 ```
 
 ## 4.3. Decorators that take arguments
@@ -1175,6 +1629,100 @@ def hello_goodbye(name):
   
 print(hello_goodbye('Alice'))
 ```
+
+**Practice**
+`**Run_n_times()**`
+
+```python
+def run_n_times(n):
+  """Define and return a decorator"""
+  def decorator(func):
+    def wrapper(*args, **kwargs):
+      for i in range(n):
+        func(*args, **kwargs)
+    return wrapper
+  return decorator
+
+# Use run_n_times() to create the run_five_times() decorator
+run_five_times = run_n_times(5)
+
+@run_five_times
+def print_sum(a, b):
+  print(a + b)
+  
+print_sum(4, 100)
+```
+
+```python
+# Modify the print() function to always run 20 times
+print = run_n_times(20)(print)
+
+print('What is happening?!?!')
+
+What is happening?!?!
+What is happening?!?!
+What is happening?!?!
+...
+```
+
+**HTML Generator**
+```python
+def bold(func):
+  @wraps(func)
+  def wrapper(*args, **kwargs):
+    msg = func(*args, **kwargs)
+    return '<b>{}</b>'.format(msg)
+  return wrapper
+def italics(func):
+  @wraps(func)
+  def wrapper(*args, **kwargs):
+    msg = func(*args, **kwargs)
+    return '<i>{}</i>'.format(msg)
+  return wrapper
+
+def html(open_tag, close_tag):
+  def decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+      msg = func(*args, **kwargs)
+      return '{}{}{}'.format(open_tag, msg, close_tag)
+    # Return the decorated function
+    return wrapper
+  # Return the decorator
+  return decorator
+
+# Make hello() return bolded text
+@html('<b>', '</b>')
+def hello(name):
+  return 'Hello {}!'.format(name)
+
+print(hello('Alice'))
+
+<b>Hello Alice!</b>
+
+# Make goodbye() return italicized text
+@html('<i>', '</i>')
+def goodbye(name):
+  return 'Goodbye {}.'.format(name)
+  
+print(goodbye('Alice'))
+
+<i>Goodbye Alice.</i>
+
+# Wrap the result of hello_goodbye() in <div> and </div>
+@html('<div>', '</div>')
+def hello_goodbye(name):
+  return '\n{}\n{}\n'.format(hello(name), goodbye(name))
+  
+print(hello_goodbye('Alice'))
+
+<div>
+<b>Hello Alice!</b>
+<i>Goodbye Alice.</i>
+</div>
+
+```
+
 
 ## 4.4. Timeout(): a real world example
 
@@ -1263,6 +1811,31 @@ bar()
 <img src="/assets/images/20210426_FunctionsInPython/pic18.png" class="largepic"/>
 
 **Finally**
+**Tag your function**
+```python
+def tag(*tags):
+  # Define a new decorator, named "decorator", to return
+  def decorator(func):
+    # Ensure the decorated function keeps its metadata
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+      # Call the function being decorated and return the result
+      return func(*args, **kwargs)
+    wrapper.tags = tags
+    return wrapper
+  # Return the new decorator
+  return decorator
+
+@tag('test', 'this is a tag')
+def foo():
+  pass
+
+print(foo.tags)
+
+('test', 'this is a tag')
+```
+
+**Check the return type**
 ```python
 def returns(return_type):
   # Complete the returns() decorator
@@ -1283,6 +1856,9 @@ try:
 except AssertionError:
   print('foo() did not return a dict!')
 
+
+<script.py> output:
+    foo() did not return a dict!
 ```
 
 # 5. Reference
