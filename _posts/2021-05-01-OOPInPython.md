@@ -86,6 +86,28 @@ dir(a) # <--- list all attributes and methods
 'view']
 ```
 
+<img src="/assets/images/20210501_OOPInPython/pic15.png" class="largepic"/>
+
+```python
+# Print the mystery employee's name
+print(mystery.name)
+
+# Print the mystery employee's salary
+print(mystery.salary)
+
+# Give the mystery employee a raise of $2500
+mystery.give_raise(2500)
+
+# Print the salary again
+print(mystery.salary)
+
+<script.py> output:
+    Natasha Ting
+    73500.0
+    76000.0
+```
+
+
 ## 1.2. Class anatomy: attributes and methods
 
 **A basic class**
@@ -161,6 +183,8 @@ mon_sal = emp.monthly_salary()
 
 # Print mon_sal
 print(mon_sal)
+
+4166.666666666667
 ```
 
 ## 1.3. Class anatomy: the __init__ constructor
@@ -358,6 +382,11 @@ p = Player(); p.draw()
 p.move(4); p.draw()
 p.move(5); p.draw()
 p.move(3); p.draw()
+
+|----------
+----|------
+---------|-
+----------|
 ```
 
 
@@ -389,6 +418,39 @@ bd = BetterDate.from_datetime(today)
 print(bd.year)
 print(bd.month)
 print(bd.day)
+```
+
+**Changing class attributes**
+```python
+# Create Players p1 and p2
+p1, p2 = Player(), Player()
+
+print("MAX_SPEED of p1 and p2 before assignment:")
+# Print p1.MAX_SPEED and p2.MAX_SPEED
+print(p1.MAX_SPEED)
+print(p2.MAX_SPEED)
+
+# ---MODIFY THIS LINE--- 
+Player.MAX_SPEED = 7
+
+print("MAX_SPEED of p1 and p2 after assignment:")
+# Print p1.MAX_SPEED and p2.MAX_SPEED
+print(p1.MAX_SPEED)
+print(p2.MAX_SPEED)
+
+print("MAX_SPEED of Player:")
+# Print Player.MAX_SPEED
+print(Player.MAX_SPEED)
+
+<script.py> output:
+    MAX_SPEED of p1 and p2 before assignment:
+    3
+    3
+    MAX_SPEED of p1 and p2 after assignment:
+    7
+    7
+    MAX_SPEED of Player:
+    7
 ```
 
 ## 2.2. Class inheritance
@@ -489,7 +551,25 @@ print(mng.name)
 
 # Call mng.display()
 mng.display()
+
+<script.py> output:
+    Debbie Lashko
+    Manager  Debbie Lashko
 ```
+
+```python
+class Counter:
+    def __init__(self, count):
+       self.count = count
+
+    def add_counts(self, n):
+       self.count += n
+
+class Indexer(Counter):
+   pass
+```
+<img src="/assets/images/20210501_OOPInPython/pic16.png" class="largepic"/>
+
 
 ## 2.3. Customizing functionality via inheritance
 
@@ -613,6 +693,33 @@ print(mngr.salary)
 mngr.give_raise(2000, bonus=1.03)
 print(mngr.salary)
 ```
+```python
+# Create a Racer class and set MAX_SPEED to 5
+class Racer(Player):
+    MAX_SPEED = 5
+ 
+# Create a Player and a Racer objects
+p = Player()
+r = Racer()
+
+print("p.MAX_SPEED = ", p.MAX_SPEED)
+print("r.MAX_SPEED = ", r.MAX_SPEED)
+
+print("p.MAX_POSITION = ", p.MAX_POSITION)
+print("r.MAX_POSITION = ", r.MAX_POSITION)
+
+<script.py> output:
+    p.MAX_SPEED =  3
+    r.MAX_SPEED =  5
+    p.MAX_POSITION =  10
+    r.MAX_POSITION =  10
+```
+
+Class attributes CAN be inherited, and the value of class attributes CAN be overwritten in the child class
+
+
+
+
 
 ```python
 # Import pandas as pd
@@ -685,6 +792,52 @@ customer1 == customer2
 
 ```python
 class BankAccount:
+   # MODIFY to initialize a number attribute
+    def __init__(self,number, balance=0):
+        self.balance = balance
+        self.number = number
+    def withdraw(self, amount):
+        self.balance -= amount 
+    
+    # Define __eq__ that returns True if the number attributes are equal 
+    def __eq__(self,other):
+        return self.number == other.number   
+
+# Create accounts and compare them       
+acct1 = BankAccount(123, 1000)
+acct2 = BankAccount(123, 1000)
+acct3 = BankAccount(456, 1000)
+print(acct1 == acct2)
+print(acct1 == acct3)
+
+<script.py> output:
+    True
+    False
+```
+
+```python
+class Phone:
+  def __init__(self, number):
+     self.number = number
+
+  def __eq__(self, other):
+    return self.number == \
+          other.number
+
+pn = Phone(873555333)
+
+
+class BankAccount:
+  def __init__(self, number):
+     self.number = number
+
+  def __eq__(self, other):
+    return self.number == \
+           other.number
+
+acct = BankAccount(873555333)
+
+class BankAccount:
     def __init__(self, number, balance=0):
         self.number, self.balance = number, balance
       
@@ -698,8 +851,11 @@ class BankAccount:
 acct = BankAccount(873555333)
 pn = Phone(873555333)
 print(acct == pn)
+
+False
 ```
 **Comparison and inheritance**
+**Which __eq__() method will be called when the following code is run?**
 
 ```python
 class Parent:
@@ -718,7 +874,7 @@ c = Child()
 p == c 
 
 ```
-Child's __eq__() method will be called. Python always calls the child's __eq__() method when comparing a child object to a parent object.
+**Child's __eq__() method will be called. Python always calls the child's __eq__() method when comparing a child object to a parent object.**
 
 ## 3.2. Operator overloading: string representation
 
@@ -927,8 +1083,40 @@ except BalanceError:
 
 **Practice**
 ```python
+# MODIFY the function to catch exceptions
+def invert_at_index(x, ind):
+  try:
+    return 1/x[ind]
+  except ZeroDivisionError:
+    print("Cannot divide by zero!")
+  except IndexError:
+    print("Index out of range!")
+ 
+a = [5,6,0,7]
+
+# Works okay
+print(invert_at_index(a, 1))
+
+# Potential ZeroDivisionError
+print(invert_at_index(a, 2))
+
+# Potential IndexError
+print(invert_at_index(a, 5))
+
+<script.py> output:
+    0.16666666666666666
+    Cannot divide by zero!
+    None
+    Index out of range!
+    None
+```
+```python
+# Define SalaryError inherited from ValueError
 class SalaryError(ValueError): pass
+
+# Define BonusError inherited from SalaryError
 class BonusError(SalaryError): pass
+
 
 class Employee:
   MIN_SALARY = 30000
@@ -1000,6 +1188,96 @@ batch_withdraw([b,c,s]) # <-- Will use BankAccount.withdraw(),
 * Subclass weakening output conditions: `BankAccount.withdraw()` can only leave a positive balance or cause an error, `CheckingAccount.withdraw()` can leave balance negative
 * Changing additional attributes in subclass's method
 * Throwing additional exceptions in subclass's method
+
+```python
+class Parent:
+    def talk(self):
+        print("Parent talking!")     
+
+class Child(Parent):
+    def talk(self):
+        print("Child talking!")          
+
+class TalkativeChild(Parent):
+    def talk(self):
+        print("TalkativeChild talking!")
+        Parent.talk(self)
+
+
+p, c, tc = Parent(), Child(), TalkativeChild()
+
+for obj in (p, c, tc):
+    obj.talk()
+
+
+Parent talking!
+Child talking!
+Talkative Child talking!
+Parent talking!   
+```
+
+**Square and rectangle**
+```python
+# Define a Rectangle class
+class Rectangle:
+    def __init__(self, h, w):
+      self.h, self.w = h, w
+
+# Define a Square class
+class Square(Rectangle):
+    def __init__(self, w):
+      self.h, self.w = w, w  
+
+hieu = Square(4)
+
+hieu.h = 7
+
+print(hieu.h)
+7
+The 4x4 Square object would no longer be a square if we assign 7 to h.
+
+
+```
+
+The classic example of a problem that violates the Liskov Substitution Principle is the Circle-Ellipse problem, sometimes called the Square-Rectangle problem.
+
+By all means, it seems like you should be able to define a class Rectangle, with attributes h and w (for height and width), and then define a class Square that inherits from the Rectangle. After all, a square "is-a" rectangle!
+
+Unfortunately, this intuition doesn't apply to object-oriented design.
+
+Each of the setter methods of Square change both h and w attributes, while setter methods of Rectangle change only one attribute at a time, so the Square objects cannot be substituted for Rectangle into programs that rely on one attribute staying constant.
+
+```python
+class Rectangle:
+    def __init__(self, w,h):
+      self.w, self.h = w,h
+
+# Define set_h to set h      
+    def set_h(self, h):
+      self.h = h
+      
+# Define set_w to set w          
+    def set_w(self, w):
+      self.w = w
+      
+      
+class Square(Rectangle):
+    def __init__(self, w):
+      self.w, self.h = w, w 
+
+# Define set_h to set w and h
+    def set_h(self, h):
+      self.h = h
+      self.w = h
+
+# Define set_w to set w and h      
+    def set_w(self, w):
+      self.h = w
+      self.w = w
+```
+Remember that the substitution principle requires the substitution to preserve the oversall state of the program. An example of a program that would fail when this substitution is made is a unit test for a setter functions in Rectangle class.
+
+
 
 ## 4.2. Managing data access: private attributes
 
@@ -1162,6 +1440,10 @@ cust.balance = 3000
 
 # Print the balance property
 print(cust.balance)
+
+<script.py> output:
+    Setter method called
+    3000
 ```
 
 **Read-only properties**
