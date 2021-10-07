@@ -170,6 +170,34 @@ bash_task = BashOperator(task_id='clean_addresses',
                          dag=dag)
 ```
 
+```python
+# Import the BashOperator
+from airflow.operators.bash_operator import BashOperator
+
+# Define the BashOperator 
+cleanup = BashOperator(
+    task_id='cleanup_task',
+    # Define the bash_command
+    bash_command='cleanup.sh',
+    # Add the task to the dag
+    dag=analytics_dag
+)
+```
+```python
+# Define a second operator to run the `consolidate_data.sh` script
+consolidate = BashOperator(
+    task_id='consolidate_task',
+    bash_command='consolidate_data.sh',
+    dag=analytics_dag)
+
+# Define a final operator to execute the `push_data.sh` script
+push_data = BashOperator(
+    task_id='pushdata_task',
+    bash_command='push_data.sh',
+    dag=analytics_dag)
+```
+
+
 **Note**
 * Individual operators are not guaranteed to run in the same location or environment. This means that just because one operator ran in a given directory with a certain setup, it does not necessarily mean that the next operator will have access to that same information.
 * You may need to set up environment variables, especially for the BashOperator. For example, it's common in bash to use the tilde character to represent a home directory. This is not defined by default in Airflow. Another example of an environment variable could be AWS credentials, database connectivity details, or other information specific to running a script.
@@ -235,6 +263,24 @@ task3	>>	task2
 ```
 <img src="/assets/images/20210502_AirflowPython/pic8.png" class="largepic"/>
 
+```python
+# Define a new pull_sales task
+pull_sales = BashOperator(
+    task_id='pullsales_task',
+    bash_command='wget https://salestracking/latestinfo?json',
+    dag=analytics_dag
+)
+
+# Set pull_sales to run prior to cleanup
+pull_sales >> cleanup
+
+# Configure consolidate to run after cleanup
+consolidate << cleanup
+
+# Set push_data to run last
+consolidate >> push_data
+
+```
 ## 2.3. Additional operators
 
 **Python Operators**
@@ -473,6 +519,8 @@ Use a sensor when:
 * If you want to continue to check for a condition but not necessarily fail the entire DAG immediately.
 * If you want to repeatedly run a check without adding cycles to your DAG, sensors are a good choice.
 
+<img src="/assets/images/20210502_AirflowPython/pic22.png" class="largepic"/>
+
 # 3.2. Airflow executors
 
 **Executors**
@@ -578,6 +626,7 @@ precheck >> generate_report_task
 <img src="/assets/images/20210502_AirflowPython/pic16.png" class="largepic"/>
     * Without Errors: Return to command line
 <img src="/assets/images/20210502_AirflowPython/pic17.png" class="largepic"/>
+
 
 ## 3.4. SLAs and reporting in Airflow
 

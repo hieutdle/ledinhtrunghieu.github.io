@@ -86,6 +86,22 @@ flights10 = spark.sql(query)
 # Show the results
 flights10.show()
 ```
+```
++----+-----+---+--------+---------+--------+---------+-------+-------+------+------+----+--------+--------+----+------+
+|year|month|day|dep_time|dep_delay|arr_time|arr_delay|carrier|tailnum|flight|origin|dest|air_time|distance|hour|minute|
++----+-----+---+--------+---------+--------+---------+-------+-------+------+------+----+--------+--------+----+------+
+|2014|   12|  8|     658|       -7|     935|       -5|     VX| N846VA|  1780|   SEA| LAX|     132|     954|   6|    58|
+|2014|    1| 22|    1040|        5|    1505|        5|     AS| N559AS|   851|   SEA| HNL|     360|    2677|  10|    40|
+|2014|    3|  9|    1443|       -2|    1652|        2|     VX| N847VA|   755|   SEA| SFO|     111|     679|  14|    43|
+|2014|    4|  9|    1705|       45|    1839|       34|     WN| N360SW|   344|   PDX| SJC|      83|     569|  17|     5|
+|2014|    3|  9|     754|       -1|    1015|        1|     AS| N612AS|   522|   SEA| BUR|     127|     937|   7|    54|
+|2014|    1| 15|    1037|        7|    1352|        2|     WN| N646SW|    48|   PDX| DEN|     121|     991|  10|    37|
+|2014|    7|  2|     847|       42|    1041|       51|     WN| N422WN|  1520|   PDX| OAK|      90|     543|   8|    47|
+|2014|    5| 12|    1655|       -5|    1842|      -18|     VX| N361VA|   755|   SEA| SFO|      98|     679|  16|    55|
+|2014|    4| 19|    1236|       -4|    1508|       -7|     AS| N309AS|   490|   SEA| SAN|     135|    1050|  12|    36|
+|2014|   11| 19|    1812|       -3|    2352|       -4|     AS| N564AS|    26|   SEA| ORD|     198|    1721|  18|    12|
++----+-----+---+--------+---------+--------+---------+-------+-------+------+------+----+--------+--------+----+------+
+```
 
 **Pandafy a Spark DataFrame**
 
@@ -101,7 +117,17 @@ pd_counts = flight_counts.toPandas()
 
 # Print the head of pd_counts
 print(pd_counts.head())
+
+
+<script.py> output:
+      origin dest    N
+    0    SEA  RNO    8
+    1    SEA  DTW   98
+    2    SEA  CLE    2
+    3    SEA  LAX  450
+    4    PDX  SEA  144
 ```
+
 
 **Put some Spark in your data**
 * Put a pandas DataFrame into a Spark cluster! The `SparkSession` class has a method for this as well.
@@ -129,6 +155,9 @@ spark_temp.createOrReplaceTempView("temp")
 
 # Examine the tables in the catalog again
 print(spark.catalog.listTables())
+
+
+[Table(name='temp', database=None, description=None, tableType='TEMPORARY', isTemporary=True)]
 ```
 
 **Read straight csv**
@@ -144,6 +173,33 @@ airports = spark.read.csv(file_path,header=True)
 # Show the data
 
 airports.show()
+```
+```
++---+--------------------+----------------+-----------------+----+---+---+
+|faa|                name|             lat|              lon| alt| tz|dst|
++---+--------------------+----------------+-----------------+----+---+---+
+|04G|   Lansdowne Airport|      41.1304722|      -80.6195833|1044| -5|  A|
+|06A|Moton Field Munic...|      32.4605722|      -85.6800278| 264| -5|  A|
+|06C| Schaumburg Regional|      41.9893408|      -88.1012428| 801| -6|  A|
+|06N|     Randall Airport|       41.431912|      -74.3915611| 523| -5|  A|
+|09J|Jekyll Island Air...|      31.0744722|      -81.4277778|  11| -4|  A|
+|0A9|Elizabethton Muni...|      36.3712222|      -82.1734167|1593| -4|  A|
+|0G6|Williams County A...|      41.4673056|      -84.5067778| 730| -5|  A|
+|0G7|Finger Lakes Regi...|      42.8835647|      -76.7812318| 492| -5|  A|
+|0P2|Shoestring Aviati...|      39.7948244|      -76.6471914|1000| -5|  U|
+|0S9|Jefferson County ...|      48.0538086|     -122.8106436| 108| -8|  A|
+|0W3|Harford County Ai...|      39.5668378|      -76.2024028| 409| -5|  A|
+|10C|  Galt Field Airport|      42.4028889|      -88.3751111| 875| -6|  U|
+|17G|Port Bucyrus-Craw...|      40.7815556|      -82.9748056|1003| -5|  A|
+|19A|Jackson County Ai...|      34.1758638|      -83.5615972| 951| -4|  U|
+|1A3|Martin Campbell F...|      35.0158056|      -84.3468333|1789| -4|  A|
+|1B9| Mansfield Municipal|      42.0001331|      -71.1967714| 122| -5|  A|
+|1C9|Frazier Lake Airpark|54.0133333333333|-124.768333333333| 152| -8|  A|
+|1CS|Clow Internationa...|      41.6959744|      -88.1292306| 670| -6|  U|
+|1G3|  Kent State Airport|      41.1513889|      -81.4151111|1134| -4|  A|
+|1OH|     Fortman Airport|      40.5553253|      -84.3866186| 885| -5|  U|
++---+--------------------+----------------+-----------------+----+---+---+
+only showing top 20 rows
 ```
 
 # 2. Manipulating data
@@ -175,6 +231,35 @@ flights.show()
 
 # Add duration_hrs
 flights = flights.withColumn("duration_hrs", flights.air_time/60)
+```
+
+```
+<script.py> output:
+    +----+-----+---+--------+---------+--------+---------+-------+-------+------+------+----+--------+--------+----+------+
+    |year|month|day|dep_time|dep_delay|arr_time|arr_delay|carrier|tailnum|flight|origin|dest|air_time|distance|hour|minute|
+    +----+-----+---+--------+---------+--------+---------+-------+-------+------+------+----+--------+--------+----+------+
+    |2014|   12|  8|     658|       -7|     935|       -5|     VX| N846VA|  1780|   SEA| LAX|     132|     954|   6|    58|
+    |2014|    1| 22|    1040|        5|    1505|        5|     AS| N559AS|   851|   SEA| HNL|     360|    2677|  10|    40|
+    |2014|    3|  9|    1443|       -2|    1652|        2|     VX| N847VA|   755|   SEA| SFO|     111|     679|  14|    43|
+    |2014|    4|  9|    1705|       45|    1839|       34|     WN| N360SW|   344|   PDX| SJC|      83|     569|  17|     5|
+    |2014|    3|  9|     754|       -1|    1015|        1|     AS| N612AS|   522|   SEA| BUR|     127|     937|   7|    54|
+    |2014|    1| 15|    1037|        7|    1352|        2|     WN| N646SW|    48|   PDX| DEN|     121|     991|  10|    37|
+    |2014|    7|  2|     847|       42|    1041|       51|     WN| N422WN|  1520|   PDX| OAK|      90|     543|   8|    47|
+    |2014|    5| 12|    1655|       -5|    1842|      -18|     VX| N361VA|   755|   SEA| SFO|      98|     679|  16|    55|
+    |2014|    4| 19|    1236|       -4|    1508|       -7|     AS| N309AS|   490|   SEA| SAN|     135|    1050|  12|    36|
+    |2014|   11| 19|    1812|       -3|    2352|       -4|     AS| N564AS|    26|   SEA| ORD|     198|    1721|  18|    12|
+    |2014|   11|  8|    1653|       -2|    1924|       -1|     AS| N323AS|   448|   SEA| LAX|     130|     954|  16|    53|
+    |2014|    8|  3|    1120|        0|    1415|        2|     AS| N305AS|   656|   SEA| PHX|     154|    1107|  11|    20|
+    |2014|   10| 30|     811|       21|    1038|       29|     AS| N433AS|   608|   SEA| LAS|     127|     867|   8|    11|
+    |2014|   11| 12|    2346|       -4|     217|      -28|     AS| N765AS|   121|   SEA| ANC|     183|    1448|  23|    46|
+    |2014|   10| 31|    1314|       89|    1544|      111|     AS| N713AS|   306|   SEA| SFO|     129|     679|  13|    14|
+    |2014|    1| 29|    2009|        3|    2159|        9|     UA| N27205|  1458|   PDX| SFO|      90|     550|  20|     9|
+    |2014|   12| 17|    2015|       50|    2150|       41|     AS| N626AS|   368|   SEA| SMF|      76|     605|  20|    15|
+    |2014|    8| 11|    1017|       -3|    1613|       -7|     WN| N8634A|   827|   SEA| MDW|     216|    1733|  10|    17|
+    |2014|    1| 13|    2156|       -9|     607|      -15|     AS| N597AS|    24|   SEA| BOS|     290|    2496|  21|    56|
+    |2014|    6|  5|    1733|      -12|    1945|      -10|     OO| N215AG|  3488|   PDX| BUR|     111|     817|  17|    33|
+    +----+-----+---+--------+---------+--------+---------+-------+-------+------+------+----+--------+--------+----+------+
+    only showing top 20 rows
 ```
 
 ## 2.2. Filtering Data
@@ -234,6 +319,86 @@ selected1.show()
 temp.show()
 ```
 
+```
++------+----+-------+
+|origin|dest|carrier|
++------+----+-------+
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     AS|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     AS|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
+|   SEA| PDX|     OO|
++------+----+-------+
+only showing top 20 rows
+
++-------+------+----+
+|tailnum|origin|dest|
++-------+------+----+
+| N846VA|   SEA| LAX|
+| N559AS|   SEA| HNL|
+| N847VA|   SEA| SFO|
+| N360SW|   PDX| SJC|
+| N612AS|   SEA| BUR|
+| N646SW|   PDX| DEN|
+| N422WN|   PDX| OAK|
+| N361VA|   SEA| SFO|
+| N309AS|   SEA| SAN|
+| N564AS|   SEA| ORD|
+| N323AS|   SEA| LAX|
+| N305AS|   SEA| PHX|
+| N433AS|   SEA| LAS|
+| N765AS|   SEA| ANC|
+| N713AS|   SEA| SFO|
+| N27205|   PDX| SFO|
+| N626AS|   SEA| SMF|
+| N8634A|   SEA| MDW|
+| N597AS|   SEA| BOS|
+| N215AG|   PDX| BUR|
++-------+------+----+
+only showing top 20 rows
+
++------+----+-------+
+|origin|dest|carrier|
++------+----+-------+
+|   SEA| LAX|     VX|
+|   SEA| HNL|     AS|
+|   SEA| SFO|     VX|
+|   PDX| SJC|     WN|
+|   SEA| BUR|     AS|
+|   PDX| DEN|     WN|
+|   PDX| OAK|     WN|
+|   SEA| SFO|     VX|
+|   SEA| SAN|     AS|
+|   SEA| ORD|     AS|
+|   SEA| LAX|     AS|
+|   SEA| PHX|     AS|
+|   SEA| LAS|     AS|
+|   SEA| ANC|     AS|
+|   SEA| SFO|     AS|
+|   PDX| SFO|     UA|
+|   SEA| SMF|     AS|
+|   SEA| MDW|     WN|
+|   SEA| BOS|     AS|
+|   PDX| BUR|     OO|
++------+----+-------+
+only showing top 20 rows
+```
+
 Similar to SQL, you can also use the `.select()` method to perform column-wise operations. When you're selecting a column using the `df.colName` notation, you can perform any column operation and the `.select()` method will return the transformed column. For example,
 
 ```py
@@ -274,6 +439,17 @@ flights.filter(flights.origin == "PDX").groupBy().min("distance").show()
 
 # Find the longest flight from SEA in terms of air time
 flights.filter(flights.origin == "SEA").groupBy().max("air_time").show()
++-------------+
+|min(distance)|
++-------------+
+|          106|
++-------------+
+
++-------------+
+|max(air_time)|
++-------------+
+|          409|
++-------------+
 ```
 
 ```py
@@ -282,6 +458,18 @@ flights.filter(flights.carrier == "DL").filter(flights.origin == "SEA").groupBy(
 
 # Total hours in the air
 flights.withColumn("duration_hrs", flights.air_time/60).groupBy().sum("duration_hrs").show()
+
++------------------+
+|     avg(air_time)|
++------------------+
+|188.20689655172413|
++------------------+
+
++------------------+
+| sum(duration_hrs)|
++------------------+
+|25289.600000000126|
++------------------+
 ```
 
 Part of what makes aggregating so powerful is the addition of groups. PySpark has a whole class devoted to grouped data frames: `pyspark.sql.GroupedData`. Now you'll see that when you pass the name of one or more columns in your DataFrame to the `.groupBy()` method, the aggregation methods behave like when you use a `GROUP BY` statement in a SQL query!
@@ -298,6 +486,39 @@ by_origin = flights.groupBy("origin")
 
 # Average duration of flights from PDX and SEA
 by_origin.avg("air_time").show()
+
++-------+-----+
+|tailnum|count|
++-------+-----+
+| N442AS|   38|
+| N102UW|    2|
+| N36472|    4|
+| N38451|    4|
+| N73283|    4|
+| N513UA|    2|
+| N954WN|    5|
+| N388DA|    3|
+| N567AA|    1|
+| N516UA|    2|
+| N927DN|    1|
+| N8322X|    1|
+| N466SW|    1|
+|  N6700|    1|
+| N607AS|   45|
+| N622SW|    4|
+| N584AS|   31|
+| N914WN|    4|
+| N654AW|    2|
+| N336NW|    1|
++-------+-----+
+only showing top 20 rows
+
++------+------------------+
+|origin|     avg(air_time)|
++------+------------------+
+|   SEA| 160.4361496051259|
+|   PDX|137.11543248288737|
++------+------------------+
 ```
 
 In addition to the `GroupedData` methods you've already seen, there is also the `.agg()` method. This method lets you pass an aggregate column expression that uses any of the aggregate functions from the `pyspark.sql.functions submodule`.
@@ -503,6 +724,10 @@ In the next few exercises you'll be tuning your logistic regression model using 
 It works by splitting the training data into a few different partitions. The exact number is up to you, but in this course you'll be using PySpark's default value of three. Once the data is split up, one of the partitions is set aside, and the model is fit to the others. Then the error is measured against the held out partition. This is repeated for each of the partitions, so that every block of data is held out and used as a test set exactly once. Then the error on each of the partitions is averaged. This is called **the cross validation error** of the model, and is a good estimate of the actual error on the held out data.
 
 You'll be using cross validation to choose the hyperparameters by creating a grid of the possible pairs of values for the two hyperparameters, `elasticNetParam` and `regParam`, and using the cross validation error to compare all the different models so you can choose the best one!
+
+What does cross validation allow you to estimate?
+The model's error on held out data.
+
 
 **Create the evaluator**
 
