@@ -324,7 +324,7 @@ Process data in the data lake in a structured way using PySpark
 * A fast and general engine for large-scale data processing
 * 4 libraries built on top of Spark core:
 
-<img src="/assets/images/20210504_OOPInPython/pic17.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic17.png" class="largepic"/>
 
     * **Spark SQL** for manipulating mostly tabular data
     * **Spark Streaming** for manipulating streaming data 
@@ -385,6 +385,46 @@ prices = spark.read.options(header="true").schema(schema).csv("mnt/data_lake/lan
 print(prices.dtypes)
 ```
 <img src="/assets/images/20210504_PipelinesPython/pic20.png" class="largepic"/>
+
+**Example**
+**Reading a CSV**
+```python
+# Read a csv file and set the headers
+df = (spark.read
+      .options(header=True)
+      .csv("/home/repl/workspace/mnt/data_lake/landing/ratings.csv"))
+
+df.show()
+
++------------+-------+---------------+-------+
+|       brand|  model|absorption_rate|comfort|
++------------+-------+---------------+-------+
+|Diapers-R-Us|6months|              2|      3|
+|     Nappy-k|2months|              3|      4|
+|     Pampers|3months|              4|      4|
+|     Huggies|newborn|              3|      5|
++------------+-------+---------------+-------+
+```
+**Defining a schema**
+```python
+# Define the schema
+schema = StructType([
+  StructField("brand", StringType(), nullable=False),
+  StructField("model", StringType(), nullable=False),
+  StructField("absorption_rate", ByteType(), nullable=True),
+  StructField("comfort", ByteType(), nullable=True)
+])
+
+better_df = (spark
+             .read
+             .options(header="true")
+             # Pass the predefined schema to the Reader
+             .schema(schema)
+             .csv("/home/repl/workspace/mnt/data_lake/landing/ratings.csv"))
+pprint(better_df.dtypes)
+```
+
+
 
 ## 2.2. Cleaning data
 
@@ -483,6 +523,80 @@ categorized_ratings = ratings.withColumn(
 categorized_ratings.show()
 ```
 
+**Example**
+**Removing invalid rows**
+```python
+# Specify the option to drop invalid rows
+ratings = (spark
+           .read
+           .options(header=True, mode="DROPMALFORMED")
+           .csv("/home/repl/workspace/mnt/data_lake/landing/ratings_with_invalid_rows.csv"))
+ratings.show()
+    +------------+-------+---------------+-------+
+    |       brand|  model|absorption_rate|comfort|
+    +------------+-------+---------------+-------+
+    |Diapers-R-Us|6months|              2|      3|
+    |     Nappy-k|2months|              3|      4|
+    |     Pampers|3months|              4|      4|
+    |     Huggies|newborn|              3|      5|
+    +------------+-------+---------------+-------+
+```
+
+**Filling unknown data**
+```python
+print("BEFORE")
+ratings.show()
+
+print("AFTER")
+# Replace nulls with arbitrary value (4) on column subset
+ratings = ratings.fillna(4, subset=["comfort"])
+ratings.show()
+
+BEFORE
+    +------------+-------+---------------+-------+
+    |       brand|  model|absorption_rate|comfort|
+    +------------+-------+---------------+-------+
+    |Diapers-R-Us|6months|              2|      3|
+    |     Nappy-k|2months|              3|      4|
+    |     Pampers|3months|              4|      4|
+    |     Huggies|newborn|              3|      5|
+    |     Pampers|    2mo|           null|   null|
+    +------------+-------+---------------+-------+
+    
+    AFTER
+    +------------+-------+---------------+-------+
+    |       brand|  model|absorption_rate|comfort|
+    +------------+-------+---------------+-------+
+    |Diapers-R-Us|6months|              2|      3|
+    |     Nappy-k|2months|              3|      4|
+    |     Pampers|3months|              4|      4|
+    |     Huggies|newborn|              3|      5|
+    |     Pampers|    2mo|           null|      4|
+    +------------+-------+---------------+-------+
+```
+
+**Conditionally replacing values**
+```python
+from pyspark.sql.functions import col, when
+
+# Add/relabel the column
+categorized_ratings = ratings.withColumn(
+    "comfort",
+    # Express the condition in terms of column operations
+    when(col("comfort") > 3, "sufficient").otherwise("insufficient"))
+
+categorized_ratings.show()
+
+<script.py> output:
+    +------------+-------+---------------+------------+
+    |       brand|  model|absorption_rate|     comfort|
+    +------------+-------+---------------+------------+
+    |Diapers-R-Us|6months|              2|insufficient|
+    |     Nappy-k|2months|              3|  sufficient|
+    |     Pampers|3months|              4|  sufficient|
+    |     Huggies|newborn|              3|  sufficient|
+    +------------+-------+---------------+------------+
+```
 ## 2.3. Transforming data with Spark
 
 **why we need transform data?**
@@ -555,7 +669,33 @@ ratings_with_prices = ratings.join(prices, ["brand", "model"])
 ```
 <img src="/assets/images/20210504_PipelinesPython/pic37.png" class="largepic"/>
 
-**Aggerating practice**
+
+
+**Practice**
+
+**Selecting and renaming columns**
+
+```python
+from pyspark.sql.functions import col
+
+# Select the columns and rename the "absorption_rate" column
+result = ratings.select([col("brand"),
+                         col("model"),
+                         col("absorption_rate").alias("absorbency")])
+
+# Show only unique values
+result.distinct().show()
+
+ +------------+-------+----------+
+    |       brand|  model|absorbency|
+    +------------+-------+----------+
+    |     Pampers|3months|         4|
+    |Diapers-R-Us|6months|         2|
+    |     Huggies|newborn|         3|
+    |     Nappy-k|2months|         3|
+    +------------+-------+----------+
+```
+**Grouping and aggregating data**
 ```py
 from pyspark.sql.functions import col, avg, stddev_samp, max as sfmax
 
@@ -573,6 +713,15 @@ aggregated = (purchased
              )
 
 aggregated.show()
+
++-------+--------------+-------------------+--------------+
+    |Country|average_salary|stddev_samp(Salary)|highest_salary|
+    +-------+--------------+-------------------+--------------+
+    |Germany|       63000.0|                NaN|         63000|
+    | France|       48000.0|                NaN|         48000|
+    |  Spain|       62000.0| 12727.922061357855|         71000|
+    +-------+--------------+-------------------+--------------+
+
 ```
 
 ## 2.4. Packaging the application
@@ -597,6 +746,21 @@ python hello_world.py
 * invoke the `zip` utility, enabling it to recursively add all files in all subfolders, by passing the `--recurse-paths` flag.
 * Provide a name for the resulting compressed archive and finally provide the name of the folder you want to compress. 
 * The resulting zip file can be passed as is to `spark-submit`’s `--py-files` argument.
+
+**Practice**
+
+**Creating a deployable artifact**
+```
+cd spark_pipelines
+zip --recurse-paths pydiaper.zip pydiaper
+```
+
+**Submitting your Spark job**
+```
+spark-submit --py-files spark_pipelines/pydiaper/pydiaper.zip ./spark_pipelines/pydiaper/pydiaper/cleaning/clean_ratings.py
+```
+
+
 
 # 3. Testing your data pipeline
 
