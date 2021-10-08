@@ -1107,7 +1107,7 @@ You tabulate tasks that you want to run at a specific time. Here’s an example.
 
 **Modern workflow managers:**
 * Luigi (Spotify, 2011, Python-based)
-* Azkaban (LinkedIn, 20009, Java-based)
+* Azkaban (LinkedIn, 2009, Java-based)
 * Airflow (Airbnb, 2015, Python-based)
 
 **The airflow task:**
@@ -1229,6 +1229,7 @@ python_task = PythonOperator(
 
 **Running PySpark from Airflow**
 * **BashOperator:**
+
 ```py
 spark_master = (
     "spark://"
@@ -1243,7 +1244,8 @@ command = (
 ).format(master=spark_master)
 BashOperator(bash_command=command, …)
 ```
-* **SSH Operator**
+* **SSH Operator:**
+
 ```py
 from airflow.contrib.operators\
     .ssh_operator import SSHOperator
@@ -1255,7 +1257,9 @@ task = SSHOperator(
     ssh_conn_id='spark_master_ssh'
 )
 ```
+
 * SparkSubmitOperator
+
 ```py
 from airflow.contrib.operators\
     .spark_submit_operator \
@@ -1271,6 +1275,7 @@ spark_task = SparkSubmitOperator(
 ```
 
 **Preparing a DAG for daily pipelines**
+
 ```py
 # Create a DAG object
 dag = DAG(
@@ -1334,6 +1339,7 @@ with dag:
     ingest >> clean >> insight
 ```
 
+
 ## 4.3. Deploying Airflow
 
 **Installing and configuring Airflow**
@@ -1355,6 +1361,11 @@ airflow initdb
 * `connections`,`pools`,`variables`: provide a location for various configuration files you can import into Airflow 
 <img src="/assets/images/20210504_PipelinesPython/pic15.png" class="largepic"/>
 
+**Airflow’s executors**
+Apache Airflow’s “SequentialExecutor” is low maintenance, but its biggest drawback is a lack of parallelization (hence the name). All other executors provide some way to parallelize tasks if their dependencies are met.
+In a production environment, you’re not likely to encounter the “SequentialExecutor”. Which executor is configured in the /home/repl/workspace/airflow/airflow.cfg configuration file?
+**CeleryExecutor**
+The CeleryExecutor is a good choice for distributing tasks across multiple worker machines. Your database choice needs to support it though, so SQLite should be replaced with e.g. MySQL or PostgreSQL.
 
 **Example Airflow deployment test**
 ```py
@@ -1370,6 +1381,51 @@ def test_dagbag_import():
 
 We first import and instantiate the DagBag, which is the collection of all DAGs found in a folder. Once instantiated, it holds a dictionary of error messages for DAGs that had issues, like Python syntax errors or the presence of cycles. If our testing framework would fail on this test, our CI/CD pipeline could prevent automatic deployment.
 
+**Recovering from deployed but broken DAGs**
+```py
+"""
+An Apache Airflow DAG used in course material.
+
+"""
+from datetime import datetime, timedelta
+from airflow import DAG
+from airflow.models import Variable
+from airflow.operators.bash_operator import BashOperator
+from airflow.operators.python_operator import PythonOperator
+
+default_args = {
+    "owner": "squad-a",
+    "depends_on_past": False,
+    "start_date": datetime(2019, 7, 5),
+    "email": ["foo@bar.com"],
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
+}
+
+dag = DAG(
+    "cleaning",
+    default_args=default_args,
+    user_defined_macros={"env": Variable.get("environment")},
+    schedule_interval="0 5 */2 * *"
+)
+
+def say(what):
+    print(what)
+
+
+with dag:
+    say_hello = BashOperator(task_id="say-hello", bash_command="echo Hello,")
+    say_world = BashOperator(task_id="say-world", bash_command="echo World")
+    shout = PythonOperator(task_id="shout",
+                           python_callable=say,
+                           op_kwargs={'what': '!'})
+
+    say_hello >> say_world >> shout
+
+```
+
 **Transferring DAGs and plugins**
 <img src="/assets/images/20210504_PipelinesPython/pic16.png" class="largepic"/>
 How do you get your DAGs uploaded to the server? 
@@ -1377,6 +1433,17 @@ How do you get your DAGs uploaded to the server?
 * Alternatively, if you keep a DAG file and any dependencies close to the processing code in another repository, you simply copy the DAG file over to the server with a tool like “rsync” for example. Or you make use of packaged DAGs, which are zipped archives that promote better isolation between projects. You’ll still need to copy over the zip file to the server though. You could also have the Airflow server regularly syncing the DAGs folder with a repository of DAGs, where everyone writes to.
 
 ```py
+"""
+An Apache Airflow DAG used in course material.
+
+"""
+from datetime import datetime, timedelta
+
+from airflow import DAG
+from airflow.models import Variable
+from airflow.operators.bash_operator import BashOperator
+from airflow.operators.python_operator import PythonOperator
+
 default_args = {
     "owner": "squad-a",
     "depends_on_past": False,
