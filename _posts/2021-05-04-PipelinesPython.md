@@ -14,11 +14,11 @@ Explain what a data platform is, how data ends up in it, and how data engineers 
 
 Many modern organizations are becoming aware of just how valuable the data that they collected is. Internally, the data is becoming more and more “democratized”:
 
-<img src="/assets/images/20210504_PipeplinesPython/pic1.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic1.png" class="largepic"/>
 
 It is being made accessible to almost anyone within the company, so that new insights can be generated. Also on the public-facing side, companies are making more and more data available to people, in the form of e.g. public APIs.
 
-<img src="/assets/images/20210504_PipeplinesPython/pic2.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic2.png" class="largepic"/>
 
 * **Genesis of data**: The genesis of the data is with the operational systems, such as streaming data collected from various Internet of Things devices or websession data from Google Analytics or some sales platform. This data has to be stored somewhere, so that it can be processed at later times. Nowadays, the scale of the data and velocity at which it flows has lead to the rise of what we call “the **data lake**”.
 * **Operational data is stored in the landing zone**: The **data lake** comprises several systems, and is typically organized in several zones. The data that comes from the operational systems for example, ends up in what we call the **“landing zone”**. This zone forms the basis of truth, it is always there and is the unaltered version of the data as it was received. **The process of getting data into the data lake is called “ingestion”**.
@@ -39,7 +39,7 @@ It is being made accessible to almost anyone within the company, so that new ins
 * **Singer** is a **specification** that describes how data extraction scripts and data loading scripts should communicate using a standard JSON-based data format over `stdout`. 
 * `JSON` is similar to Python dictionaries. And `stdout` is a standardized “location” to which programs write their output. 
 * Because Singer is a **specification**, these **extraction scripts**, which are called “**taps**”, and the **loading scripts**, which are called “**targets**”, can be written in any programming language. And they can easily be mixed and matched to create small data pipelines that move data from one place to another.
-<img src="/assets/images/20210504_PipeplinesPython/pic3.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic3.png" class="largepic"/>
 * Taps and targets communicate using 3 kinds of messages, which are sent to and read from specific **streams**:
     * schema (metadata)
     * state (process metadata)
@@ -83,7 +83,7 @@ singer.write_schema(schema=json_schema,
 * With “stream_name” you specify the name of the stream this message belongs to. This can be anything you want. Data that belongs together, should be sent to the same stream. 
 * The “key_properties” attribute should equal a list of strings that make up the primary key for records from this stream. 
 
-<img src="/assets/images/20210504_PipeplinesPython/pic4.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic4.png" class="largepic"/>
 
 The “write_schema” call simply wraps the actual JSON schema into a new JSON message and adds a few attributes.
 
@@ -213,7 +213,7 @@ tap-custom-google-scraper | target-postgresql --config headlines.json
 **Keeping track with state messages**
 
 STATE messages yet: They are typically used to keep track of state, which is the way something is at some moment in time. That something is typically some form of memory of the process.
-<img src="/assets/images/20210504_PipeplinesPython/pic5.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic5.png" class="largepic"/>
 
 For example that you must extract only new records from this database daily at noon, local time. 
 The easiest way to do so, is to keep track of the highest encountered “last_updated_on” value and emit that as a state message at the end of a successful run of your tap. 
@@ -362,14 +362,14 @@ prices = spark.read.options(header="true").csv("mnt/data_lake/landing/prices.csv
 
 prices.show()
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic19.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic19.png" class="largepic"/>
 
 **Spark Automatically inferred data types**
 ```py
 from pprint import pprint
 pprint(prices.dtypes)
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic18.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic18.png" class="largepic"/>
 
 **Enforcing a schema**
 ```py
@@ -384,7 +384,7 @@ schema = StructType([StructField("store", StringType(), nullable=False),
 prices = spark.read.options(header="true").schema(schema).csv("mnt/data_lake/landing/prices.csv")
 print(prices.dtypes)
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic20.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic20.png" class="largepic"/>
 
 ## 2.2. Cleaning data
 
@@ -397,13 +397,13 @@ print(prices.dtypes)
 **We can automate data cleaning**
 
 **Select data types**
-<img src="/assets/images/20210504_PipeplinesPython/pic21.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic21.png" class="largepic"/>
 
 **Badly formatted source data**
 ```
 cat bad_data.csv	# prints the entire file on stdout
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic22.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic22.png" class="largepic"/>
 
 Spark’s default handling of bad source data
 
@@ -412,7 +412,7 @@ prices = spark.read.options(header="true").csv('landing/prices.csv')
 
 prices.show()
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic23.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic23.png" class="largepic"/>
 
 
 Spark makes an effort to incorporate the invalid row. That’s not what we want.
@@ -424,10 +424,10 @@ prices = (spark
           .options(header="true", mode="DROPMALFORMED")
           .csv('landing/prices.csv'))
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic24.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic24.png" class="largepic"/>
 
 **The signigicance of null**
-<img src="/assets/images/20210504_PipeplinesPython/pic25.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic25.png" class="largepic"/>
 
 Sometimes data isn’t malformed, but simply incomplete. In this example, the 2nd row is missing a country code and a quantity. Removing the row entirely is not ideal, as it still contains useful information. As you can see, Spark’s default way of handling this is to fill the blanks with “null”, which is a well-established way to express missing or unknown values.
 
@@ -438,13 +438,13 @@ prices = (spark.read.options(header="true")
           .csv('/landing/prices_with_incomplete_rows.csv'))
 prices.show()
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic26.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic26.png" class="largepic"/>
 
 **Supplying default values for missing data**
 ```py
 prices.fillna(25, subset=['quantity']).show()
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic27.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic27.png" class="largepic"/>
 You could instruct Spark to fill the missing data with specific values. For that, we use the “fillna” method, which optionally accepts a list of column names as input. Only those columns will be affected, as you can see.
 
 
@@ -453,7 +453,7 @@ Example: contracts of employees
 ```py
 employees = spark.read.options(header="true").schema(schema).csv('employees.csv')
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic28.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic28.png" class="largepic"/>
 
 People often put placeholders for fields they don’t know the value of. In this example, someone gave an unrealistic date for the end of Alice’s employment contract. Such placeholders are bad for analytics purposes. In most cases, it’s better to have unknown data simply represented by the “null” value. Many libraries have built-in functionality to deal with this appropriately.
 
@@ -467,7 +467,7 @@ better_frame = employees.withColumn("end_date",
     when(col("end_date") > one_year_from_now, None).otherwise(col("end_date")))
 better_frame.show()
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic29.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic29.png" class="largepic"/>
 
 Here, we replace the values that are illogical by using a condition in the “when()” function. When the condition is met, we replace the values with Python’s “None”, which in Spark gets translated to “null”. Otherwise, we leave the column unaltered.
 
@@ -499,27 +499,27 @@ categorized_ratings.show()
 
 **Common data transformations:**
 1. **Filtering** data (**rows**). It allows us to focus only on the data that are useful for a particular analysis. (Remove rows have country not in Europe)
-<img src="/assets/images/20210504_PipeplinesPython/pic30.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic30.png" class="largepic"/>
 2. **Selecting** and **renaming** **columns** allows us to focus only on fields of interest and possibly renaming them to make their meaning more clear.
-<img src="/assets/images/20210504_PipeplinesPython/pic31.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic31.png" class="largepic"/>
 3. **Grouping and aggerating**: Grouping rows by a particular field and then aggregating some metrics, like the mean price and the number of samples. If you have sales data, for example, you can group it by country, and calculate the total revenue per country.
-<img src="/assets/images/20210504_PipeplinesPython/pic32.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic32.png" class="largepic"/>
 4. **Joining** multiple datasets: Joining DataFrames by linking them through certain fields allows you to add more attributes to records in your data.
-<img src="/assets/images/20210504_PipeplinesPython/pic33.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic33.png" class="largepic"/>
 5. **Ordering** data to prioritize.
-<img src="/assets/images/20210504_PipeplinesPython/pic34.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic34.png" class="largepic"/>
 
 **The prices dataset**
 ```py
 prices = spark.read.options(header="true").schema(schema).csv('landing/prices.csv')
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic35.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic35.png" class="largepic"/>
 
 **Filtering and ordering rows**
 ```py
 prices_in_belgium = prices.filter(col('countrycode') == 'BE').orderBy(col('date'))
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic36.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic36.png" class="largepic"/>
 * Function `col` creates Column objects
 * Method `orderBy` sorts values by a certain column
 
@@ -553,7 +553,7 @@ Executing a join with 2 foreign keys
 ```py
 ratings_with_prices = ratings.join(prices, ["brand", "model"])
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic37.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic37.png" class="largepic"/>
 
 **Aggerating practice**
 ```py
@@ -586,13 +586,13 @@ python hello_world.py
 `spark-submit`comes with any Spark installation
 1.	script helps setting up the launch environment in a manner appropriate for the cluster manager and the selected deploy mode. 
 2.	invokes main class/app/module/function or main method.
-<img src="/assets/images/20210504_PipeplinesPython/pic38.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic38.png" class="largepic"/>
 
 **Basic arguments of “spark-submit”**
-<img src="/assets/images/20210504_PipeplinesPython/pic39.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic39.png" class="largepic"/>
 
 **Collecting alldependencies in one archive**
-<img src="/assets/images/20210504_PipeplinesPython/pic40.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic40.png" class="largepic"/>
 * The `--py-files` option can take a comma separated list of files that will be added on each worker’s PYTHONPATH, which lists the places where the Python interpreter will look for modules. Zip files are a common way to package and distribute your code. 
 * invoke the `zip` utility, enabling it to recursively add all files in all subfolders, by passing the `--recurse-paths` flag.
 * Provide a name for the resulting compressed archive and finally provide the name of the folder you want to compress. 
@@ -641,18 +641,18 @@ Sometimes people avoid writing tests, because it takes time they believe is bett
 
 A useful concept to keep in mind when designing tests, is the test pyramid. It tells you where to invest your efforts. 
 
-<img src="/assets/images/20210504_PipeplinesPython/pic41.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic41.png" class="largepic"/>
 
 * Testing pieces of code that do not rely on integration with external components are unit tests.These can run fast and their development effort is cheap. An example of this is a data cleaning function that transforms all variations of yes and no strings to proper booleans. Because these tests run so fast, you should have many of them.
 * Interactions with file systems and databases are integration tests or service tests, as they integrate different services or components. They run more slowly and their setup also takes more effort. You can have less of them, because your unit tests should already cover some parts, like the conversion to booleans before inserting records into a database.
 * The same goes for end-to-end tests, which often mimic the experience a user would get when interacting through a user interface (UI). They’re even more costly, as they run slowly and are often difficult to write robustly, but are close to the end-user’s experience.
 
-<img src="/assets/images/20210504_PipeplinesPython/pic42.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic42.png" class="largepic"/>
 
 ## 3.2. Writing unit tests for PySpark
 
 **ETL pipeline**
-<img src="/assets/images/20210504_PipeplinesPython/pic43.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic43.png" class="largepic"/>
 
 **Separate transform from extract and load**
 
@@ -663,7 +663,7 @@ unit_prices_with_ratings = (prices_with_ratings
                             .join(…) # transform
                             .withColumn(…))	# transform
 ```
-<img src="/assets/images/20210504_PipeplinesPython/pic44.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic44.png" class="largepic"/>
 
 We will rewrite the transformations in this piece of code from our pipeline to allow testing. Now, the transformations operate on DataFrames, which we obtained through interacting with the file system. As mentioned, we would like to remove that dependency and focus solely on the transformations. If(2) the transformations would no longer get data from files, how do we still feed them data?
 
@@ -797,7 +797,7 @@ if __name__ == "__main__":
 
 **Running a test suite**
 Several modules to execute tests:
-<img src="/assets/images/20210504_PipeplinesPython/pic45.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic45.png" class="largepic"/>
 Core task: assert or raise
 
 Examples:
@@ -839,7 +839,7 @@ Solution:
 * All artifacts should always be in deployable state at any time without any problem. When you push your code as part of some version control system to some remote server, you can also trigger running unit tests and static code checks, like compliancy with PEP8, which is the Python style guide.
 
 **Configuring a CI/CD tools**
-<img src="/assets/images/20210504_PipeplinesPython/pic46.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic46.png" class="largepic"/>
 
 CircleCI is a service that runs tests automatically for you. 
 Like many of these tools, it’s looking for a specific file in your code repository. For CircleCI, it’s `config.yml` in the .circleci folder, which should be at the root of your code repository. 
@@ -864,7 +864,7 @@ In this case, we instruct CircleCI to:
 
 **A high-level view on CI/CD**
 
-<img src="/assets/images/20210504_PipeplinesPython/pic47.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic47.png" class="largepic"/>
 
 **Improving style guide compliancy**
 
@@ -925,7 +925,7 @@ jobs:
 
 **Workflow remind**
 A workflow is a **sequence of tasks** that are either scheduled to run or that **could be triggered** by the occurrence of an event. Workflows are typically used to orchestrate data processing pipelines.
-<img src="/assets/images/20210504_PipeplinesPython/pic6.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic6.png" class="largepic"/>
 
 **Scheduling with cron**
 Oftentimes we have tasks that need to run on a schedule. Churn prediction algorithms might need to be run weekly for example. An often used software utility in such cases is “cron”.
@@ -956,16 +956,16 @@ You tabulate tasks that you want to run at a specific time. Here’s an example.
 
 **Apache Airflow fulfills modern engineering needs**
 1. Create and visualize com plex workflows
-<img src="/assets/images/20210504_PipeplinesPython/pic7.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic7.png" class="largepic"/>
 2. Monitor and log workflows
 Airflow can show us when certain tasks failed or how long each task took and plot that in clear charts.
-<img src="/assets/images/20210504_PipeplinesPython/pic8.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic8.png" class="largepic"/>
 3. Scales horizontally 
 As we get more tasks to execute, we want our tool to work with multiple machines, rather than increasing the performance of one single machine
-<img src="/assets/images/20210504_PipeplinesPython/pic9.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic9.png" class="largepic"/>
 
 **The Directed Acyclic Graph (DAG)**
-<img src="/assets/images/20210504_PipeplinesPython/pic10.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic10.png" class="largepic"/>
 The central piece in an Airflow workflow is the DAG, which is an acronym for Directed Acyclic Graph: 
 * A graph is a collection of nodes that are connected by edges. 
 * The “directed” part in the acronym implies that there is a sense of direction between the nodes. The arrows on the edges indicate the direction. 
@@ -1000,7 +1000,7 @@ task3.set_upstream(task2)
 #	task1 >> task2 >> task3
 ```
 
-<img src="/assets/images/20210504_PipeplinesPython/pic11.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic11.png" class="largepic"/>
 
 **Specifying the DAG schedule**
 ```py
@@ -1018,7 +1018,7 @@ reporting_dag = DAG(
 
 **Specifying operator dependencies**
 
-<img src="/assets/images/20210504_PipeplinesPython/pic12.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic12.png" class="largepic"/>
 
 ```py
 # Specify direction using verbose method
@@ -1181,15 +1181,15 @@ pip install apache-airflow
 airflow initdb
 ```
 
-<img src="/assets/images/20210504_PipeplinesPython/pic13.png" class="largepic"/>
-<img src="/assets/images/20210504_PipeplinesPython/pic14.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic13.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic14.png" class="largepic"/>
 
 **Setting up for production**
 * `dags`: place to store the dags (con gurable)
 * `tests`: unit test the possible deployment, possibly ensure consistency across DAGs
 * `plugins`: store custom operators and hooks
 * `connections`,`pools`,`variables`: provide a location for various configuration files you can import into Airflow 
-<img src="/assets/images/20210504_PipeplinesPython/pic15.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic15.png" class="largepic"/>
 
 
 **Example Airflow deployment test**
@@ -1207,7 +1207,7 @@ def test_dagbag_import():
 We first import and instantiate the DagBag, which is the collection of all DAGs found in a folder. Once instantiated, it holds a dictionary of error messages for DAGs that had issues, like Python syntax errors or the presence of cycles. If our testing framework would fail on this test, our CI/CD pipeline could prevent automatic deployment.
 
 **Transferring DAGs and plugins**
-<img src="/assets/images/20210504_PipeplinesPython/pic16.png" class="largepic"/>
+<img src="/assets/images/20210504_PipelinesPython/pic16.png" class="largepic"/>
 How do you get your DAGs uploaded to the server? 
 * If you keep all the DAGs in the repository that contains the basic installation layout. This can be done simply by cloning the repository on the Airflow server.
 * Alternatively, if you keep a DAG file and any dependencies close to the processing code in another repository, you simply copy the DAG file over to the server with a tool like “rsync” for example. Or you make use of packaged DAGs, which are zipped archives that promote better isolation between projects. You’ll still need to copy over the zip file to the server though. You could also have the Airflow server regularly syncing the DAGs folder with a repository of DAGs, where everyone writes to.
