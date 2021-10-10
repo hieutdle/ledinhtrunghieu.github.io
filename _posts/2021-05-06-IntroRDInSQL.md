@@ -28,6 +28,34 @@ WHERE table_name = 'pg_config';
 * `tables`: information about all tables in your current database
 * `columns`: information about all columns in all of the tables in your current database
 
+**Query information_schema with SELECT**
+```sql
+-- Query the right table in information_schema
+SELECT table_name 
+FROM information_schema.tables
+-- Specify the correct table_schema value
+WHERE table_schema = 'public';
+
+table_name
+university_professors
+
+
+-- Query the right table in information_schema to get columns
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'university_professors' AND table_schema = 'public';
+
+column_name	data_type
+firstname	text
+lastname	text
+university	text
+university_shortname	text
+university_city	text
+function	text
+organization	text
+organization_sector	text
+```
+
 
 **Count Column**
 ```sql
@@ -37,14 +65,25 @@ SELECT COUNT(*)
    AND table_name = 'table_name'
 ```
 
-How many columns does the table `university_professors` have?
-
-
+**How many columns does the table `university_professors` have?**
 ```sql
 SELECT COUNT(*)
   FROM information_schema.columns
  WHERE table_schema = 'public' -- the database
    AND table_name = 'university_professors'
+```
+```sql
+-- Query the first five rows of our table
+SELECT * 
+FROM university_professors 
+LIMIT 5;
+
+firstname	lastname	university	university_shortname	university_city	function	organization	organization_sector
+Karl	Aberer	ETH Lausanne	EPF	Lausanne	Chairman of L3S Advisory Board	L3S Advisory Board	Education & research
+Karl	Aberer	ETH Lausanne	EPF	Lausanne	Member Conseil of Zeno-Karl Schindler Foundation	Zeno-Karl Schindler Foundation	Education & research
+Karl	Aberer	ETH Lausanne	EPF	Lausanne	Member of Conseil Fondation IDIAP	Fondation IDIAP	Education & research
+Karl	Aberer	ETH Lausanne	EPF	Lausanne	Panel Member 	SNF Ambizione Program	Education & research
+Reza Shokrollah	Abhari	ETH Zürich	ETH	Zurich	Aufsichtsratsmandat	PNE Wind AG	Energy, environment & mobility
 ```
 
 ## 1.2. Tables
