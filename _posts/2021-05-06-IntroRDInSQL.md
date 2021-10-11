@@ -92,11 +92,25 @@ Reza Shokrollah	Abhari	ETH Zürich	ETH	Zurich	Aufsichtsratsmandat	PNE Wind AG	En
 
 <img src="/assets/images/20210506_IntroRDInSQL/pic3.png" class="largepic"/>
 
+This professor is repeated in the first three records. Also, his university, the "ETH Lausanne", is repeated a couple of times – because he only works for this university. However, he seems to have affiliations with at least three different organizations. So, there's a certain redundancy in that table.
+
+<img src="/assets/images/20210506_IntroRDInSQL/pic12.png" class="largepic"/>
+
 **Better database with four entity types**
+
+Redundancy in the university_professors table
 
 <img src="/assets/images/20210506_IntroRDInSQL/pic4.png" class="largepic"/>
 
 **Create new tables with CREATE TABLE**
+
+```sql
+CREATE TABLE table_name (
+ column_a data_type,
+ column_b data_type,
+ column_c data_type
+);
+```
 
 ```sql
 CREATE TABLE weather ( 
@@ -105,6 +119,30 @@ CREATE TABLE weather (
     weather_station char(5)
 );
 ```
+**Practice**
+```sql
+-- Create a table for the professors entity type
+CREATE TABLE professors (
+ firstname text,
+ lastname text
+);
+
+-- Print the contents of this table
+SELECT * 
+FROM professors
+
+-- Create a table for the universities entity type
+CREATE TABLE universities (
+ university_shortname text,
+ university text,
+ university_city text
+);
+
+-- Print the contents of this table
+SELECT * 
+FROM universities
+```
+
 
 **ADD a COLUMN with ALTER TABLE**
 
@@ -117,6 +155,11 @@ ADD COLUMN column_name data_type;
 Alter table professors
 Add column university_shortname text;
 
+-- Print the contents of this table
+SELECT * 
+FROM professors
+
+firstname	lastname	university_shortname
 ```
 
 ## 1.3. Update your database as the structure changes
