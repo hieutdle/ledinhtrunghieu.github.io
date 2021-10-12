@@ -356,6 +356,10 @@ def median(values):
 
 In Python, integers are immutable, meaning they can't be changed.
 
+<img src="/assets/images/20210426_FunctionsInPython/pic19.png" class="largepic"/>
+
+we created a variable "my_var" and assigned it the value 3. Then we passed it to the function bar(), which caused the argument "x" to point to the same place "my_var" is pointing. But the bar() function assigns "x" to a new value, so the "my_var" variable isn't touched. In fact, there is no way in Python to have changed "x" or "my_var" directly, because integers are immutable variables.
+
 <img src="/assets/images/20210426_FunctionsInPython/pic4.png" class="largepic"/>
 
 There are only a few immutable data types in Python because almost everything is represented as an object. The only way to tell if something is mutable is to see if there is a function or method that will change the object without assigning it to a new variable.

@@ -230,6 +230,66 @@ DROP COLUMN column_name;
 ```sql
 DROP TABLE table_name;
 ```
+**Practice**
+
+```sql
+-- Rename the organisation column
+ALTER TABLE affiliations
+RENAME COLUMN organisation TO organization;
+
+-- Delete the university_shortname column
+ALTER TABLE affiliations
+DROP COLUMN university_shortname;
+```
+
+```sql
+-- Insert unique professors into the new table
+INSERT INTO professors 
+SELECT DISTINCT firstname, lastname, university_shortname 
+FROM university_professors;
+
+-- Doublecheck the contents of professors
+SELECT * 
+FROM professors;
+
+firstname	lastname	university_shortname
+Michel	Rappaz	EPF
+Hilal	Lashuel	EPF
+Jeffrey	Huang	EPF
+Pierre	Magistretti	EPF
+Paolo	Ienne	EPF
+Frédéric	Kaplan	EPF
+Olivier	Hari	UNE
+Christian	Hesse	UBE
+...
+```
+
+```sql
+-- Insert unique affiliations into the new table
+INSERT INTO affiliations 
+SELECT DISTINCT firstname, lastname, function, organization 
+FROM university_professors;
+
+-- Doublecheck the contents of affiliations
+SELECT * 
+FROM affiliations;
+
+firstname	lastname	university_shortname	function	organisation
+Dimos	Poulikakos	VR-Mandat	Scrona AG	null
+Francesco	Stellacci	Co-editor in Chief, Nanoscale	Royal Chemistry Society, UK	null
+Alexander	Fust	Fachexperte und Coach für Designer Startups	Creative Hub	null
+Jürgen	Brugger	Proposal reviewing HEPIA	HES Campus Biotech, Genève	null
+Hervé	Bourlard	Director	Idiap Research Institute	null
+Ioannis	Papadopoulos	Mandat	Schweizerischer Nationalfonds (SNF)	null
+Olaf	Blanke	Professeur à 20%	Université de Genève	null
+
+-- Delete the university_professors table
+DROP TABLE university_professors;
+```
+
+
+
+
 # 2. Enforce data consistency with attribute constraints
 
 Specify data types in columns, enforce column uniqueness, and disallow NULL values in this chapter.
@@ -256,6 +316,47 @@ Specify data types in columns, enforce column uniqueness, and disallow NULL valu
 SELECT temperature * CAST(wind_speed AS integer) AS wind_chill 
 FROM weather;
 ```
+**Practice**
+**Conforming with data types**
+```sql
+-- Let's add a record to the table
+INSERT INTO transactions (transaction_date, amount, fee) 
+VALUES ('2018-09-24', 5454, '30');
+
+-- Doublecheck the contents
+SELECT *
+FROM transactions;
+
+transaction_date	amount	fee
+1999-01-08	500	20
+2001-02-20	403	15
+2001-03-20	3430	35
+2018-09-24	5454	30
+```
+
+**Type CASTs**
+```sql
+SELECT CAST(some_column AS integer)
+FROM table;
+```
+
+```sql
+-- Calculate the net amount as amount + fee
+SELECT transaction_date, amount + CAST(fee AS integer) AS net_amount 
+FROM transactions;
+
+transaction_date	net_amount
+1999-01-08	520
+2001-02-20	418
+2001-03-20	3465
+1999-01-08	520
+2001-02-20	418
+2001-03-20	3465
+2018-09-24	5484
+```
+
+
+
 
 ## 2.2 Working with data types
 
@@ -328,6 +429,15 @@ USING ROUND(average_grade);
 ```
 
 ```sql
+-- Select the university_shortname column
+SELECT DISTINCT(university_shortname) 
+FROM professors;
+
+-- Specify the correct fixed-length character type
+ALTER TABLE professors
+ALTER COLUMN university_shortname
+TYPE char(3);
+
 -- Change the type of firstname
 ALTER TABLE professors
 ALTER COLUMN firstname
@@ -383,6 +493,26 @@ CREATE TABLE table_name (
 
 ALTER TABLE table_name
 ADD CONSTRAINT some_name UNIQUE(column_name);
+```
+**Disallow NULL values with SET NOT NULL**
+```sql
+-- Disallow NULL values in firstname
+ALTER TABLE professors 
+ALTER COLUMN firstname SET NOT NULL;
+
+-- Disallow NULL values in lastname
+ALTER TABLE professors 
+ALTER COLUMN lastname SET NOT NULL;
+```
+**Make your columns UNIQUE with ADD CONSTRAINT**
+```sql
+-- Make universities.university_shortname unique
+ALTER TABLE universities
+ADD CONSTRAINT university_shortname_unq UNIQUE(university_shortname);
+
+-- Make organizations.organization unique
+ALTER TABLE organizations
+ADD CONSTRAINT organization_unq UNIQUE(organization);
 ```
 
 # 3. Uniquely identify records with key constraints
