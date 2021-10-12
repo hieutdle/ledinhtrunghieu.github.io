@@ -979,6 +979,19 @@ ON affiliations.professor_id = professors.id
 -- Group by the university ids of professors
 GROUP BY professors.university_id 
 ORDER BY count DESC;
+
+count	university_id
+579	EPF
+273	USG
+162	UBE
+133	ETH
+75	UBA
+40	UFR
+36	UNE
+35	ULA
+33	UGE
+7	UZH
+4	USI
 ```
 ```sql
 -- Filter the table and sort it
@@ -996,6 +1009,8 @@ GROUP BY organizations.organization_sector,
 professors.id, universities.university_city
 ORDER BY COUNT DESC;
 ```
+<img src="/assets/images/20210506_IntroRDInSQL/pic16.png" class="largepic"/>
+
 # 5. Reference
 
 1. [Introduction to Relational Databases in SQL- DataCamp](https://learn.datacamp.com/courses/introduction-to-relational-databases-in-sql)
