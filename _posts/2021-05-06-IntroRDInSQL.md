@@ -546,13 +546,39 @@ K1 =  = {license_no}; K2 = {serial_no}; K3 = {model}; K4 = {make, year}
 These four minimal superkeys are also called **candidate keys**. Why candidate keys? In the end, there can only be one key for the table, which has to be chosen from the candidates
 
 **Practice**
+**Get to know SELECT COUNT DISTINCT**
+```sql
+-- Count the number of rows in universities
+SELECT COUNT(*) 
+FROM universities;
+
+11
+```
+```sql
+-- Count the number of distinct values in the university_city column
+SELECT COUNT(DISTINCT(university_city)) 
+FROM universities;
+
+9
+```
+
+**Identify keys with SELECT COUNT DISTINCT**
+
 1. Count the distinct records for all possible combinations of columns. If the resulting number x equals the number of all rows in the table for a combination, you have discovered a superkey.
 2. Then remove one column after another until you can no longer remove columns without seeing the number x decrease. If that is the case, you have discovered a (candidate) key.
+```sql
+-- Try out different combinations
+SELECT COUNT(DISTINCT(firstname)) 
+FROM professors;
 
+360
+```
 ```sql
 -- Try out different combinations
 SELECT COUNT(DISTINCT(firstname,lastname)) 
 FROM professors;
+
+551
 ```
 
 ## 3.2. Primary keys
@@ -589,8 +615,13 @@ ALTER TABLE table_name
 ADD CONSTRAINT some_name PRIMARY KEY (column_name)
 ```
 
+<img src="/assets/images/20210506_IntroRDInSQL/pic10.png" class="largepic"/>
+
 
 **Practice**
+
+**ADD key CONSTRAINTs to the tables**
+
 ```sql
 -- Rename the organization column to id
 ALTER TABLE organizations
@@ -599,6 +630,14 @@ RENAME COLUMN organization TO id;
 -- Make id a primary key
 ALTER TABLE organizations
 ADD CONSTRAINT organization_pk PRIMARY KEY (id);
+
+-- Rename the university_shortname column to id
+ALTER TABLE universities
+RENAME COLUMN university_shortname TO id;
+
+-- Make id a primary key
+ALTER TABLE universities
+ADD CONSTRAINT university_pk PRIMARY KEY (id);
 ```
 
 ## 3.3. Surrogate keys
@@ -641,6 +680,9 @@ ADD CONSTRAINT pk PRIMARY KEY (column_c);
 ```
 
 **Practice**
+
+**Add a SERIAL surrogate key**
+
 ```sql
 -- Add the new column to the table
 ALTER TABLE professors 
@@ -654,12 +696,28 @@ ADD CONSTRAINT professors_pkey PRIMARY KEY (id);
 SELECT *
 FROM professors
 LIMIT 10;
+
+firstname	lastname	university_shortname	id
+Karl	Aberer	EPF	1
+Reza Shokrollah	Abhari	ETH	2
+Georges	Abou Jaoudé	EPF	3
+Hugues	Abriel	UBE	4
+Daniel	Aebersold	UBE	5
+Marcelo	Aebi	ULA	6
+Christoph	Aebi	UBE	7
+Patrick	Aebischer	EPF	8
+Stephan	Aier	USG	9
+Anastasia	Ailamaki	EPF	10
 ```
+
+**CONCATenate columns to a surrogate key**
 
 ```sql
 -- Count the number of distinct rows with columns make, model
 SELECT COUNT(DISTINCT(make, model)) 
 FROM cars;
+
+10
 
 -- Add the id column
 ALTER TABLE cars
@@ -675,6 +733,18 @@ ADD CONSTRAINT id_pk PRIMARY KEY(id);
 
 -- Have a look at the table
 SELECT * FROM cars;
+
+make	model	mpg	id
+Subaru	Forester	24	SubaruForester
+Opel	Astra	45	OpelAstra
+Opel	Vectra	40	OpelVectra
+Ford	Avenger	30	FordAvenger
+Ford	Galaxy	30	FordGalaxy
+Toyota	Prius	50	ToyotaPrius
+Toyota	Speedster	30	ToyotaSpeedster
+Toyota	Galaxy	20	ToyotaGalaxy
+Mitsubishi	Forester	10	MitsubishiForester
+Mitsubishi	Galaxy	30	MitsubishiGalaxy
 ```
 
 ```sql
@@ -691,6 +761,8 @@ CREATE TABLE students (
 Leverage foreign keys to connect tables and establish relationships that will greatly benefit data quality. Run ad hoc analyses on new database.
 
 ## 4.1. Model 1:N relationships with foreign keys
+
+<img src="/assets/images/20210506_IntroRDInSQL/pic13.png" class="largepic"/>
 
 **Implementing relationships with foreign keys**
 * A foreign key (FK) points to the primary key (PK) of another table 
@@ -758,6 +830,10 @@ WHERE universities.university_city = 'Zurich';
 
 ## 4.2. Model more complex relationships
 
+**The final database model**
+<img src="/assets/images/20210506_IntroRDInSQL/pic14.png" class="largepic"/>
+
+
 **How to implement N:M-relationships**
 * Create a table
 * Add foreign keys for every connected table 
@@ -770,6 +846,7 @@ professor_id integer REFERENCES professors (id), organization_id varchar(256) RE
 * No primary key!
 * Possible PK = {professor_id, organization_id, function}
 
+**Add foreign keys to the "affiliations" table**
 ```sql
 -- Add a professor_id column
 ALTER TABLE affiliations
@@ -867,7 +944,11 @@ It fails because referential integrity from professors to universities is violat
 SELECT constraint_name, table_name, constraint_type
 FROM information_schema.table_constraints
 WHERE constraint_type = 'FOREIGN KEY';
+```
+<img src="/assets/images/20210506_IntroRDInSQL/pic15.png" class="largepic"/>
 
+
+```sql
 -- Drop the right foreign key constraint
 ALTER TABLE affiliations
 DROP CONSTRAINT affiliations_organization_id_fkey;
@@ -887,6 +968,18 @@ WHERE organization_id = 'CUREM';
 
 ## 4.4. Ad-hoc SQL query
 
+**Count affiliations per university**
+
+```sql
+-- Count the total number of affiliations per university
+SELECT COUNT(*), professors.university_id 
+FROM affiliations
+JOIN professors
+ON affiliations.professor_id = professors.id
+-- Group by the university ids of professors
+GROUP BY professors.university_id 
+ORDER BY count DESC;
+```
 ```sql
 -- Filter the table and sort it
 SELECT COUNT(*), organizations.organization_sector, 
