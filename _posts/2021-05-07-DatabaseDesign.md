@@ -37,7 +37,8 @@ Learn about the two approaches to data processing, OLTP and OLAP. Get familiar w
 * Data: up-to-date, operational                        
 * Size: snapshot, gigabytes                             
 * Queries: simple transactions & frequent updates        
-* Users: thousands                                       
+* Users: thousands
+
 **OLAP**
 Purpose: report and analyze data
 Design: ubject-oriented (certain subject that's under analysis)
@@ -54,6 +55,7 @@ Users: hundreds
 * OLAP and OLTP systems work together; in fact, they need each other. OLTP data is usually stored in an operational database that is pulled and cleaned to create an OLAP data warehouse
 * Without transactional data, no analyses can be done in the first place. Analyses from OLAP systems are used to inform business practices and day-to-day activity, thereby influencing the OLTP databases.
 
+<img src="/assets/images/20210507_DatabaseDesign/pic69.png" class="largepic"/>
 
 ## 1.2. Storing data
 
@@ -71,6 +73,8 @@ Users: hundreds
     * Does not follow larger schema 
     * Self-describing structure
     * e.g., NoSQL, XML, JSON
+
+<img src="/assets/images/20210507_DatabaseDesign/pic70.png" class="largepic"/>
 
 <img src="/assets/images/20210507_DatabaseDesign/pic1.png" class="largepic"/>
 
@@ -110,10 +114,22 @@ Because its clean and organized, structured data is easier to analyze. However, 
 * Retains all data and can take up petabytes
 * Schema-on-read as opposed to schema-on-write
 * Need to catalog data otherwise becomes a **data swamp**
-* Run b**ig data analytics** using services such as **Apache Spark** and **Hadoop**
+* Run **big data analytics** using services such as **Apache Spark** and **Hadoop**
     * Useful for deep learning and data discovery because activities require so much data
 
+
+Technically, traditional databases and warehouses can store unstructured data, but not cost-effectively. 
+Data Lake storage is cheaper because it uses object storage as opposed to the traditional block or file storage. This allows massive amounts of data to be stored effectively of all types, from streaming data to operational databases. 
+Lakes are massive because they store all the data that might be used. Data lakes are often petabytes in size - that's 1,000 terabytes! 
+Unstructured data is the most scalable, which permits this size. Lakes are schema-on-read, meaning the schema is created as data is read. Warehouses and traditional databases are classified as schema-on-write because the schema is predefined.
+
+**Data lakes aren't only limited to storage. It's becoming popular to run analytics on data lakes. This is especially true for tasks like deep learning and data discovery, which needs a lot of data that doesn't need to be that "clean."**
 <img src="/assets/images/20210507_DatabaseDesign/pic5.png" class="largepic"/>
+
+**Extract, Transform, Load or Extract, Load, Transform**
+
+ETL is the more traditional approach for warehousing and smaller-scale analytics. But, ELT has become common with big data projects. In ETL, data is transformed before loading into storage - usually to follow the storage's schema, as is the case with warehouses. 
+In ELT, the data is stored in its native form in a storage solution like a data lake.**Portions of data are transformed for different purposes**, from building a data warehouse to doing deep learning.
 
 **ETL**
 
@@ -122,6 +138,15 @@ Because its clean and organized, structured data is easier to analyze. However, 
 **ELT**
 
 <img src="/assets/images/20210507_DatabaseDesign/pic7.png" class="largepic"/>
+
+<img src="/assets/images/20210507_DatabaseDesign/pic71.png" class="largepic"/>
+
+**Ordering ETL Tasks**
+
+<img src="/assets/images/20210507_DatabaseDesign/pic72.png" class="largepic"/>
+
+**When should you choose a data warehouse over a data lake?**
+To create accessible and isolated data repositories for other analysts. Analysts will appreciate working in a data warehouse more because of its organization of structured data that make analysis easier.
 
 ## 1.3. Database design
 * Determines how data is logically stored
@@ -173,11 +198,23 @@ Adaptation of the relational model for data warehouse design
 * Holds descriptions of attributes 
 * Does not change as often
 
+<img src="/assets/images/20210507_DatabaseDesign/pic73.png" class="largepic"/>
+
+```sql
+SELECT 
+	-- Get the total duration of all runs
+	SUM(duration_mins)
+FROM 
+	runs_fact
+-- Get all the week_id's that are from July, 2019
+INNER JOIN week_dim ON week_dim.week_id = runs_fact.week_id
+WHERE month = 'July' and year = '2019';
+```
 # 2. Database Schemas and Normalization
 
 Learn to implement star and snowflake schemas, recognize the importance of normalization and see how to normalize databases to different extents.
 
-# 2.1. Star and snowflake schema
+## 2.1. Star and snowflake schema
 
 **Dimesion modeling: Star schema**
 

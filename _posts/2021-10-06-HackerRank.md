@@ -1,7 +1,7 @@
 ---
 layout: post
 author: ledinhtrunghieu
-title: Algorithms and Data Structures
+title: HackerRank
 ---
 
 # 1. Python
