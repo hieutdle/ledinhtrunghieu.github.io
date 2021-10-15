@@ -379,19 +379,21 @@ Normalization eliminates data redundancy
     Smaller tables are easier to extend than larger tables
 
 **Database normalization**
+
 **Advantages**
 * Normalization eliminates data redundancy: save on storage 
 * Better data integrity: accurate and consistent data
+
 **Disadvantages**
 * Complex queries require more CPU
 
 **Normalization on OLTP and OLAP**
+
 **OLTP**
 * e.g., Operational databases 
 * Typically highly normalized
 * Write-intensive
 * Prioritize quicker and safer insertion of data
-
 
 **OLAP**
 * e.g., Data warehouses 
@@ -545,6 +547,12 @@ An insertion anomaly is when you are unable to add a new record due to missing a
 
 If you were to delete any of these students, you would lose the course information provided in the columns enrolled_in and taught_by. This could be resolved if we put that information in another table.
 
+
+Does the customers table meet 1NF criteria?
+
+No, because there are multiple values in cars_rented and invoice_id
+<img src="/assets/images/20210507_DatabaseDesign/pic74.png" class="largepic"/>
+
 ```sql
 
 --1NF
@@ -570,7 +578,13 @@ CREATE TABLE cars (
   condition VARCHAR(128),
   color VARCHAR(128)
 );
+```
 
+Why doesn't customer_rentals meet 2NF criteria?
+Because there are non-key attributes describing the car that only depend on one primary key, car_id.
+<img src="/assets/images/20210507_DatabaseDesign/pic75.png" class="largepic"/>
+
+```sql
 -- 2NF
 -- Drop columns in customer_rentals to satisfy 2NF
 ALTER TABLE customer_rentals
@@ -579,7 +593,16 @@ DROP COLUMN manufacturer,
 DROP COLUMN type_car,
 DROP COLUMN condition,
 DROP COLUMN color;
+```
 
+<img src="/assets/images/20210507_DatabaseDesign/pic76.png" class="largepic"/>
+
+Why doesn't rental_cars meet 3NF criteria?
+
+
+Because there are two columns that depend on the non-key column, model.
+
+```sql
 --3NF
 
 -- Create a new table to satisfy 3NF
@@ -776,6 +799,26 @@ ON artist_title.reviewid = top_15_2017.reviewid;
 
 -- Output the new view
 SELECT * FROM top_artists_2017;
+
+artist
+
+massive attack
+krallice
+uranium club
+liliput
+kleenex
+taso
+various artists
+little simz
+yotam avni
+brian eno
+harry bertoia
+run the jewels
+steven warwick
+pete rock
+smoke dza
+various artists
+senyawa
 ```
 
 **Granting and revoking access**
@@ -865,7 +908,23 @@ VALUES (50000, 'classical');
 REFRESH MATERIALIZED VIEW genre_count;
 
 SELECT * FROM genre_count;
+
+genre	count
+global	217
+experimental	1815
+metal	860
+null	2367
+classical	1
+electronic	3874
+folk/country	685
+pop/r&b	1432
+jazz	435
+rap	1559
+rock	9436
 ```
+
+**Why do companies use pipeline schedulers, such as Airflow and Luigi, to manage materialized views?**
+To refresh materialized views with consideration to dependences between views. These pipeline schedulers help visualize dependencies and create a logical order for refreshing views.
 
 # 4. Database Management
 
@@ -944,6 +1003,9 @@ REVOKE data_analyst FROM alex;
 
 **Practice**
 ```sql
+-- Create a data scientist role
+CREATE ROLE data_scientist;
+
 -- Create a role for Marta
 CREATE ROLE marta LOGIN;
 
@@ -969,8 +1031,11 @@ REVOKE data_scientist FROM Marta;
 
 **Why partition?**
 *Tables grow (100s Gb / Tb)*
+
 **Problem:** queries/updates become slower 
+
 **Because:** e.g., indices don't fit memory
+
 **Solution:** split table into smaller parts (= partitioning)
 
 **Data modeling refresher**
@@ -1066,9 +1131,13 @@ SELECT film_id, title, release_year FROM film;
 SELECT * FROM film_partitioned;
 ```
 
+<img src="/assets/images/20210507_DatabaseDesign/pic77.png" class="largepic"/>
+
+
 ## 4.3. Data integration
 
 **What is data integration**
+
 **Data Integration** combines data from different sources, formats, technologies to provide users with a translated and unified view of that data.
 
 **Business case examples**
@@ -1120,6 +1189,8 @@ Security is also a concern: if data access was originally restricted, it should 
 <img src="/assets/images/20210507_DatabaseDesign/pic57.png" class="largepic"/>
 
 For data governance purposes, you need to consider lineage: for effective auditing, you should know where the data originated and where it is used at all times.
+
+<img src="/assets/images/20210507_DatabaseDesign/pic78.png" class="largepic"/>
 
 ## 4.4. Picking a Database Management System (DBMS)
 
