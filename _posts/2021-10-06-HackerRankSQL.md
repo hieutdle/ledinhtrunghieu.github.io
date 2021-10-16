@@ -1,22 +1,11 @@
 ---
 layout: post
 author: ledinhtrunghieu
-title: HackerRank
+title: HackerRank SQL
 ---
 
-# 1. Python
 
-**sWAP cASE**
-```python
-def swap_case(s):
-    s = s.swapcase()
-    return s
-```
-
-
-
-
-# 2. SQL
+# . SQL
 
 **The PADS**
 
@@ -42,13 +31,4 @@ SELECT
   END tuple
 FROM TRIANGLES;
 ```
-
-
-# 3. ALgorithms
-
-
-
-# 4. Data Structures
-
-
 
