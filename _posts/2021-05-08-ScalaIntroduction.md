@@ -69,5 +69,40 @@ Scala combines object-oriented and functional programming in one concise, high-l
 
 **Scala fuses OOP and FP**
 
-Scala combines object-oriented and functional programming
+* Scala combines object-oriented and functional programming
+* Scala is scalable
+
+**Scala is object-oriented**
+* Every value is an object
+* Every operation is a method call
+
+```py
+val sumA = 2 + 4
+val sumA = 2.+(4)
+
+sumA: Int = 6
+```
+
+**Scala is functional**
+1. Functions are first-class values like Int or Str
+2. Operations of a program should map input values to output values rather than change data in place (Function should not have side effects)
+
+**More answer to "Why use Scala**
+
+Scala combines object-oriented and functional programming in one concise, high-level language. Scala's static types help avoid bugs in complex applications, and its JVM and JavaScript runtimes let you build high-performance systems with easy access to huge ecosystems of libraries.
+
+* Scala is **concise**. Scala programs tend to be short, often down to one tenth of the number of lines compared to Java programs.
+* Scala is **high-level**, which means you won't deal with the details of the computer in your Scala code. In turn, your code becomes shorter and easier to understand. You have fewer opportunities to make mistakes.
+* Scala has an **ADVANCED static type system** that reduces verbosity in your code and adds language flexibility. These are two common criticisms of static typing.
+* Scala is **compatible**, which means you can build on previously existing Java code. That's huge. Scala runs primarily on the Java Virtual Machine. It heavily reuses Java types. Plus more.
+
+
+
+
+
+
+
+
+
+
 
