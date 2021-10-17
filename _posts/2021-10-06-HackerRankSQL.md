@@ -61,6 +61,23 @@ happens to equal the minimum value in Northern Latitude (LAT_N in STATION).
  happens to equal the maximum value in Western Longitude (LONG_W in STATION).
 Query the Manhattan Distance between points  and  and round it to a scale of  decimal places.
 
+**Weather Observation Station 15**
+Query the Western Longitude (LONG_W) for the largest Northern Latitude (LAT_N) in STATION that is less than 137.2345. Round your answer to  decimal places.
+```sql
+SELECT ROUND(LONG_W,4)
+FROM STATION
+WHERE LAT_N = (SELECT MAX(LAT_N)
+                FROM STATION
+                WHERE LAT_N < 137.2345)
+```
+or
+```sql
+SELECT ROUND(LONG_W, 4) 
+FROM STATION 
+WHERE LAT_N < 137.2345 
+ORDER BY LAT_N 
+DESC LIMIT 1;
+```
 **Weather Observation Station 18**
 <img src="/assets/images/20211006_HackerRankSQL/pic3.png" class="largepic"/>
 ```sql
@@ -71,6 +88,14 @@ FROM
     STATION;
 ```
 
+**Weather Observation Station 19**
+<img src="/assets/images/20211006_HackerRankSQL/pic11.png" class="largepic"/>
+```sql
+SELECT
+    ROUND(SQRT(POWER(ABS(MAX(LAT_N)  - MIN(LAT_N)),2)+ POWER(ABS(MAX(LONG_W)-MIN(LONG_W)),2)),4)
+FROM 
+    STATION;
+```
 
 
 **Higher Than 75 Marks**
@@ -86,14 +111,49 @@ ORDER BY RIGHT(Name,3),ID;
 
 **Employee Salaries**
 
+Oceania 109190
+South America 147435
+Europe 175138
+Africa 274439
+Asia 693038
 
+Oceania 109189 
+South America 147435 
+Europe 175138 
+Africa 274439 
+Asia 693038 
 # 2. Aggeration
+
+**The Blunder**
+Samantha was tasked with calculating the average monthly salaries for all employees in the EMPLOYEES table, but did not realize her keyboard's  key was broken until after completing the calculation. She wants your help finding the difference between her miscalculation (using salaries with any zeros removed), and the actual average salary. Write a query calculating the amount of error , and round it up to the next integer.
+<img src="/assets/images/20211006_HackerRankSQL/pic6.png" class="largepic"/>
+<img src="/assets/images/20211006_HackerRankSQL/pic7.png" class="largepic"/>
+<img src="/assets/images/20211006_HackerRankSQL/pic8.png" class="largepic"/>
+
+```sql
+SELECT CEIL(AVG(Salary)-AVG(REPLACE(Salary,'0','')))
+FROM EMPLOYEES
+```
+
+
+**Top Earners**
+<img src="/assets/images/20211006_HackerRankSQL/pic10.png" class="largepic"/>
+<img src="/assets/images/20211006_HackerRankSQL/pic9.png" class="largepic"/>
+
+```sql
+SELECT MAX(SALARY*MONTHS), COUNT(*)
+FROM EMPLOYEE
+WHERE (SALARY*MONTHS) = (SELECT MAX(SALARY*MONTHS)
+                         FROM EMPLOYEE);
+```
+
 
 # 3. Advance Select
 
 
 **The PADS**
-https://www.hackerrank.com/challenges/the-pads/problem
+<img src="/assets/images/20211006_HackerRankSQL/pic5.png" class="largepic"/>
+
 Generate the following two result sets:
 
 Query an alphabetically ordered list of all names in OCCUPATIONS, immediately followed by the first letter of each profession as a parenthetical (i.e.: enclosed in parentheses). For example: AnActorName(A), ADoctorName(D), AProfessorName(P), and ASingerName(S).
@@ -106,8 +166,23 @@ There are a total of [occupation_count] [occupation]s.
 where [occupation_count] is the number of occurrences of an occupation in OCCUPATIONS and [occupation] is the lowercase occupation name. If more than one Occupation has the same [occupation_count], they should be ordered alphabetically.
 
 Note: There will be at least two entries in the table for each type of occupation.
-
-
+Sample output
+```sql
+Ashely(P)
+Christeen(P)
+Jane(A)
+Jenny(D)
+Julia(A)
+Ketty(P)
+Maria(A)
+Meera(S)
+Priya(S)
+Samantha(D)
+There are a total of 2 doctors.
+There are a total of 2 singers.
+There are a total of 3 actors.
+There are a total of 3 professors.
+```
 ```sql
 SELECT CONCAT(NAME,'(',SUBSTR(OCCUPATION,1,1),')') AS N
 FROM OCCUPATIONS

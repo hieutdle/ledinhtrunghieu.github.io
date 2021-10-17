@@ -25,3 +25,10 @@ SELECT
     (SELECT AVG(price) FROM wine) AS avg_price
 FROM food
 ```
+
+
+Math.Round computes the nearest number to the input to a specified degree of accuracy.
+
+Rounds a value to the nearest integer or to the specified number of fractional digits.
+
+Math.Truncate effectively discards the any digits after the decimal point. It will always round to the nearest integer toward zero.
