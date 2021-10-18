@@ -378,6 +378,467 @@ println(maxHand(handPlayerA, handPlayerB))
 
 ## 2.3. Arrays
 **Collection**
+* Mutable collections: can be updated or extended in place, can change, add, or remove elements of the originally created collection
+* Immutable collections: never change
 
+**Array**
+* Mutable sequence of objects that share the same type
+* Parameterize an array: configure its types and parameter values
+```scala
+scala> val players = new Array[String](3)
+
+players: Array[String] = Array(null, null, null)
+
+Type parameter: String
+Value parameter: length which is 3
+```
+* Initialize elements of an array: give the array data
+```scala
+scala>	players(0)	=	"Alex"
+scala>	players(1)	=	"Chen"
+scala>	players(2)	=	"Marta"
+scala>	players		
+
+res3: Array[String] = Array(Alex, Chen, Marta)
+```
+
+```scala
+scala> val players = Array("Alex", "Chen", "Marta")
+
+players: Array[String] = Array(Alex, Chen, Marta)
+```
+
+**Array are mutable**
+```scala
+scala> val players = Array("Alex", "Chen", "Marta")
+
+players: Array[String] = Array(Alex, Chen, Marta)
+
+scala> players(0) = "Sindhu"
+
+res5: Array[String] = Array(Sindhu, Chen, Marta)
+```
+
+You can only update arrays with values of the same type of the array
+<img src="/assets/images/20210508_ScalaIntroduction/pic18.png" class="largepic"/>
+
+**Recommendation: use val with Array**
+<img src="/assets/images/20210508_ScalaIntroduction/pic19.png" class="largepic"/>
+it is recommended that you make mutable collections vals so you don't have to keep track of two things that can change. If we made players a var, the elements in our original array could change, like the update to include Sindhu, AND an entirely different Array object could be assigned to players.
+
+Scala nudges us towards immutability, and arrays are NOT immutable. Because collections store more data than the single value variables you previously created, immutability with collections increases the potential for hard-to-find bugs.
+
+**The Any supertype**
+<img src="/assets/images/20210508_ScalaIntroduction/pic20.png" class="largepic"/>
+you can mix and match types by parameterizing with Any, the supertype of all types.
+
+**Practice**
+**Create and parameterize an array**
+```scala
+// Create and parameterize an array for a round of Twenty-One
+val hands: Array[Int] = new Array[Int](3)
+```
+
+**Initialize an array**
+```scala
+// Create and parameterize an array for a round of Twenty-One
+val hands: Array[Int] = new Array[Int](3)
+
+// Initialize the first player's hand in the array
+hands(0) = tenClubs + fourDiamonds
+
+// Initialize the second player's hand in the array
+hands(1) = nineSpades + nineHearts
+
+// Initialize the third player's hand in the array
+hands(2) = twoClubs + threeSpades
+
+// Create, parameterize, and initialize an array for a round of Twenty-One
+val hands = Array(tenClubs + fourDiamonds,
+                  nineSpades + nineHearts,
+                  twoClubs + threeSpades)
+
+hands: Array[Int] = Array(14, 18, 5)
+```
+
+**Updating arrays**
+```scala
+// Initialize player's hand and print out hands before each player hits
+hands(0) = tenClubs + fourDiamonds
+hands(1) = nineSpades + nineHearts
+hands(2) = twoClubs + threeSpades
+hands.foreach(println)
+
+// Add 5♣ to the first player's hand
+hands(0) = hands(0) + fiveClubs
+
+// Add Q♠ to the second player's hand
+hands(1) = hands(1) + queenSpades
+
+// Add K♣ to the third player's hand
+hands(2) = hands(2) + kingClubs
+
+// Print out hands after each player hits
+hands.foreach(println)
+
+14
+18
+5
+19
+28
+15
+```
+
+## 2.4. Lists
+
+**Mutable collections:** can be updated or extended in place. Mutable meaning you can change, add, or remove elements of an Array, though you can't change the parameter values like the length of the array
+* Array: mutable sequence of objects with the same type
+
+**Immutable collections:** never change
+* List: immutable sequence of objects with the same type. Like with Array, "share the same type" unintuitively means you can have mixed types when you use the Any supertype.
+
+**Lists have a type parameter**
+```scala
+Array
+scala> val players = Array("Alex", "Chen", "Marta")
+players: Array[String] = Array(Alex, Chen, Marta)
+
+List
+scala> val players = List("Alex", "Chen", "Marta")
+players: List[String] = List(Alex, Chen, Marta)
+```
+
+**How Lists are useful while immutable**
+* `List`: has methods, like all of Scala collections
+  * Method: a function that belongs to an object
+* There are many `List` methods
+ * myList.drop()
+ * myList.mkString(", ")
+ * myList.length
+ * myList.reverse
+
+```scala
+scala> val players = List("Alex", "Chen", "Marta")
+players: List[String] = List(Alex, Chen, Marta)
+
+scala> val newPlayers = "Sindhu" :: players
+newPlayers: List[String] = List(Sindhu, Alex, Chen, Marta)
+```
+or make `players` a `var`
+```scala
+scala> var players = List("Alex", "Chen", "Marta")
+players: List[String] = List(Alex, Chen, Marta)
+
+scala> var players = "Sindhu" :: players
+newPlayers: List[String] = List(Sindhu, Alex, Chen, Marta)
+```
+
+**cons(:)**
+* Prepends a new element to the **beginning** of an existing `List` and returns the resulting `List`
+
+**Nil**
+* Nil is an empty list
+```scala
+scala> Nil
+
+res0: scala.collection.immutable.Nil.type = List()
+```
+
+A common way to initialize new lists combines `Nil` and `::`
+```scala
+scala> val players = "Alex" :: "Chen" :: "Marta" :: Nil
+
+players: List[String] = List(Alex, Chen, Marta)
+
+scala> val playersError = "Alex" :: "Chen" :: "Marta"
+
+<console>:11: error: value :: is not a member of String val playersError = "Alex" :: "Chen" :: "Marta"
+```
+
+**Concatenating Lists**
+* `:::` for concatenation
+```scala
+val	playersA =	List("Sindhu", "Alex")
+val	playersB =	List("Chen", "Marta")
+val	allPlayers	= playersA ::: playersB
+println(playersA + " and " + playersB + " were not mutated,")
+println("which means " + allPlayers + " is a new List.")
+
+List(Sindhu, Alex) and List(Chen, Marta) were not mutated, 
+which means List(Sindhu, Alex, Chen, Marta) is a new List.
+```
+
+**Practice**
+**Initialize and prepend to a list**
+```scala
+// Initialize a list with an element for each round's prize
+val prizes = List(10, 15, 20, 25, 30)
+println(prizes)
+
+// Prepend to prizes to add another round and prize
+val newPrizes = 5 :: prizes
+println(newPrizes)
+
+prizes: List[Int] = List(10, 15, 20, 25, 30)
+newPrizes: List[Int] = List(5, 10, 15, 20, 25, 30)
+List(10, 15, 20, 25, 30)
+List(5, 10, 15, 20, 25, 30)
+```
+
+**Initialize a list using cons and Nil**
+```scala
+// Initialize a list with an element each round's prize
+val prizes = 10 :: 15 :: 20 :: 25 :: 30 :: Nil
+println(prizes)
+```
+
+**Concatenate Lists**
+```scala
+// The original NTOA and EuroTO venue lists
+val venuesNTOA = List("The Grand Ballroom", "Atlantis Casino", "Doug's House")
+val venuesEuroTO = "Five Seasons Hotel" :: "The Electric Unicorn" :: Nil
+
+// Concatenate the North American and European venues
+val venuesTOWorld = venuesNTOA ::: venuesEuroTO
+
+venuesTOWorld: List[String] = List(
+  "The Grand Ballroom",
+  "Atlantis Casino",
+  "Doug's House",
+  "Five Seasons Hotel",
+  "The Electric Unicorn"
+)
+```
+
+# 3. Type Systems, Control Structures, Style
+Learn about Scala's advanced static type system. After learning how to control your program with if/else, while loops, and the foreach method, Convert imperative-style code to the Scala-preferred functional style.
+
+## 3.1. Scala's static type system
+
+**Some definitions**
+* Type: restricts the possible values to which a variable can refer, or an expression can produce, at run time
+* Compile time: when source code is translated into machine code, i.e., code that a computer can read
+* Run time: when the program is executing commands (a er compilation, if compiled)
+
+**Type systems**
+* Static type systems: A language is statically typed if the type of a variable is known at compile time. That is, types checked before run-time: C/C++, Fortran, Java, Scala
+* Dynamic type systems A language is dynamically typed if types are checked on the fly. That is, types are checked during execution (i.e., run-time): Javascript, Python, Ruby, R
+
+**Pros of static type system**
+* Increased performance at run-time: statically typed languages don't HAVE to check types when someone hits "run program", they execute a little faster.
+* Properties of your program verified (i.e., prove the absence of common type-related bugs) Static type systems can prove the absence of certain run-time errors,
+* Safe refactorings.  A static type system lets you make changes to a codebase with a high degree of confidence. When you recompile your system after a refactor, Scala will alert you of the lines you tweaked that caused a type error, then you fix them
+* Documentation in the form of type annotations ( `:Int` in `val fourHearts: Int = 4`)
+
+**Cons of static type systems**
+* It takes time to check types (i.e, delay before execution)
+* Code is verbose (i.e., code is longer/more annoying to write)
+* The language is inflexible, preventing coders from expressing themselves as they wish (e.g., one strict way of composing a type)
+
+**Reducing verbosity (with variables)**
+Without type inference
+```scala
+scala> val fourHearts: Int = 4
+
+fourHearts: Int = 4
+
+scala> val players: Array[String] = Array("Alex", "Chen", "Marta")
+
+players: Array[String] = Array(Alex, Chen, Marta)
+```
+With type inference
+```scala
+scala> val fourHearts = 4
+
+fourHearts: Int = 4
+
+scala> val players = Array("Alex", "Chen", "Marta")
+
+players: Array[String] = Array(Alex, Chen, Marta)
+```
+
+**Promoting flexibility**
+* Pattern matching
+* Innovative ways to write and compose types
+
+**Compiled, statically-typed languages**
+Compiled languages
+* Increased performance at run time
+Statically-typed languages
+* Increased performance at run time
+
+Scala being both compiled AND statically-typed doubles down on the "increased performance" benefit. Because the compiler knows the exact data types that are used, it can allocate memory accordingly to make the code faster and memory efficient.
+
+
+**Static typing vs. dynamic typing**
+<img src="/assets/images/20210508_ScalaIntroduction/pic21.png" class="largepic"/>
+
+**Pros and cons of static type systems**
+<img src="/assets/images/20210508_ScalaIntroduction/pic22.png" class="largepic"/>
+
+## 3.2. Make decisions with if and else
+
+**A program for playing Twenty-One**
+**Variables**
+```scala
+val fourHearts: Int = 4 
+var aceClubs: Int = 1
+```
+Collections
+```scala
+val hands: Array[Int] = new Array[Int](3)`
+```
+Functions
+```scala
+// Define a function to determine if hand busts def bust(hand: Int) = {
+hand > 21
+}
+```
+A control structure is a block of programming that analyses variables and chooses a direction in which to go based on given parameters. The term flow control details the direction the program takes (which way program control "flows")
+* if/else
+
+**if-else control flow**
+```scala
+def maxHand(handA: Int, handB: Int): Int = { if (handA > handB) handA
+else handB
+}
+
+//	Point	values	for	two	competing	hands
+val	handA	= 17				
+val	handB	= 19				
+
+// Print the value of the hand with the most points 
+if (handA > handB) println(handA)
+else println(handB)
+```
+```scala
+// Point values for two competing hands val handA = 26
+val handB = 20
+
+// If both hands bust, neither wins
+if (bust(handA) & bust(handB)) println(0)
+// If hand A busts, hand B wins  
+else if (bust(handA)) println(handB)
+// If hand B busts, hand A wins  
+else if (bust(handB)) println(handA)
+// If hand A is greater than hand B, hand A wins 
+else if (handA > handB) println(handA)
+// Hand B wins otherwise 
+else println(handB)
+```
+```scala
+scala> val maxHand = if (handA > handB) handA else handB
+
+maxHand: Int = 19
+```
+**Relational and logical operators, these "operators" are actually methods!**
+<img src="/assets/images/20210508_ScalaIntroduction/pic23.png" class="largepic"/>
+
+**Practice**
+```scala
+// Point value of a player's hand
+val hand = sevenClubs + kingDiamonds + threeSpades
+
+// Inform a player where their current hand stands
+val informPlayer: String = {
+  if (hand > 21)
+    "Bust! :("
+  else if (hand == 21) 
+    "Twenty-One! :)"
+  else
+    "Hit or stay?"
+}
+
+// Print the message
+print(informPlayer)
+
+// Find the number of points that will cause a bust
+def pointsToBust(hand: Int): Int = {
+  // If the hand is a bust, 0 points remain
+  if (bust(hand))
+    0
+  // Otherwise, calculate the difference between 21 and the current hand
+  else
+    21 - hand
+}
+
+// Test pointsToBust with 10♠ and 5♣
+val myHandPointsToBust = pointsToBust(tenSpades + fiveClubs)
+println(myHandPointsToBust)
+
+myHandPointsToBust: Int = 6
+6
+```
+
+## 3.3. while and the imperative style
+**Loop with while**
+```scala
+// Define counter variable
+var i = 0
+
+// Define the number of times for the cheer to repeat
+val numRepetitions = 3
+
+// Loop to repeat the cheer 
+while (i < numRepetitions) {
+ println("Hip hip hooray!") 
+ i += 1 // i = i + 1, ++i and i++ don't work!
+}
+```
+**Loop with while over a collection**
+```scala
+// Define counter variable
+var i = 0
+
+// Create an array with each player's hand
+var hands = Array(17, 24, 21)
+
+// Loop through hands and see if each busts 
+while (i < hands.length) {
+  println(bust(hands(i))) 
+  i = i + 1
+}
+```
+<img src="/assets/images/20210508_ScalaIntroduction/pic24.png" class="largepic"/>
+Can't do it like in python
+<img src="/assets/images/20210508_ScalaIntroduction/pic25.png" class="largepic"/>
+
+**Practice**
+```scala
+// Define counter variable
+var i = 0
+
+// Define the number of loop iterations
+val numRepetitions = 3
+
+// Loop to print a message for winner of the round
+while (i < numRepetitions) {
+  if (i < 2)
+    println("winner")
+  else
+    println("chicken dinner")
+  // Increment the counter variable
+  i = i + 1
+}
+
+winner
+winner
+chicken dinner
+
+// Define counter variable
+var i = 0
+
+// Create list with five hands of Twenty-One
+var hands = List(16, 21, 8, 25, 4)
+
+// Loop through hands
+while (i < hands.length) {
+  // Find and print number of points to bust
+  println(pointsToBust(hands(i)))
+  // Increment the counter variable
+  i += 1
+}
+```
+## 3.3. foreach and the functional style
 
 
