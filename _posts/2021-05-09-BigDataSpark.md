@@ -1,5 +1,5 @@
 ---
 layout: post
 author: ledinhtrunghieu
-title: Lesson 18 - Introduction to Scala
+title: Lesson 18 - Big Data Spark
 ---
