@@ -842,3 +842,178 @@ while (i < hands.length) {
 ## 3.3. foreach and the functional style
 
 
+Scala is functional:
+1.	Functions are first-class values
+2.	Operations of a program should map input values to output values rather than change data in place
+
+
+Imperative: Definition: Of the nature of or expressing a command
+
+Scala usually is functional but can also be imperative sometimes
+Scala can be imperative:
+* One command at a time 
+* Iterate with loops
+* Mutate shared state (e.g., mutating variables out of scope)
+* Examples: C, Java, Python
+
+**The imperative style**
+```scala
+// Define counter variable
+var i = 0
+
+// Initialize array with each player's hand
+var hands = Array(17, 24, 21)
+
+// Loop through hands and see if each busts while (i < hands.length) {
+println(bust(hands(i))) i = i + 1
+}
+```
+Feature 1 of imperative programming: one command at a time. Look inside the while loop. One command: print if a hand busts. Another command: increment the counter variable. Feature 2: iterate with loops. The while loop. Feature 3: mutating shared state. var i can be changed within the loop (which is one scope) or outside the loop (another scope). It is mutated in the loop in this example.
+
+**The functional style**
+```scala
+def bust(hand:Int)
+println(hand => 21)	{
+}		
+
+// Initialize array with each player's hand
+var hands = Array(17, 24, 21)
+
+// See if each hand busts
+hands.foreach(INSERT FUNCTION HERE)
+hands.foreach(bust)
+```
+`foreach` is not a built-in control structure; it is a method that takes a function as an argument, which is a demonstration of Scala the functional language.
+
+**What is side effect?**
+Side effect: code that modifies some variable outside of its local scope
+
+```scala
+def bust(hand: Int) = { 
+  println(hand > 21)
+}
+
+scala> val myHand = bust(22)
+
+true
+myHand: Unit = ()
+```
+
+When we provide 22 as an input to bust then assign the result to a val named myHand in the interpreter, we see two lines of output: true, which is printed by the print line call, and the output from declaring the val myHand, which has type Unit. The input value (hand) no longer maps to a true output value with the print statement present. 
+
+```scala
+// Define counter variable
+var i = 0
+// Initialize array with each player's hand
+var hands = Array(17, 24, 21)
+
+// Loop through hands and see if each busts while (i < hands.length) {
+println(bust(hands(i))) i = i + 1
+}
+```
+Mutating a variable outside of its scope is also a side effect. Since i was declared OUTSIDE of the while loop, which is one scope, incrementing i in the loop (another scope) is a side effect.
+
+
+**Less functional than before**
+```scala
+// Define a function to determine if hand busts 
+def bust(hand: Int) = {
+println(hand > 21)
+}
+```
+**More functional than before**
+```scala
+// Initialize array with each player's hand
+var hands = Array(17, 24, 21)
+
+// See if each hand busts
+hands.foreach(bust)
+```
+**Sign of style**
+<img src="/assets/images/20210508_ScalaIntroduction/pic26.png" class="largepic"/>
+
+**Practice**
+
+**Converting while to foreach**
+```scala
+// Define counter variable
+var i = 0
+
+// Create list with five hands of Twenty-One
+var hands = List(16, 21, 8, 25, 4)
+
+// Loop through hands
+while(i < hands.length) {
+  // Find and print number of points to bust
+  println(pointsToBust(hands(i)))
+  // Increment the counter variable
+  i += 1
+}
+```
+```scala
+// Find the number of points that will cause a bust
+def pointsToBust(hand: Int) = {
+  // If the hand is a bust, 0 points remain
+  if (bust(hand))
+    println(0)
+  // Otherwise, calculate the difference between 21 and the current hand
+  else
+    println(21 - hand)
+}
+
+// Create list with five hands of Twenty-One
+var hands = List(16, 21, 8, 25, 4)
+
+// Loop through hands, finding each hand's number of points to bust
+hands.foreach(pointsToBust)
+```
+**Remind**
+Scala is a hybrid imperative/functional language. 
+
+Imperative-style Scala code often has the following traits:
+* One command at a time
+* Iterate with loops
+* Mutate shared state (e.g., mutating variables out of scope)
+
+Functional-style Scala code often has the following traits:
+* Functions are used as first-class values
+* Operations of a program map input values to output values rather than change data in place
+<img src="/assets/images/20210508_ScalaIntroduction/pic27.png" class="largepic"/>
+
+## 3.5. The essence of Scala
+
+**The functional style**
+* Operations of a program map input values to output values rather than change data in place
+<img src="/assets/images/20210508_ScalaIntroduction/pic28.png" class="largepic"/>
+An analogy for this is a pipe with no leaks. Input liquid from other pipes, flowing in, those liquids combining to create something new, then that new mixture flowing out of the pipe, again with no leaks in between.
+
+**Non-functional code**
+* WHEN operations of a program DON'T map input values to output values and DO change data in place
+<img src="/assets/images/20210508_ScalaIntroduction/pic29.png" class="largepic"/>
+When this statement isn't true, we've got a pipe with leaks. Not all leaks in a pipe with leaks spurt out water: sometimes the water flows a certain way to pass over it or a piece of debris or sediment blocks the leak. In large systems of pipes though, there is bound to be a leak that spurts SOMEWHERE and streams of water spurt out as a side effect.
+
+When your script or application runs often or affects lots of users, it's nice to have non-leaky, well-maintained pipes. Well-written, functional-style Scala code lets you have this.
+
+**Benefits of the functional style**
+* Your data won't be changed inadvertently 
+* Your code is easier to reason about
+* You have to write fewer tests
+* Functions are more reliable and reusable
+The first three benefits of the functional style are similar to those of immutability. You won't change variables accidentally, since you don't CHANGE variables passed as inputs to your functions. You just use them to create a new result. Your code becomes easier to reason about, as functions are less entangled. In, out, that's it. You won't have to test for side effects. Plus, the functions you create are more reliable and reusable.
+
+**Scala is a hybrid imperative/functional language**
+Prefer
+* `val`
+* Immutable objects
+* Functions without side effects 
+If necessary
+* `var`
+* Mutable objects
+* Functions with side effects
+
+The designers of Scala suggest the following: look to use vals, immutable objects, and functions without side effects at first instinct, then use vars, mutable objects, and functions with side effects when the need arises. 
+
+**A quote from Martin Odersky, the designer of Scala**
+<img src="/assets/images/20210508_ScalaIntroduction/pic30.png" class="largepic"/>
+
+At the 10th anniversary of the Scala Days conference, he discussed the reason why he created Scala in the first place: he wanted to show that **the fusion of functional programming and object-oriented programming in a statically-typed setting could be practical and powerful**. He said this combination is the essence of Scala, since Scala was the first mainstream language to successfully try the first two with the third. He's been proven right. Scala powers some of the world's largest websites, applications, and data engineering infrastructures.
