@@ -3,7 +3,70 @@ layout: post
 author: ledinhtrunghieu
 title: Algorithms and Data Structures
 ---
-# 1. Introduction
+
+
+**List**
+Two common operations are indexing and assigning to an index position. Both of these operations take the same amount of time no matter how large the list becomes. When an operation like this is independent of the size of the list they are O(1).
+append 0(1)
+The pop() method removes the element at the specified position.
+When pop is called on the end of the list it takes O(1) but when pop is called on the first element in the list or anywhere in the middle it is O(n). The reason for this lies in how Python chooses to implement lists. When an item is taken from the front of the list, in Python’s implementation, all the other elements in the list are shifted one position closer to the beginning.
+that the time required to pop from the end of the list will stay constant even as the list grows in size, while the time to pop from the beginning of the list will continue to increase as the list grows.
+<img src="/assets/images/20210626_AlgoDataStruc/pic2.png" class="largepic"/>
+
+**The second major Python data structure is the dictionary**
+dictionaries differ from lists in that you can access items in a dictionary by a key rather than a position.
+
+The thing that is most important to notice right now is that the get item and set item operations on a dictionary are O(1). Another important dictionary operation is the contains operation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 * Given a problem, a computer scientist’s goal is to develop an **algorithm**, a step-by-step list of instructions for solving any instance of the problem that might arise. Algorithms are finite processes that if followed will solve the problem. Algorithms are solutions.
 * It is also very common to include the word **computable** when describing problems and solutions. We say that a problem is **computable** if an algorithm exists for solving it.
