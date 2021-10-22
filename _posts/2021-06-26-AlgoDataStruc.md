@@ -18,11 +18,20 @@ dictionaries differ from lists in that you can access items in a dictionary by a
 
 The thing that is most important to notice right now is that the get item and set item operations on a dictionary are O(1). Another important dictionary operation is the contains operation
 
+**Linear data structure**
+Stacks, queues, deques, and lists are examples of data collections whose items are ordered depending on how they are added or removed. Once an item is added, it stays in that position relative to the other elements that came before and came after it. Collections such as these are often referred to as linear data structures.
 
+**Stack**
+A stack (sometimes called a “push-down stack”) is an ordered collection of items where the addition of new items and the removal of existing items always takes place at the same end. This end is commonly referred to as the “top.” The end opposite the top is known as the “base.”
 
+The base of the stack is significant since items stored in the stack that are closer to the base represent those that have been in the stack the longest. The most recently added item is the one that is in position to be removed first. This ordering principle is sometimes called LIFO, last-in first-out. It provides an ordering based on length of time in the collection. Newer items are near the top, while older items are near the base.
 
-
-
+`Stack()` creates a new stack that is empty. It needs no parameters and returns an empty stack.
+`push(item)` adds a new item to the top of the stack. It needs the item and returns nothing.
+`pop()` removes the top item from the stack. It needs no parameters and returns the item. The stack is modified.
+`peek()` returns the top item from the stack but does not remove it. It needs no parameters. The stack is not modified.
+`is_empty()` tests to see whether the stack is empty. It needs no parameters and returns a boolean value.
+`size()` returns the number of items on the stack. It needs no parameters and returns an integer.
 
 
 
