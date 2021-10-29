@@ -38,8 +38,39 @@ WHERE location LIKE '%CA';
 ```
 End with CA
 
+```sql
+rating NOT IN ('innovative','fabulous', 'delightful','pretty good');
 
+SELECT * FROM easy_drinks
+WHERE NOT drink_name <> 'Blackthorn';
 
+SELECT * FROM easy_drinks
+WHERE NOT main = 'soda'
+AND NOT main = 'iced tea';
+```
+
+```sql
+UPDATE doughnut_ratings (table)
+SET
+type = 'glazed'
+WHERE type = 'plain glazed'
+```
+
+**Atomic data**
+RULE 1: A column with atomic data can't have several values of the same type of data in that column
+RULE 2: A table with atomic data can't have multiple columns with the same type of data.
+
+Normal tables won’t have duplicate data, which will reduce the size of your database
+
+With less data to search through, your queries will be faster
+
+```sql
+CREATE TABLE my_contacts
+(
+contact_id INT NOT NULL AUTO_INCREMENT,
+```
+
+188
 # 2. Programming language
 
 # 3. Relational Databases - Design & Architecture
