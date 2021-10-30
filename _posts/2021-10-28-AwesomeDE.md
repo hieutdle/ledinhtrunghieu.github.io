@@ -70,7 +70,43 @@ CREATE TABLE my_contacts
 contact_id INT NOT NULL AUTO_INCREMENT,
 ```
 
-188
+Table altering
+```sql
+ALTER TABLE
+CHANGE both the name and data type of an existing column *
+MODIFY the data type or position of an existing column *
+ADD a column to your table—you pick the data type
+DROP a column from your table *
+
+ALTER TABLE projekts
+RENAME TO project_list;
+rename table
+
+ALTER TABLE project_list
+CHANGE COLUMN number proj_id INT NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (proj_id);
+```
+
+To SELECT everything in front of the comma
+```sql
+SUBSTRING_INDEX()
+
+Return a substring of a string before a specified number of delimiter occurs:
+
+SELECT SUBSTRING_INDEX(location, ',', 1) FROM my_contacts;
+
+This is the tricky part. It’s “1” because it’s looking for the first comma. If it were “2” it would keep going until it found a second comma and grab everything in front of that
+```
+
+```sql
+LIMIT 0,4
+```
+LIMIT to position 0 3
+
+A description of the data (the columns and tables) in your database, along with any other related objects and the way they all connect is known as a SCHEMA
+
+300
+
 # 2. Programming language
 
 # 3. Relational Databases - Design & Architecture
