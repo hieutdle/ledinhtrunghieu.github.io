@@ -105,7 +105,32 @@ LIMIT to position 0 3
 
 A description of the data (the columns and tables) in your database, along with any other related objects and the way they all connect is known as a SCHEMA
 
-300
+CREATE a table with a FOREIGN KEY
+```sql
+CREATE TABLE interests (
+int_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+interest VARCHAR(50) NOT NULL,
+contact_id INT NOT NULL,
+CONSTRAINT my_contacts_contact_id_fk
+FOREIGN KEY (contact_id)
+REFERENCES my_contacts (contact_id)
+);
+```
+
+First Normal Form, or 1NF:
+Rule 1: Columns contain only atomic values
+Rule 2: No repeating groups of data
+
+A COMPOSITE KEY is a PRIMARY KEY composed of multiple columns, creating a unique key
+
+When a column’s data must change when another column’s data is modified, the first column is functionally dependent on the second
+A dependent column is one containing data that could change if another column changes. Non-dependent columns stand alone.
+
+
+A partial functional dependency means that a non-key column is dependent on some, but not all, of the columns in a composite primary key
+
+If changing any of the non-key columns might cause any of the other columns to change, you have a transitive dependency
+
 
 # 2. Programming language
 
