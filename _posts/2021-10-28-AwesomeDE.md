@@ -117,19 +117,33 @@ REFERENCES my_contacts (contact_id)
 );
 ```
 
-First Normal Form, or 1NF:
+**First Normal Form, or 1NF:**
 Rule 1: Columns contain only atomic values
 Rule 2: No repeating groups of data
 
+<img src="/assets/images/20211028_AwesomeDE/pic3.png" class="largepic"/>
+
+
 A COMPOSITE KEY is a PRIMARY KEY composed of multiple columns, creating a unique key
 
-When a column’s data must change when another column’s data is modified, the first column is functionally dependent on the second
-A dependent column is one containing data that could change if another column changes. Non-dependent columns stand alone.
+<img src="/assets/images/20211028_AwesomeDE/pic1.png" class="largepic"/>
 
+<img src="/assets/images/20211028_AwesomeDE/pic4.png" class="largepic"/>
+
+When a column’s data must change when another column’s data is modified, the first column is functionally dependent on the second
+
+A dependent column is one containing data that could change if another column changes. Non-dependent columns stand alone.
 
 A partial functional dependency means that a non-key column is dependent on some, but not all, of the columns in a composite primary key
 
+<img src="/assets/images/20211028_AwesomeDE/pic2.png" class="largepic"/>
+
+<img src="/assets/images/20211028_AwesomeDE/pic5.png" class="largepic"/>
+
+
 If changing any of the non-key columns might cause any of the other columns to change, you have a transitive dependency
+
+
 
 
 # 2. Programming language
