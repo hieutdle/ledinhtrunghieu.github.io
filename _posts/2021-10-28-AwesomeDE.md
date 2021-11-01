@@ -143,7 +143,27 @@ A partial functional dependency means that a non-key column is dependent on some
 
 If changing any of the non-key columns might cause any of the other columns to change, you have a transitive dependency
 
+**Cartesian join**
+```sql
+SELECT t.toy, b.boy
+FROM toys AS t
+CROSS JOIN
+boys AS b;
+```
 
+An INNER JOIN combines the records from two tables using comparison operators in a condition. Columns are returned only where the joined rows match the condition. Let’s take a closer look at the syntax.
+
+NATURAL JOIN inner joins identify matching column names.
+```sql
+ELECT boys.boy, toys.toy
+FROM boys
+NATURAL JOIN
+toys;
+```
+A LEFT OUTER JOIN takes all the rows in the left table and matches them to rows in the RIGHT table. It’s useful when the left table and the right table have a one-to-many relationship
+
+The difference is that an outer join gives you a row whether there’s a match with the other table or not.
+A NULL value in the results of a left outer join means that the right table has no values that correspond to the left table.
 
 
 # 2. Programming language
