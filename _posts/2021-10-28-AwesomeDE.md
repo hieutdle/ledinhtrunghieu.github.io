@@ -298,6 +298,74 @@ The goal of Three Tier client-server architecture is:
 * Supporting multiple views of the data
 # 4. noSql
 
+## 4.1. NoSQL Tutorial: Learn NoSQL Features, Types, What is, Advantages - Guru99
+NoSQL Database is a non-relational Data Management System, that does not require a fixed schema. It avoids joins, and is easy to scale. The major purpose of using a NoSQL database is for distributed data stores with humongous data storage needs. NoSQL is used for Big data and real-time web apps. For example, companies like Twitter, Facebook and Google collect terabytes of user data every single day.
+
+NoSQL database stands for “Not Only SQL” or “Not SQL.” Though a better term would be “NoREL”, NoSQL caught on. Carl Strozz introduced the NoSQL concept in 1998.
+
+The concept of NoSQL databases became popular with Internet giants like Google, Facebook, Amazon, etc. who deal with huge volumes of data. The system response time becomes slow when you use RDBMS for massive volumes of data.
+
+To resolve this problem, we could “scale up” our systems by upgrading our existing hardware. This process is expensive.
+
+The alternative for this issue is to distribute database load on multiple hosts whenever the load increases. This method is known as “scaling out.”
+
+NoSQL database is non-relational, so it scales out better than relational databases as they are designed with web applications in mind.
+
+<img src="/assets/images/20211028_AwesomeDE/pic22.png" class="largepic"/>
+
+
+
+
+NoSQL Databases are mainly categorized into four types: Key-value pair, Column-oriented, Graph-based and Document-oriented. Every category has its unique attributes and limitations. None of the above-specified database is better to solve all the problems. Users should select the database based on their product needs.
+
+Types of NoSQL Databases:
+
+Key-value Pair Based
+Column-oriented Graph
+Graphs based
+Document-oriented
+
+Features of NoSQL
+Non-relational
+
+
+NoSQL databases never follow the relational model
+Never provide tables with flat fixed-column records
+Work with self-contained aggregates or BLOBs
+Doesn’t require object-relational mapping and data normalization
+No complex features like query languages, query planners,referential integrity joins, ACID
+Schema-free
+
+NoSQL databases are either schema-free or have relaxed schemas
+Do not require any sort of definition of the schema of the data
+Offers heterogeneous structures of data in the same domain
+
+Key Value Pair Based
+Data is stored in key/value pairs. It is designed in such a way to handle lots of data and heavy load.
+
+<img src="/assets/images/20211028_AwesomeDE/pic23.png" class="largepic"/>
+
+Key-value pair storage databases store data as a hash table where each key is unique, and the value can be a JSON, BLOB(Binary Large Objects), string, etc.
+
+For example, a key-value pair may contain a key like “Website” associated with a value like “Guru99”.
+
+
+It is one of the most basic NoSQL database example. This kind of NoSQL database is used as a collection, dictionaries, associative arrays, etc. Key value stores help the developer to store schema-less data. They work best for shopping cart contents.
+
+Redis, Dynamo, Riak are some NoSQL examples of key-value store DataBases. They are all based on Amazon’s Dynamo paper.
+
+Column-based
+Column-oriented databases work on columns and are based on BigTable paper by Google. Every column is treated separately. Values of single column databases are stored contiguously.
+
+<img src="/assets/images/20211028_AwesomeDE/pic24.png" class="largepic"/>
+
+Column based NoSQL database
+
+They deliver high performance on aggregation queries like SUM, COUNT, AVG, MIN etc. as the data is readily available in a column.
+
+Column-based NoSQL databases are widely used to manage data warehouses, business intelligence, CRM, Library card catalogs,
+
+HBase, Cassandra, HBase, Hypertable are NoSQL query examples of column based database.
 # 5. Columnar Databases
 
 ## 5.1. Data Processing Holy Grail? Row vs. Columnar Databases - Joao Sousa
