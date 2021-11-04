@@ -213,9 +213,40 @@ ORDER BY COUNT(OCCUPATION), OCCUPATION;
 ```
 
 **Occupations**
+Pivot the Occupation column in OCCUPATIONS so that each Name is sorted alphabetically and displayed underneath its corresponding Occupation. The output column headers should be Doctor, Professor, Singer, and Actor, respectively.
 
+Note: Print NULL when there are no more names corresponding to an occupation.
+Input:
+<img src="/assets/images/20211006_HackerRankSQL/pic15.png" class="largepic"/>
+Output:
+```sql
+Jenny    Ashley     Meera  Jane
+Samantha Christeen  Priya  Julia
+NULL     Ketty      NULL   Maria
+```
 
+The first column is an alphabetically ordered list of Doctor names.
+The second column is an alphabetically ordered list of Professor names.
+The third column is an alphabetically ordered list of Singer names.
+The fourth column is an alphabetically ordered list of Actor names.
 
+```sql
+SET @D:=0,@P:=0,@S:=0,@A:=0;
+SELECT MIN(Doctor),MIN(Professor),MIN(Singer),MIN(Actor)FROM 
+(SELECT CASE 
+            When Occupation = "Doctor" then @D := @D+1
+            When Occupation = "Professor" then @P := @P+1
+            When Occupation = "Singer" then @S := @S+1
+            When Occupation = "Actor" then @A := @A+1
+        END AS RowNumber,
+        CASE When Occupation = "Doctor" then Name end as Doctor,
+        CASE When Occupation = "Professor" then Name end as Professor,
+        CASE When Occupation = "Singer" then Name end as Singer,
+        CASE When Occupation = "Actor" then Name end as Actor
+    FROM OCCUPATIONS
+    ORDER BY Name) as Temp
+GROUP BY RowNumber;
+```
 
 
 
@@ -239,6 +270,43 @@ SELECT
     WHEN A <> B and B <> C THEN 'Scalene'
   END tuple
 FROM TRIANGLES;
+```
+
+**New Companies**
+
+<img src="/assets/images/20211006_HackerRankSQL/pic16.png" class="largepic"/>
+Input:
+<img src="/assets/images/20211006_HackerRankSQL/pic17.png" class="largepic"/>
+Output:
+```sql
+C1 Monika 1 2 1 2
+C2 Samantha 1 1 2 2
+```
+Note:
+The tables may contain duplicate records.
+The company_code is string, so the sorting should not be numeric. For example, if the company_codes are C_1, C_2, and C_10, then the ascending company_codes will be C_1, C_10, and C_2.
+
+```sql
+SELECT  c.company_code, c.founder, 
+        COUNT(DISTINCT l.lead_manager_code), COUNT(DISTINCT s.senior_manager_code),
+        COUNT(DISTINCT m.manager_code), COUNT(DISTINCT e.employee_code)
+FROM Company c, Lead_Manager l, Senior_Manager s, Manager m, Employee e
+WHERE c.company_code = l.company_code AND 
+      l.lead_manager_code = s.lead_manager_code AND
+      s.senior_manager_code = m.senior_manager_code AND
+      m.manager_code = e.manager_code
+GROUP BY c.company_code,c.founder ORDER BY c.company_code;
+```
+Solution 2:
+```sql
+SELECT c.company_code, c.founder, 
+       COUNT(DISTINCT l.lead_manager_code), COUNT(DISTINCT s.senior_manager_code),
+       COUNT(DISTINCT m.manager_code), COUNT(DISTINCT e.employee_code)
+FROM Company c JOIN Lead_Manager l ON c.company_code = l.company_code JOIN
+     Senior_Manager s ON l.lead_manager_code = s.lead_manager_code JOIN
+     Manager m ON s.senior_manager_code = m.senior_manager_code JOIN
+     Employee e ON m.manager_code = e.manager_code   
+GROUP BY c.company_code, c.founder ORDER BY c.company_code;
 ```
 
 # 4. Basic Join
@@ -274,3 +342,4 @@ JOIN GRADES as g
 WHERE s.Marks BETWEEN g.Min_Mark AND g.Max_Mark
 ORDER BY g.Grade DESC, s.Name ASC, s.Marks ASC;
 ```
+
