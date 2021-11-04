@@ -124,6 +124,24 @@ Africa 274439
 Asia 693038 
 # 2. Aggeration
 
+**Weather Observation Station 20**
+A median is defined as a number separating the higher half of a data set from the lower half. Query the median of the Northern Latitudes (LAT_N) from STATION and round your answer to 4 decimal places.
+
+```sql
+SET @N:=0;
+SELECT COUNT(*) FROM STATION INTO @TOTAL;
+SELECT
+    ROUND(AVG(A.LAT_N), 4)
+FROM (SELECT @N := @N +1 AS ROW_ID, LAT_N FROM STATION ORDER BY LAT_N) A
+WHERE
+    CASE WHEN MOD(@TOTAL, 2) = 0 
+            THEN A.ROW_ID IN (@TOTAL/2, (@TOTAL/2+1))
+            ELSE A.ROW_ID = (@TOTAL+1)/2
+    END
+;
+```
+
+
 **The Blunder**
 Samantha was tasked with calculating the average monthly salaries for all employees in the EMPLOYEES table, but did not realize her keyboard's  key was broken until after completing the calculation. She wants your help finding the difference between her miscalculation (using salaries with any zeros removed), and the actual average salary. Write a query calculating the amount of error , and round it up to the next integer.
 <img src="/assets/images/20211006_HackerRankSQL/pic6.png" class="largepic"/>
@@ -194,6 +212,13 @@ GROUP BY OCCUPATION
 ORDER BY COUNT(OCCUPATION), OCCUPATION;
 ```
 
+**Occupations**
+
+
+
+
+
+
 **Type of Triangle**
 
 Write a query identifying the type of each record in the TRIANGLES table using its three side lengths. Output one of the following statements for each record in the table:
@@ -216,3 +241,36 @@ SELECT
 FROM TRIANGLES;
 ```
 
+# 4. Basic Join
+
+**The Report**
+
+You are given two tables: Students and Grades.
+
+<img src="/assets/images/20211006_HackerRankSQL/pic12.png" class="largepic"/>
+
+<img src="/assets/images/20211006_HackerRankSQL/pic13.png" class="largepic"/>
+
+Ketty gives Eve a task to generate a report containing three columns: Name, Grade and Mark. Ketty doesn't want the NAMES of those students who received a grade lower than 8. The report must be in descending order by grade -- i.e. higher grades are entered first. If there is more than one student with the same grade (8-10) assigned to them, order those particular students by their name alphabetically. Finally, if the grade is lower than 8, use "NULL" as their name and list them by their grades in descending order. If there is more than one student with the same grade (1-7) assigned to them, order those particular students by their marks in ascending order.
+
+Write a query to help Eve.
+
+<img src="/assets/images/20211006_HackerRankSQL/pic14.png" class="largepic"/>
+
+Output:
+```sql
+Maria 10 99
+Jane 9 81
+Julia 9 88 
+Scarlet 8 78
+NULL 7 63
+NULL 7 68
+```
+
+```sql
+SELECT IF(g.Grade>=8,s.Name,NULL), g.Grade, s.Marks
+FROM STUDENTS as s
+JOIN GRADES as g
+WHERE s.Marks BETWEEN g.Min_Mark AND g.Max_Mark
+ORDER BY g.Grade DESC, s.Name ASC, s.Marks ASC;
+```
