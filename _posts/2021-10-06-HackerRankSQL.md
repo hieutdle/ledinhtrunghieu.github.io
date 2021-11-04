@@ -309,6 +309,43 @@ FROM Company c JOIN Lead_Manager l ON c.company_code = l.company_code JOIN
 GROUP BY c.company_code, c.founder ORDER BY c.company_code;
 ```
 
+**Binary Tree Nodes**
+Sample Input:
+<img src="/assets/images/20211006_HackerRankSQL/pic18.png" class="largepic"/>
+Sample Output:
+```sql
+1 Leaf
+2 Inner
+3 Leaf
+5 Root
+6 Leaf
+8 Inner
+9 Leaf
+```
+You are given a table, BST, containing two columns: N and P, where N represents the value of a node in Binary Tree, and P is the parent of N.
+Write a query to find the node type of Binary Tree ordered by the value of the node. Output one of the following for each node:
+Root: If node is root node.
+Leaf: If node is leaf node.
+Inner: If node is neither root nor leaf node.
+Explain:
+<img src="/assets/images/20211006_HackerRankSQL/pic19.png" class="largepic"/>
+```sql
+SELECT N,
+        (Case
+            When P IS NULL then 'Root'
+            When N in (SELECT DISTINCT(P) FROM BST) then 'Inner'
+            ELSE 'Leaf'
+            END) As NodeType
+FROM BST
+ORDER BY N ASC;
+```
+
+
+
+
+
+
+
 # 4. Basic Join
 
 **The Report**
@@ -343,3 +380,254 @@ WHERE s.Marks BETWEEN g.Min_Mark AND g.Max_Mark
 ORDER BY g.Grade DESC, s.Name ASC, s.Marks ASC;
 ```
 
+**Ollivander's Inventory**
+Harry Potter and his friends are at Ollivander's with Ron, finally replacing Charlie's old broken wand.
+
+Hermione decides the best way to choose is by determining the minimum number of gold galleons needed to buy each non-evil wand of high power and age. Write a query to print the id, age, coins_needed, and power of the wands that Ron's interested in, sorted in order of descending power. If more than one wand has same power, sort the result in order of descending age.
+
+<img src="/assets/images/20211006_HackerRankSQL/pic20.png" class="largepic"/>
+
+Sample output
+
+```sql
+9 45 1647 10
+12 17 9897 10
+1 20 3688 8
+15 40 6018 7
+19 20 7651 6
+11 40 7587 5
+10 20 504 5
+18 40 3312 3
+20 17 5689 3
+5 45 6020 2
+14 40 5408 1
+```
+Explanation
+<img src="/assets/images/20211006_HackerRankSQL/pic21.png" class="largepic"/>
+```sql
+SELECT W.ID, P.AGE, W.COINS_NEEDED, W.POWER 
+FROM WANDS AS W
+JOIN WANDS_PROPERTY AS P
+ON (W.CODE = P.CODE) 
+WHERE P.IS_EVIL = 0 AND W.COINS_NEEDED = (SELECT MIN(COINS_NEEDED) 
+                                          FROM WANDS AS X
+                                          JOIN WANDS_PROPERTY AS Y 
+                                          ON (X.CODE = Y.CODE) 
+                                          WHERE X.POWER = W.POWER AND Y.AGE = P.AGE) 
+ORDER BY W.POWER DESC, P.AGE DESC;
+```
+
+**Top Competitors**
+Julia just finished conducting a coding contest, and she needs your help assembling the leaderboard! Write a query to print the respective hacker_id and name of hackers who achieved full scores for more than one challenge. Order your output in descending order by the total number of challenges in which the hacker earned a full score. If more than one hacker received full scores in same number of challenges, then sort them by ascending hacker_id.
+<img src="/assets/images/20211006_HackerRankSQL/pic22.png" class="largepic"/>
+
+Input:
+<img src="/assets/images/20211006_HackerRankSQL/pic23.png" class="largepic"/>
+Output
+
+```
+90411 Joe
+```
+
+```sql
+SELECT s.hacker_id, h.name
+FROM submissions s
+JOIN hackers h ON s.hacker_id = h.hacker_id
+JOIN challenges c ON s.challenge_id = c.challenge_id
+JOIN difficulty d ON c.difficulty_level = d.difficulty_level
+WHERE s.score = d.score
+GROUP BY h.hacker_id, h.name
+HAVING COUNT(s.hacker_id) > 1
+ORDER BY COUNT(s.hacker_id) DESC, s.hacker_id ASC;
+```
+
+**Challenges**
+Julia asked her students to create some coding challenges. Write a query to print the hacker_id, name, and the total number of challenges created by each student. Sort your results by the total number of challenges in descending order. If more than one student created the same number of challenges, then sort the result by hacker_id. If more than one student created the same number of challenges and the count is less than the maximum number of challenges created, then exclude those students from the result.
+
+<img src="/assets/images/20211006_HackerRankSQL/pic24.png" class="largepic"/>
+
+Output:
+```
+21283 Angela 6
+88255 Patrick 5
+96196 Lisa 1
+```
+<img src="/assets/images/20211006_HackerRankSQL/pic25.png" class="largepic"/>
+```
+12299 Rose 6
+34856 Angela 6
+79345 Frank 4
+80491 Patrick 3
+81041 Lisa 1
+```
+Explain:
+<img src="/assets/images/20211006_HackerRankSQL/pic26.png" class="largepic"/>
+
+```sql
+SELECT h.hacker_id, h.name, COUNT(c.challenge_id) as challenges_created
+FROM hackers h
+JOIN challenges c ON h.hacker_id = c.hacker_id
+GROUP BY h.hacker_id,h.name
+HAVING challenges_created = 
+    (SELECT COUNT(c1.challenge_id) 
+     FROM challenges AS c1 
+     GROUP BY c1.hacker_id 
+     ORDER BY COUNT(*) DESC LIMIT 1)
+     OR challenges_created IN 
+     (select t.cc
+         from (select count(*) as cc
+               from challenges
+               group by hacker_id) t
+         group by t.cc
+         having count(t.cc) = 1)
+ORDER BY challenges_created DESC,h.hacker_id;
+```
+
+**Contest Leaderboard**
+You did such a great job helping Julia with her last coding contest challenge that she wants you to work on this one, too!
+
+The total score of a hacker is the sum of their maximum scores for all of the challenges. Write a query to print the hacker_id, name, and total score of the hackers ordered by the descending score. If more than one hacker achieved the same total score, then sort the result by ascending hacker_id. Exclude all hackers with a total score of 0 from your result.
+<img src="/assets/images/20211006_HackerRankSQL/pic27.png" class="largepic"/>
+
+<img src="/assets/images/20211006_HackerRankSQL/pic28.png" class="largepic"/>
+
+Output:
+```sql
+4071 Rose 191
+74842 Lisa 174
+84072 Bonnie 100
+4806 Angela 89
+26071 Frank 85
+80305 Kimberly 67
+49438 Patrick 43
+```
+
+Explain:
+<img src="/assets/images/20211006_HackerRankSQL/pic29.png" class="largepic"/>
+
+```sql
+SELECT h.hacker_id, h.name, t1.total_score
+  FROM (
+        SELECT hacker_id, SUM(max_score) AS total_score
+          FROM (
+                SELECT hacker_id, MAX(score) AS max_score
+                  FROM Submissions
+                GROUP BY hacker_id, challenge_id
+               ) t
+        GROUP BY hacker_id
+       ) t1
+  JOIN Hackers h
+    ON h.hacker_id = t1.hacker_id
+ WHERE t1.total_score <> 0
+ ORDER BY total_score DESC, hacker_id;
+```
+
+
+
+
+# 5. Advanced Join
+
+**Symmetric Pairs**
+<img src="/assets/images/20211006_HackerRankSQL/pic30.png" class="largepic"/>
+
+```sql
+SELECT f1.X, f1.Y FROM Functions f1
+INNER JOIN Functions f2 ON f1.X=f2.Y AND f1.Y=f2.X
+GROUP BY f1.X, f1.Y
+HAVING COUNT(f1.X)>1 or f1.X<f1.Y
+ORDER BY f1.X 
+```
+The criteria in the having clause allows us to prevent duplication in our output while still achieving our goal of finding mirrored pairs. We have to treat our pairs where f1.x = f1.y and f1.x <> f1.y differently to capture both. The first criteria handles pairs where f1.x = f1.y and the 2nd criteria handles pairs where f1.x <> f1.y, which is why the or operator is used.
+
+The first part captures records where f1.x = f1.y. The 'count(f1.x) > 1' requires there to be at least two records of a mirrored pair to be pulled through. Without this a pair would simply match with itself (since it's already it's own mirrored pair) and be pulled through incorrectly when you join the table on itself.
+
+The 2nd part matches the remaining mirrored pairs. It's important to note that for this challenge, the mirrored match of (f1.x,f1.y) is considered a duplicate and excluded from the final output. You can see this in the sample output where (20, 21) is outputted, but not (21,20). The 'or f1.x < f1.y' criteria allows us to pull all those pairs where f1.x does not equal f1.y, but where f1.x is also less than f1.y so we don't end up with the mirrored paired duplicate.
+
+**SQL Project Planning**
+<img src="/assets/images/20211006_HackerRankSQL/pic31.png" class="largepic"/>
+
+Sample Output
+
+```
+2015-10-28 2015-10-29
+2015-10-30 2015-10-31
+2015-10-13 2015-10-15
+2015-10-01 2015-10-04
+```
+
+Explanation
+
+The example describes following four projects:
+
+Project 1: Tasks 1, 2 and 3 are completed on consecutive days, so these are part of the project. Thus start date of project is 2015-10-01 and end date is 2015-10-04, so it took 3 days to complete the project.
+Project 2: Tasks 4 and 5 are completed on consecutive days, so these are part of the project. Thus, the start date of project is 2015-10-13 and end date is 2015-10-15, so it took 2 days to complete the project.
+Project 3: Only task 6 is part of the project. Thus, the start date of project is 2015-10-28 and end date is 2015-10-29, so it took 1 day to complete the project.
+Project 4: Only task 7 is part of the project. Thus, the start date of project is 2015-10-30 and end date is 2015-10-31, so it took 1 day to complete the project.
+
+First, we need to find start dates and end dates of each project separately. If a start date is not included in all end dates, it should be the start date of a project:
+Similarly, an end date excluded in start date column should be the end date of some project:
+Then, we need to find (start date, end date) pairs for each project. Before that, we can cross join start dates and end dates of projects to generate all potential pairs. Also, for the same project, end date should be the minimum among all end dates of projects that are larger than start date of the project:
+Finally, sort output by duration and start date:
+
+```sql
+SELECT Start_Date, MIN(End_Date) FROM
+(SELECT Start_Date FROM Projects WHERE Start_Date NOT IN (SELECT End_Date FROM Projects)) AS s,
+(SELECT End_Date FROM Projects WHERE End_Date NOT IN (SELECT Start_Date FROM Projects)) AS e
+WHERE Start_Date < End_Date
+GROUP BY Start_Date
+ORDER BY DATEDIFF(MIN(End_Date), Start_Date), Start_Date;
+```
+
+
+
+# 6. Alternative Queries
+
+**Print Prime Numbers**
+```sql
+SET @number := 1;
+SET @divisor := 1;
+SELECT GROUP_CONCAT(n SEPARATOR '&')
+FROM (SELECT @number := @number + 1 AS n 
+          FROM information_schema.tables AS t1, information_schema.tables AS t2
+         LIMIT 1000
+       ) AS n1
+WHERE NOT EXISTS(SELECT *
+                    FROM (SELECT @divisor := @divisor + 1 AS d
+                            FROM information_schema.tables AS t3, information_schema.tables AS t4
+                           LIMIT 1000
+                         ) AS n2
+                   WHERE MOD(n, d) = 0 AND n <> d)
+```
+
+**Draw The Triangle 1**
+```sql
+* * * * * 
+* * * * 
+* * * 
+* * 
+*
+```
+
+```sql
+SET @count = 21;
+SELECT REPEAT('* ', @count := @count - 1)
+FROM information_schema.tables 
+WHERE @count > 0;
+```
+
+**Draw The Triangle 2**
+
+```sql
+* 
+* * 
+* * * 
+* * * * 
+* * * * *
+```
+
+```sql
+SET @count = 0;
+SELECT REPEAT('* ', @count := @count + 1)
+FROM information_schema.tables 
+WHERE @count < 20;
+```
