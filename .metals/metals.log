@@ -11,3 +11,4 @@
 [0m2021.11.08 10:57:20 INFO  time: initialize in 2.02s[0m
 [0m2021.11.08 10:57:21 WARN  Build server is not auto-connectable.[0m
 [0m2021.11.08 10:57:21 WARN  no build tool detected in workspace 'C:\Users\lehie\OneDrive\Documents\GitHub\ledinhtrunghieu.github.io'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. [0m
+[0m2021.11.08 22:43:40 INFO  shutting down Metals[0m
