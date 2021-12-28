@@ -42,7 +42,7 @@ Data: consolidated, historical (over a large period of time, consolidated for lo
 Size: archive, terabytes (large amount) 
 Queries: complex, aggregate queries & limited updates Users: hundreds
 
-<img src="/assets/images/20212212_BachelorThesis/pic1.png" class="largepic"/>
+<img src="/assets/images/20211222_BachelorThesis/pic1.png" class="largepic"/>
 
 ## 1.3 Row vs Columnar 
 
@@ -50,9 +50,9 @@ Row-oriented databases are commonly used in OLTP systems, whereas columnar ones 
 
 Row-oriented databases store the whole row in the same block, if possible. Columnar databases store columns in subsequent blocks.
 
-<img src="/assets/images/20212212_BachelorThesis/pic2.png" class="largepic"/>
+<img src="/assets/images/20211222_BachelorThesis/pic2.png" class="largepic"/>
 
-<img src="/assets/images/20212212_BachelorThesis/pic2.png" class="largepic"/>
+<img src="/assets/images/20211222_BachelorThesis/pic3.png" class="largepic"/>
 
 **Perfomance**
 
