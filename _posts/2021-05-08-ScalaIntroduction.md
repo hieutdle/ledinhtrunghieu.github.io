@@ -1017,3 +1017,7 @@ The designers of Scala suggest the following: look to use vals, immutable object
 <img src="/assets/images/20210508_ScalaIntroduction/pic30.png" class="largepic"/>
 
 At the 10th anniversary of the Scala Days conference, he discussed the reason why he created Scala in the first place: he wanted to show that **the fusion of functional programming and object-oriented programming in a statically-typed setting could be practical and powerful**. He said this combination is the essence of Scala, since Scala was the first mainstream language to successfully try the first two with the third. He's been proven right. Scala powers some of the world's largest websites, applications, and data engineering infrastructures.
+
+# 4. Reference
+
+1. [Introduction to Scala- DataCamp](https://app.datacamp.com/learn/courses/introduction-to-scala)

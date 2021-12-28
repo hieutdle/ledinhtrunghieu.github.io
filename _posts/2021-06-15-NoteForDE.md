@@ -70,3 +70,8 @@ https://app.datacamp.com/learn/courses/improving-query-performance-in-postgresql
 https://app.datacamp.com/learn/courses/creating-postgresql-databases
 https://app.datacamp.com/learn/courses/writing-functions-and-stored-procedures-in-sql-server
 https://app.datacamp.com/learn/courses/web-scraping-with-python
+https://app.datacamp.com/learn/courses/intermediate-python
+https://app.datacamp.com/learn/courses/data-manipulation-with-pandas
+
+https://app.datacamp.com/learn/courses/etl-in-python
+

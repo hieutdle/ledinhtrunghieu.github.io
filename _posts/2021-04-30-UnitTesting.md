@@ -31,7 +31,15 @@ my_function(argument_3)
 
 Unit tests automate the repetitive testing process and saves times.
 
+A function is tested after the first implementation and then any time the function is modified, which happens mainly when new bugs are found, new features are implemented or the code is refactored.
+
 ## 1.2. Write a simple unit test using pytest
+
+Manuel test:
+
+<img src="/assets/images/20210430_UnitTesting/pic25.png" class="largepic"/>
+
+Unit test will improve this process
 
 **Python unit testing libraries**
 * pytest 
