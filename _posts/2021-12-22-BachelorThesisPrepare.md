@@ -219,4 +219,26 @@ Database services is a database that typically runs on the cloud.
 
 # 6. Pipeline / Workflow Management
 
+# 7. Tools
 
+
+# 7.1 Custom ETL
+Many companies use general purpose programming languages to write their own ETL tools. This approach has the greatest flexibility, but also requires the most effort. This approach also requires users to perform their own maintenance, build their own documentation, test and perform ongoing development. Users of custom ETL often find it difficult to source help from people outside of their own team.
+
+SQL
+
+Python
+
+# 7.2 ETL Cloud Services
+
+AWS EMR. Elastic MapReduce (EMR) is the Hadoop offering provided by AWS. Companies running on AWS who like to use Hadoop for ETL or ELT may use EMR. As with any Hadoop distribution, there are several tools available to perform ETL, including Hive and Spark. 
+
+
+
+# 7.3 Open Source ETL Tools
+
+Over the past 10 years, software developers have created several open source ETL products. These products are free to use. Their source code is also freely available, which allows you to extend or enhance their capabilities. These tools vary significantly in quality, integrations, ease of use, adoption and availability of support. Like the enterprise ETL tools, many of these open source ETL tools provide a graphical interface for designing and executing pipelines.
+
+Dremio
+
+Pentaho Data Integration (PDI)
