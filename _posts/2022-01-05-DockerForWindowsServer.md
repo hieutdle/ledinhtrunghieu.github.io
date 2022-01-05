@@ -28,7 +28,7 @@ Install-WindowsFeature containers -Restart
 
 <img src="/assets/images/20220105_DockerWinServer/pic2.png" class="largepic"/>
 
-## 1.2. Install DockerMsftProvider and latest Docker version
+## 1.2. Install DockerMsftProvider and latest Docker version 
 
 ```bash
 Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
@@ -62,10 +62,10 @@ https://stackoverflow.com/questions/16657778/install-nuget-via-powershell-script
 
 
 
-## 2.1. Check Powershell version is 5.0 or higher: 
+## 2.1. Check Powershell version is 5.0 or higher (Complete)
 
 ```bash
-Get-Host | Select-Object Version (Complete) 
+Get-Host | Select-Object Version
 ```
 <img src="/assets/images/20220105_DockerWinServer/pic5.png" class="largepic"/>
 
