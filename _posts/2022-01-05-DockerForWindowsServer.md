@@ -162,3 +162,11 @@ Install-Module -Name DockerMsftProvider -Force
 
 Install-Package -Name docker -ProviderName DockerMsftProvider -Force
 Restart-Computer -Forc
+
+
+set-executionpolicy unrestricted
+
+
+https://debug.to/1524/powershell-gallery-is-currently-unavailableplease-try-again-later
+
+
