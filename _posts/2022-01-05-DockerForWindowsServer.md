@@ -150,6 +150,15 @@ Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 (Not Work)
 
 
+https://stackoverflow.com/questions/45638302/error-trying-to-install-docker-in-windows-server-2016-with-install-module
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+ 
+set-executionpolicy unrestricted
+ 
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 
+Install-Module -Name DockerMsftProvider -Force
 
+Install-Package -Name docker -ProviderName DockerMsftProvider -Force
+Restart-Computer -Forc
