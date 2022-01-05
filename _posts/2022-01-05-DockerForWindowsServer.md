@@ -10,12 +10,14 @@ title: Docker for Windows Server
 **Source:**
 
 https://4sysops.com/archives/install-docker-on-windows-server-2019/
+
 https://www.virtualizationhowto.com/2020/12/install-docker-in-windows-server-2019/
+
 https://docs.microsoft.com/en-us/virtualization/windowscontainers/quick-start/set-up-environment?tabs=Windows-Server
 
 **Those links have the same steps:**
 
-1. Enable Hyper-V and Container (Complete)
+## 1.1. Enable Hyper-V and Container (Complete)
 
 ```bash
 Install-WindowsFeature -Name Hyper-V -IncludeManagementTools -Restart
@@ -26,7 +28,7 @@ Install-WindowsFeature containers -Restart
 
 <img src="/assets/images/20220105_DockerWinServer/pic2.png" class="largepic"/>
 
-2. Install DockerMsftProvider and latest Docker version
+## 1.2. Install DockerMsftProvider and latest Docker version
 
 ```bash
 Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
@@ -49,14 +51,18 @@ Counter issues can not install NuGet
 Links below also have the same steps:
 
 https://www.alitajran.com/unable-to-install-nuget-provider-for-powershell/
+
 https://answers.microsoft.com/en-us/windows/forum/all/trying-to-install-program-using-powershell-and/4c3ac2b2-ebd4-4b2a-a673-e283827da143
+
 https://stackoverflow.com/questions/55826791/powershell-installing-nuget-says-unable-to-access-internet-but-i-actually-can
+
 https://stackoverflow.com/questions/43323123/warning-unable-to-find-module-repositories
+
 https://stackoverflow.com/questions/16657778/install-nuget-via-powershell-script/26421187
 
 
 
-1. Check Powershell version is 5.0 or higher: 
+## 2.1. Check Powershell version is 5.0 or higher: 
 
 ```bash
 Get-Host | Select-Object Version (Complete) 
@@ -66,7 +72,7 @@ Get-Host | Select-Object Version (Complete)
 
 Power version already 5.0
 
-2. Update TLS versions (Complete)
+## 2.2 Update TLS versions (Complete)
 
 ```
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
@@ -82,7 +88,7 @@ Restart the Powershell and check whether the desired effect is achieved:
  
 Already Tls, Tls11, Tls12, etc.
 
-3. Install NuGet 
+## 2.3. Install NuGet 
 ```
 Install NuGet: Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 ```
@@ -99,9 +105,9 @@ Install-Module PowershellGet -Force
  
 Still not work
 
-Addtional steps:
+# 3. Addtional steps:
 
-1. https://stackoverflow.com/questions/16657778/install-nuget-via-powershell-script/26421187
+## 3.1. https://stackoverflow.com/questions/16657778/install-nuget-via-powershell-script/26421187
 
 ```
 $sourceNugetExe = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
@@ -120,20 +126,20 @@ Set-ItemProperty -Path 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NetFramework\v4.0.
 ```
 (Not Work)
 
-2. https://answers.microsoft.com/en-us/windows/forum/all/trying-to-install-program-using-powershell-and/4c3ac2b2-ebd4-4b2a-a673-e283827da143
+## 3.2. https://answers.microsoft.com/en-us/windows/forum/all/trying-to-install-program-using-powershell-and/4c3ac2b2-ebd4-4b2a-a673-e283827da143
 ```
 Set-ItemProperty -Path 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NetFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Value '1' -Type DWord
 Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\.NetFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Value '1' -Type DWord
 ```
 (Not Work)
 
-3. https://stackoverflow.com/questions/55826791/powershell-installing-nuget-says-unable-to-access-internet-but-i-actually-can
+## 3.3. https://stackoverflow.com/questions/55826791/powershell-installing-nuget-says-unable-to-access-internet-but-i-actually-can
 ```
 [System.Net.WebRequest]::DefaultWebProxy.Credentials = System.Net.CredentialCache]::DefaultCredentials
 ```
 ( Not Work )
 
-4. https://stackoverflow.com/questions/43323123/warning-unable-to-find-module-repositories
+## 3.4. https://stackoverflow.com/questions/43323123/warning-unable-to-find-module-repositories
 ```
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 
 Install-Module PowerShellGet -RequiredVersion 2.2.4 -SkipPublisherCheck
