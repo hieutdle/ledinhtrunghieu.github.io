@@ -242,3 +242,90 @@ Over the past 10 years, software developers have created several open source ETL
 Dremio
 
 Pentaho Data Integration (PDI)
+
+
+
+
+
+
+
+
+ETL and ELT
+
+What Is ETL?
+Historically, data warehouses were optimized to query and read large datasets fast for accurate business intelligence. This made data warehouses good at processing read operations (SELECT, WHERE, etc.). However, the cost of building and setting up a data warehouse – in terms of buying hardware, licensing software, and developing and maintaining the system – was a multi-million-dollar undertaking. To save on costs, developers would only load cleaned, transformed, and aggregated data into their warehouses – and for greater efficiency, they would remove any data that wasn’t necessary for the analysis.   
+
+To prepare data like this, organizations needed to extract data from different databases, transform it into a unified format, and remove unnecessary information before loading it into the warehouse. This gave rise to ETL (extract, transform, load) tools, which prepare and process data in the following order:
+
+Extract raw, unprepared data from source applications and databases into a staging area. Data from different sources has its own 
+Transform and aggregate the data with SORT, JOIN, and other operations while it is in the staging area.
+Load data into the warehouse.
+
+
+
+What Is ELT?
+Most organizations continue to rely on ETL for data integration, but the need for preload transformations has changed with the rise of high-performance, cloud-based data warehouses (like Redshift, Azure, BigQuery, and Snowflake). 
+
+Modern cloud data warehouses have the processing capability to efficiently manage write operations on large data sets. In fact, cloud data warehouses are so fast at processing data that they have rendered ETL unnecessary for many use-cases. This has ultimately given rise to a new data integration strategy, ELT, which skips the ETL staging area for speedier data ingestion and greater agility. ELT sends raw, unprepared data directly to the warehouse and relies on the data warehouse to carry out the transformations post-loading.  
+
+ELT tools prepare and process data in the following order:
+
+Extract raw, unprepared data from source applications and databases.
+Load the unprepared data into the warehouse.
+Use the data warehouse to process transformations when required.
+The main point to remember with ELT is that data transformations happen within the data warehouse itself, which typically bypasses the need for a staging server. In this respect, the data warehouse contains both raw and transformed data inside it. 
+
+ELT offers an excellent way to collect and store large amounts of raw, unstructured data. At the same time, ELT doesn’t give you the option of removing PHI, PII, and other sensitive data before loading it into the data warehouse. Therefore, it isn’t perfect from the perspectives of data security, compliance, and data quality. Simply put, sacrificing security and compliance in the name of speed and flexibility just isn’t an option for many businesses, which is why most businesses continue to rely on ETL or they select the hybrid approach of ETLT (more on this later).
+
+ETL Advantages and Use-Cases
+The advantages of ETL apply to the following scenarios:
+
+Data compliance and security: Whether your organization adheres to industry-specific data compliance standards – like SOC 2, GDPR, CCPA, and HIPAA – or a data compliance standard of your own, it may be necessary to remove, mask, or encrypt PHI (protected health information), PII (personally identifiable information), and other data before moving it to the data warehouse. An ETL strategy that transforms data before loading can achieve this, but an ELT strategy can’t. For instance, with ELT, SysAdmins may have access to sensitive information in logs even if the data warehouse transforms it after loading. This makes ETL more suitable when data compliance is a concern.
+Managing large datasets: Even though a modern cloud data warehouse can handle virtually any size dataset, you might not want to pay extra data warehousing fees for this service. Instead, you can use an ETL solution to remove unnecessary or redundant data in-pipeline to reduce your data storage expenses. In contrast, an ELT solution could load a lot of unnecessary data into the data warehouse.
+Data warehouse processing fees: Many ELT tools offer lower upfront prices, but this is only because ELT shifts data processing costs over to the data warehouse. In the end, ELT doesn’t bypass the cost of processing data transformations. For this reason, many organizations choose ETL as a more cost-efficient way to perform data transformations. 
+
+Data quality: ETL ensures data quality by managing data transformations in batches and by standardizing data formats to prevent unintended data corruption.
+
+
+ELT Advantages and Use-Cases
+The advantages of ELT apply to the following use-cases:
+
+Rapid data ingestion: ELT allows you to quickly add new data sources and ingest any kind of raw data immediately without the data passing through a staging server. These advantages make ELT ideal for use-cases that require real-time streaming and rapid data ingestion.
+
+
+Ingest and save data that you might need later: Traditional ETL involves the aggregation of data in a certain way, which requires you to throw out data. But ELT lets you save all data in the data warehouse – even data that you don’t have a use for now, but could be useful later.
+
+
+Transform only the data you need for a specific analysis: ELT allows you to load raw data into the warehouse for storage purposes, and transform only specific data in the way that best supports a specific type of analysis. This slows down the process of reading and analyzing the information because each analysis transforms the data from scratch. However, for certain use-cases, it offers the flexibility to easily change the business logic of your data on the fly as your requirements change, or as you learn more about the data.  
+
+
+More individuals have the skills to code in-warehouse transformations: In-warehouse transformations are usually coded in basic SQL. The prevalence of SQL knowledge makes the process of coding ELT transformations more accessible for a larger number of developers, i.e., it’s easier and less expensive to find developers who can manage this task.
+
+
+
+What Is ETLT? How ETLT Merges the Best of ETL and ELT
+In the age of big-data analytics, ELT offers tremendous advantages because rapid ingestion gives BI solutions access to more data faster – including raw and unstructured information. ELT also brings the flexibility to change analytics strategies on the fly. However, the limitation of an ELT-only strategy is that it cannot always meet data security and compliance requirements – especially those that require you to mask, remove, or encrypt PHI and PII data before moving it into a data warehouse. 
+
+Whether you need to adhere to national or industry data compliance standards – or a security standard of your own – your organization simply might not be able to sacrifice any degree of security and compliance in the name of faster analytics. Thus, we come to the need for ETLT (extract, transform, load, transform). 
+
+ETLT is a “best of both worlds” approach to data integration that (1) speeds up data ingestion while (2) ensuring data quality and securing sensitive data in accordance with industry compliance standards. ETLT uses the following data integration pattern:
+
+Extract the raw, unprepared data from source applications and databases and load it into a staging area.
+Transform data “lightly” while it’s in the staging area (usually to remove/mask/encrypt PHI, PII, or other sensitive data). The first transformation stage only applies to one data source at a time. These transformations are fast and simple because they transform each source independently of other sources. There is no attempt to integrate two data sources into one until after loading. Transformations for this first stage relate to data formats, data cleansing, and masking/removing sensitive data for compliance purposes.
+Load the prepared data into the data warehouse.
+Transform and integrate data more completely within the data warehouse using the data warehouse to process those transactions. The second transformation stage relates to integrating multiple data sources and other transformations that apply to data from multiple sources at the same time.
+
+https://www.integrate.io/blog/what-is-etlt/
+
+ETL is generally used when we transform all the data before storing it anywhere. In ELT, you first store the data and transform when needed. ELT is good when you the transform is not well defined or you want create the data latter with different transform logic.
+
+https://blog.panoply.io/etl-vs-elt-the-difference-is-in-the-how 
+Has:image
+
+
+The reason for ELT type things is people aren't exactly sure how they want to use data. ELT allows them to keep granular datasets and decide later how they want to aggregate them.
+
+
+
+
+
