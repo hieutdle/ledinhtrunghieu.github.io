@@ -4,6 +4,9 @@ author: ledinhtrunghieu
 title: Docker for Windows Server
 ---
 
+https://stackoverflow.com/questions/45638302/error-trying-to-install-docker-in-windows-server-2016-with-install-module
+
+https://computingforgeeks.com/how-to-run-docker-containers-on-windows-server-2019/
 
 # 1. Install Docker
 
