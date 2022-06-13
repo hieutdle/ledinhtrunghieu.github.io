@@ -340,7 +340,47 @@ AWS offers four different Support plans to help you troubleshoot issues, lower c
 
 If your company has an Enterprise Support plan, the TAM is your primary point of contact at AWS. They provide guidance, architectural reviews, and ongoing communication with your company as you plan, deploy, and optimize your applications. 
 
-**AWS Marketplace** is a digital catalog that includes thousands of software listings from independent software vendors. You can use AWS Marketplace to find, test, and buy software that runs on AWS. 
+**AWS Marketplace** is a digital catalog that includes thousands of software listings from independent software vendors. You can use AWS Marketplace to find, test, and buy software that runs on AWS.
 
-AWS Marketplace offers products in several categories, such as Infrastructure Products, Business Applications, Data Products, and DevOps.
+**AWS Marketplace** offers products in several categories, such as Infrastructure Products, Business Applications, Data Products, and DevOps.
+
+**AWS Cloud Adoption Framework (AWS CAF)** organizes guidance into six areas of focus, called Perspectives. Each Perspective addresses distinct responsibilities. The planning process helps the right people across the organization prepare for the changes ahead.
+
+In general, the **Business, People, and Governance** Perspectives focus on business capabilities, whereas the **Platform, Security, and Operations** Perspectives focus on technical capabilities.
+
+
+The Business Perspective ensures that IT aligns with business needs and that IT investments link to key business results. Common roles in the Business Perspective include: 
+* Business managers
+* Finance managers
+* Budget owners
+* Strategy stakeholders
+
+The People Perspective supports development of an organization-wide change management strategy for successful cloud adoption. Common roles in the People Perspective include: 
+* Human resources
+* Staffing
+* People managers
+
+The Governance Perspective focuses on the skills and processes to align IT strategy with business strategy. Common roles in the Governance Perspective include: 
+* Chief Information Officer (CIO)
+* Program managers
+* Enterprise architects
+* Business analysts
+* Portfolio managers
+
+The Platform Perspective includes principles and patterns for implementing new solutions on the cloud, and migrating on-premises workloads to the cloud. Common roles in the Platform Perspective include: 
+* Chief Technology Officer (CTO)
+* IT managers
+* Solutions architects
+
+The Security Perspective ensures that the organization meets security objectives for visibility, auditability, control, and agility. Common roles in the Security Perspective include: 
+* Chief Information Security Officer (CISO)
+* IT security managers
+* IT security analysts
+
+The Operations Perspective helps you to enable, run, use, operate, and recover IT workloads to the level agreed upon with your business stakeholders. Common roles in the Operations Perspective include: 
+* IT operations managers
+* IT support managers
+
+
+
 
