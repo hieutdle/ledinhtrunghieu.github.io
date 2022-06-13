@@ -251,3 +251,81 @@ The Customer Compliance Center contains resources to help you learn more about A
 
 
 **AWS WAF** is a **web application firewall** that helps protect your web applications or APIs against common web exploits and bots that may affect availability, compromise security, or consume excessive resources.
+
+Encryption at rest and encryption in transit. By at rest, we mean when your data is idle. It's just being stored and not moving. For example, server-side encryption at rest is enabled on all DynamoDB table data. And that helps prevent unauthorized access. DynamoDB's encryption at rest also integrates with **AWS KMS**, or **Key Management Service**, for managing the encryption key that is used to encrypt your tables.
+
+We use secure sockets layer, or SSL connections to encrypt data, and we can use service certificates to validate, and authorize a client. This means that data is protected when passing between Redshift, and our client. And this functionality exists in numerous other AWS services such as SQS, S3, RDS, and many more. 
+
+**Amazon Inspector** Inspector helps to improve security, and compliance of your AWS deployed applications by running an automated security assessment against your infrastructure. Specifically, it helps to check on deviations of security best practices, exposure of EC2 instances, vulnerabilities, and so forth.
+
+
+**Amazon GuardDuty** It analyzes continuous streams of metadata generated from your account, and network activity found on AWS CloudTrail events, Amazon VPC Flow Logs, and DNS logs. It uses integrated threat intelligence such as known malicious IP addresses, anomaly detection, and machine learning to identify threats more accurately. The best part is that it runs independently from your other AWS services.
+
+**AWS Key Management Service (AWS KMS)** enables you to perform encryption operations through the use of cryptographic keys. A cryptographic key is a random string of digits used for locking (encrypting) and unlocking (decrypting) data. You can use AWS KMS to create, manage, and use cryptographic keys. You can also control the use of keys across a wide range of services and in your applications.
+
+**AWS WAF** is a web application firewall that lets you monitor network requests that come into your web applications. 
+
+
+**Which statement best describes an IAM policy?**
+A document that grants or denies permissions to AWS services and resources
+
+
+**An employee requires temporary access to create several Amazon S3 buckets. Which option would be the best choice for this task?**
+IAM role
+
+**Which statement best describes the principle of least privilege?**
+Granting only the permissions that are needed to perform specific tasks
+
+**Which service helps protect your applications against distributed denial-of-service (DDoS) attacks?**
+
+AWS Shield
+
+Amazon GuardDuty is a service that provides intelligent threat detection for your AWS infrastructure and resources. It identifies threats by continuously monitoring the network activity and account behavior within your AWS environment.
+Amazon Inspector checks applications for security vulnerabilities and deviations from security best practices, such as open access to Amazon EC2 instances and installations of vulnerable software versions.
+AWS Artifact is a service that provides on-demand access to AWS security and compliance reports and select online agreements.
+
+## 1.7. Monitoring and Analytics
+
+**Amazon CloudWatch** is a web service that enables you to monitor and manage various metrics and configure alarm actions based on data from those metrics.
+
+With CloudWatch, you can create **alarms** that automatically perform actions if the value of your metric has gone above or below a predefined threshold. 
+
+The CloudWatch **dashboard** feature enables you to access all the metrics for your resources from a single location
+
+**AWS CloudTrail** records API calls for your account. The recorded information includes the identity of the API caller, the time of the API call, the source IP address of the API caller, and more. 
+
+Within CloudTrail, you can also enable **CloudTrail Insights**. This optional feature allows CloudTrail to automatically detect unusual API activities in your AWS account. 
+
+**Which tasks can you perform using AWS CloudTrail? (Select TWO.)**
+* Filter logs to assist with operational analysis and troubleshooting
+* Track user activities and API requests throughout your AWS infrastructure
+
+AWS has an automated advisor called **AWS Trusted Advisor**. This is a service that you can use in your AWS account that will evaluate your resources against five pillars. The pillars are cost optimization, performance, security, fault tolerance, and service limits. Trusted Advisor in real time runs through a series of checks for each pillar in your account, based on AWS best practices, and it compiles categorized items for you to look into, and you can view them directly in the AWS console. 
+
+**Which actions can you perform using Amazon CloudWatch? (Select TWO.)**
+* Monitor your resources’ utilization and performance
+* Access metrics from a single dashboard
+
+Receiving real-time recommendations for improving your AWS environment can be performed by **AWS Trusted Advisor**.
+Comparing your infrastructure to AWS best practices in five categories can be performed by **AWS Trusted Advisor**.
+Automatically detecting unusual account activity can be performed by **AWS CloudTrail**.
+
+## 1.8. Pricing and Support
+
+The **AWS Free Tier** enables you to begin using certain services without having to worry about incurring costs for the specified period. 
+Three types of offers are available: 
+* Always Free
+* 12 Months Free
+* Trials
+
+**The AWS Pricing Calculator** lets you explore AWS services and create an estimate for the cost of your use cases on AWS.
+
+**AWS Billing & Cost Management** dashboard to pay your AWS bill, monitor your usage, and analyze and control your costs.
+
+
+**AWS Organizations** also provides the option for **consolidated billing**. 
+
+In **AWS Budgets**, you can create budgets to plan your service usage, service costs, and instance reservations.
+
+
+In **AWS Budgets**, you could set a custom budget to notify you when your usage has reached half of this amount ($100).
