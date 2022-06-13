@@ -1,7 +1,7 @@
 ---
 layout: post
 author: ledinhtrunghieu
-title: Test Preparation for AWS Practioner
+title: Test Preparation for AWS Cloud Practioner
 ---
 
 
@@ -329,3 +329,18 @@ In **AWS Budgets**, you can create budgets to plan your service usage, service c
 
 
 In **AWS Budgets**, you could set a custom budget to notify you when your usage has reached half of this amount ($100).
+
+**AWS Cost Explorer** is a tool that enables you to visualize, understand, and manage your AWS costs and usage over time.
+
+AWS offers four different Support plans to help you troubleshoot issues, lower costs, and efficiently use AWS services. 
+* Basic aws trusted advisor, aws health dashboard
+* Developer email access
+* Business direct phone access, aws trusted advisor full
+* Enterprise 15 min SLA, TAM (technical account management)
+
+If your company has an Enterprise Support plan, the TAM is your primary point of contact at AWS. They provide guidance, architectural reviews, and ongoing communication with your company as you plan, deploy, and optimize your applications. 
+
+**AWS Marketplace** is a digital catalog that includes thousands of software listings from independent software vendors. You can use AWS Marketplace to find, test, and buy software that runs on AWS. 
+
+AWS Marketplace offers products in several categories, such as Infrastructure Products, Business Applications, Data Products, and DevOps.
+
