@@ -381,6 +381,65 @@ The Operations Perspective helps you to enable, run, use, operate, and recover I
 * IT operations managers
 * IT support managers
 
+Migration strategies:
+* Rehosting also known as “lift-and-shift” involves moving applications without changes. 
+* Replatforming, also known as “lift, tinker, and shift,” involves making a few cloud optimizations to realize a tangible benefit. Optimization is achieved without changing the core architecture of the application.
+* Refactoring (also known as re-architecting) involves reimagining how an application is architected and developed by using cloud-native features. Refactoring is driven by a strong business need to add features, scale, or performance that would otherwise be difficult to achieve in the application’s existing environment.
+* Repurchasing involves moving from a traditional license to a software-as-a-service model. 
+* Retaining consists of keeping applications that are critical for the business in the source environment. This might include applications that require major refactoring before they can be migrated, or, work that can be postponed until a later time.
+* Retiring is the process of removing applications that are no longer needed.
 
+**The AWS Snow Family** is a collection of physical devices that help to physically transport up to exabytes of data into and out of AWS. 
+
+AWS Snow Family is composed of **AWS Snowcone** , **AWS Snowball**, and **AWS Snowmobile**. 
+
+AWS Snowcone is a small, rugged, and secure edge computing and data transfer device. It features 2 CPUs, 4 GB of memory, and 8 TB of usable storage.
+
+**Snowball Edge Storage Optimized** devices are well suited for large-scale data migrations and recurring transfer workflows, in addition to local computing with higher capacity needs. 
+Storage: 80 TB of hard disk drive (HDD) capacity for block volumes and Amazon S3 compatible object storage, and 1 TB of SATA solid state drive (SSD) for block volumes. 
+Compute: 40 vCPUs, and 80 GiB of memory to support Amazon EC2 sbe1 instances (equivalent to C5).
+
+**Snowball Edge Compute Optimized** provides powerful computing resources for use cases such as machine learning, full motion video analysis, analytics, and local computing stacks. 
+Storage: 42-TB usable HDD capacity for Amazon S3 compatible object storage or Amazon EBS compatible block volumes and 7.68 TB of usable NVMe SSD capacity for Amazon EBS compatible block volumes. 
+Compute: 52 vCPUs, 208 GiB of memory, and an optional NVIDIA Tesla V100 GPU. Devices run Amazon EC2 sbe-c and sbe-g instances, which are equivalent to C5, M5a, G3, and P3 instances.
+
+With AWS, serverless** refers to applications that don’t require you to provision, maintain, or administer servers. You don’t need to worry about fault tolerance or availability. AWS handles these capabilities for you.
+
+
+AWS offers a variety of services powered by artificial intelligence (AI). For example, you can perform the following tasks:
+* Convert speech to text with **Amazon Transcribe**.
+* Discover patterns in text with **Amazon Comprehend**.
+* Identify potentially fraudulent online activities with **Amazon Fraud Detector**.
+* Build voice and text chatbots with **Amazon Lex**.
+
+Traditional machine learning (ML) development is complex, expensive, time consuming, and error prone. AWS offers **Amazon SageMaker** to remove the difficult work from the process and empower you to build, train, and deploy ML models quickly.You can use ML to analyze data, solve complex problems, and predict outcomes before they happen.
+
+The **AWS Well-Architected Framework** helps you understand how to design and operate reliable, secure, efficient, and cost-effective systems in the AWS Cloud. It provides a way for you to consistently measure your architecture against best practices and design principles and identify areas for improvement.
+The Well-Architected Framework is based on five pillars: 
+* Operational excellence
+* Security
+* Reliability
+* Performance efficiency
+* Cost optimization
+
+
+Six advantages of cloud computing:
+* Trade upfront expense for variable expense.
+* Benefit from massive economies of scale.
+* Stop guessing capacity.
+* Increase speed and agility.
+* Stop spending money running and maintaining data centers.
+* Go global in minutes.
+
+**Amazon Textract** is a machine learning service that automatically extracts text and data from scanned documents.
+
+**Amazon Augmented AI (Amazon A2I)** provides built-in human review workflows for common machine learning use cases, such as content moderation and text extraction from documents. With Amazon A2I, you can also create your own workflows for machine learning models built on Amazon SageMaker or any other tools.
+
+**Trusted Advisor includes an ever-expanding list of checks in the following five categories:**
+* Cost Optimization – recommendations that can potentially save you money by highlighting unused resources and opportunities to reduce your bill.
+* Security – identification of security settings that could make your AWS solution less secure.
+* Fault Tolerance – recommendations that help increase the resiliency of your AWS solution by highlighting redundancy shortfalls, current service limits, and over-utilized resources.
+* Performance – recommendations that can help to improve the speed and responsiveness of your applications.
+* Service Limits – recommendations that will tell you when service usage is more than 80% of the service limit.
 
 
