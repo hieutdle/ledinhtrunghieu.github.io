@@ -92,5 +92,62 @@ AWS CloudTrail is a service that enables governance, compliance, operational aud
 
 **Amazon CloudWatch** is incorrect because this service is primarily used to collect monitoring and operational data in the form of logs, metrics, and events, providing you with a unified view of AWS resources, applications, and services that run on AWS and on-premises servers.
 
+Trusted Advisor includes an ever-expanding list of checks in the following five categories:
+
+Cost Optimization – recommendations that can potentially save you money by highlighting unused resources and opportunities to reduce your bill.
+
+Security – identification of security settings that could make your AWS solution less secure.
+
+Fault Tolerance – recommendations that help increase the resiliency of your AWS solution by highlighting redundancy shortfalls, current service limits, and over-utilized resources.
+
+Performance – recommendations that can help to improve the speed and responsiveness of your applications.
+
+Service Limits – recommendations that will tell you when service usage is more than 80% of the service limit.
+
+The Well-Architected Framework has been developed to help cloud architects build secure, high-performing, resilient, and efficient infrastructure for their applications. This is based on six pillars namely:
+
+1. Operational Excellence
+
+2. Security
+
+3. Reliability
+
+4. Performance Efficiency
+
+5. Cost Optimization
+
+6. Sustainability
+
+In the event of a disaster or an outage, AWS recommends that you spread your servers and databases at least in different _____?
+
+Availability Zones
+
+Regions is incorrect. At a minimum, your servers and databases should be running in more than one AZ. You can also launch them in a separate region if you are worried about regional outages.
+
+Which AWS storage service offers faster disk read and write performance and provides temporary block-level storage for your instance?
+
+Instance Store
 
 
+AWS WAF is global
+
+The AWS Architecture Center provides a collection of technical resources to help you build more effectively and efficiently in the AWS Cloud.
+
+AWS Trusted Advisor is incorrect because this is just an online tool that provides real-time guidance to help you provision your resources following AWS best practices
+
+Cost Explorer can display up to 12 months of historical data, the current month, and the forecasted costs for the next three months.
+
+Hence, the correct answer is: 12 Months.
+
+The option that says: 15 Months is incorrect because this is beyond the capacity of Cost Explorer. This is only applicable in Amazon Cloudwatch which enables you to view both up-to-the-minute data, historical data, and kept for 15 months.
+
+
+AWS CodeBuild is a fully managed continuous integration service that compiles source code, runs tests, and produces software packages that are ready to deploy
+
+AWS CodeDeploy, AWS CodePipeline, and AWS CodeCommit are all incorrect because these services are not suitable to build and test applications in AWS Cloud. CodeDeploy is primarily used to automate code deployments to any instance, including EC2 instances and instances running on-premises. CodePipeline is a continuous delivery service while CodeCommit is a fully-managed source control service.
+
+Service Control Policy is incorrect because this is a feature of AWS Organizations. SCP is a policy that specifies the services and actions that users and roles can use in the accounts that the SCP affects
+
+An Origin Access Identity is used for sharing private content through CloudFront. The OAI is a virtual user identity that will be used to give your CloudFront distribution permission to fetch a private object from your origin server.
+
+Resource-based policy is incorrect. Although it can be used to control access, they are linked directly to a specific AWS resource and not managed through AWS Organizations.
