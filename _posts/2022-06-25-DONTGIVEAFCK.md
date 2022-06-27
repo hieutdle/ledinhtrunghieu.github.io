@@ -19,5 +19,15 @@ present-day anger toward her. That sweet gift she gave us last Christmas is now 
 patronizing and condescending. That time she forgot to invite us to her lake house is now seen not as
 an innocent mistake but as horrible negligence.
 
+Trusted Advisor includes an ever-expanding list of checks in the following five categories:
 
+Cost Optimization – recommendations that can potentially save you money by highlighting unused resources and opportunities to reduce your bill.
+
+Security – identification of security settings that could make your AWS solution less secure.
+
+Fault Tolerance – recommendations that help increase the resiliency of your AWS solution by highlighting redundancy shortfalls, current service limits, and over-utilized resources.
+
+Performance – recommendations that can help to improve the speed and responsiveness of your applications.
+
+Service Limits – recommendations that will tell you when service usage is more than 80% of the service limit.
 
